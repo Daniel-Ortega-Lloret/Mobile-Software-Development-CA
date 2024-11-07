@@ -4,28 +4,24 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:gravity="center"
     android:orientation="vertical"
     android:id="@+id/Linear_layout"
     tools:context=".MainActivity">
 
-    <Button
-        android:layout_height="wrap_content"
-        android:layout_width="match_parent"
-        android:text="Default Snackbar"
-        android:id="@+id/default_button"
-        />
-
-    <Button
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="Snackbar with action"
-        android:id="@+id/action_button" />
 
     <CalendarView
         android:id="@+id/calendarView"
         android:layout_width="wrap_content"
+        android:layout_height="375dp"
+        android:maxDate="12152024"
+        android:minDate="09012024" />
+
+    <Button
         android:layout_height="wrap_content"
-        android:minDate="09012024"
-        android:maxDate="12152024"/>
+        android:layout_width="wrap_content"
+        android:text="Default Snackbar"
+        android:id="@+id/default_button"
+        />
 
 </LinearLayout>
