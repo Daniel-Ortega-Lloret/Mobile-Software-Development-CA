@@ -14,7 +14,6 @@ import com.google.android.material.navigation.NavigationView
 
 class HabitsActivity : AppCompatActivity() {
     private lateinit var binding: ActivityHabitBinding
-    private var _habitCalendarBtn: Button? = null;
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -40,28 +39,37 @@ class HabitsActivity : AppCompatActivity() {
             true
         }
 
-        _habitCalendarBtn = findViewById<Button>(R.id.habits_calendarButton)
-
-        _habitCalendarBtn?.setOnClickListener({
-            val intent = Intent(this, Calendar::class.java)
-            startActivity(intent)
-        })
     }
 
     private fun handleMenuItemClick(menuItem: MenuItem) {
         val drawerLayout: DrawerLayout = binding.drawerLayout
         drawerLayout.closeDrawer(binding.navView)
 
+        val sharedPreferences = getSharedPreferences("ActivityPrefs", MODE_PRIVATE)
+        val editor = sharedPreferences.edit()
+
         val intent = when (menuItem.itemId) {
-            R.id.nav_tasks -> Intent(this, MainActivity::class.java).apply {
-                addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT)
+            R.id.nav_tasks -> {
+                Utils.setLastActivity(this, "TasksActivity")
+                Intent(this, MainActivity::class.java).apply {
+                    addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT)
+                }
             }
-            R.id.nav_schedule -> Intent(this, Calendar::class.java).apply {
-                addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT)
+
+            R.id.nav_schedule -> {
+                Utils.setLastActivity(this, "Calendar")
+                Intent(this, Calendar::class.java).apply {
+                    addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT)
+                }
             }
-            R.id.nav_habits -> Intent(this, HabitsActivity::class.java).apply {
-                addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT)
+
+            R.id.nav_habits -> {
+                Utils.setLastActivity(this, "HabitsActivity")
+                Intent(this, HabitsActivity::class.java).apply {
+                    addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT)
+                }
             }
+
             else -> null
         }
 
@@ -83,6 +91,18 @@ class HabitsActivity : AppCompatActivity() {
             true
         } else {
             super.onSupportNavigateUp()
+        }
+    }
+
+    override fun onResume() {
+        super.onResume()
+        val lastActivity = Utils.getLastActivity(this)
+        val navView: NavigationView = binding.navView
+
+        when (lastActivity) {
+            "MainActivity" -> navView.setCheckedItem(R.id.nav_tasks)
+            "Calendar" -> navView.setCheckedItem(R.id.nav_schedule)
+            "HabitsActivity" -> navView.setCheckedItem(R.id.nav_habits)
         }
     }
 

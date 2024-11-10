@@ -26,14 +26,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="This is the Habits Activity"
-            />
-
-        <Button
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Calendar View"
-            android:id="@+id/habits_calendarButton"
-            />
+        />
     </LinearLayout>
 
     <com.google.android.material.navigation.NavigationView

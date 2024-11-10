@@ -31,13 +31,6 @@
             android:maxDate="12152024"
             android:minDate="09012024" />
 
-        <Button
-            android:layout_height="wrap_content"
-            android:layout_width="wrap_content"
-            android:text="Habits"
-            android:id="@+id/habits_button"
-            />
-
     </LinearLayout>
 
     <com.google.android.material.navigation.NavigationView
