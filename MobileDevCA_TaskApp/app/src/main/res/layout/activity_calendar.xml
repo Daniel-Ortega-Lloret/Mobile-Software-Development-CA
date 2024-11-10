@@ -7,7 +7,7 @@
     android:gravity="center"
     android:orientation="vertical"
     android:id="@+id/Linear_layout"
-    tools:context=".MainActivity">
+    tools:context=".Calendar">
 
 
     <CalendarView
@@ -20,8 +20,8 @@
     <Button
         android:layout_height="wrap_content"
         android:layout_width="wrap_content"
-        android:text="Default Snackbar"
-        android:id="@+id/default_button"
+        android:text="Habits"
+        android:id="@+id/habits_button"
         />
 
 </LinearLayout>
