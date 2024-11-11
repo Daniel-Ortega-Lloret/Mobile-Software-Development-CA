@@ -22,9 +22,10 @@
         android:gravity="center"
         android:orientation="vertical"
         android:fitsSystemWindows="true"
-        tools:context=".MainActivity">
+        tools:context=".TasksActivity">
 
         <TextView
+            style="@style/White"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="This is the Tasks Activity"
