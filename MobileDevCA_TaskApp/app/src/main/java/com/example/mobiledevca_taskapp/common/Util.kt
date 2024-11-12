@@ -1,4 +1,5 @@
-//
+//This is a singleton object that is visible to all classes
+//Use this to make any custom function you wanna call from every class
 package com.example.mobiledevca_taskapp.common
 
 import android.content.Context

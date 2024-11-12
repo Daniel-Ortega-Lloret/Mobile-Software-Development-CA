@@ -1,3 +1,5 @@
+// This is an abstract class that all Activities of the app inherit from
+// Add any logic that all classes need to implement here
 package com.example.mobiledevca_taskapp.common
 
 import android.content.Intent
@@ -8,7 +10,7 @@ import androidx.appcompat.app.ActionBarDrawerToggle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.GravityCompat
 import androidx.drawerlayout.widget.DrawerLayout
-import com.example.mobiledevca_taskapp.Calendar
+import com.example.mobiledevca_taskapp.CalendarActivity
 import com.example.mobiledevca_taskapp.HabitsActivity
 import com.example.mobiledevca_taskapp.R
 import com.example.mobiledevca_taskapp.TasksActivity
@@ -24,9 +26,11 @@ abstract class BaseActivity : AppCompatActivity() {
 
     //Sets up navigation and settings buttons
     protected fun setUpDrawer(navView: NavigationView, drawerLayout: DrawerLayout) {
+        //Creates top action bar with buttons
         setSupportActionBar(findViewById(R.id.toolbar))
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
 
+        //Hamburger icon logic
         drawerToggle = ActionBarDrawerToggle(
             this,
             drawerLayout,
@@ -42,6 +46,7 @@ abstract class BaseActivity : AppCompatActivity() {
         }
     }
 
+    //Called after onCreate to sync the state of the hamburger button
     override fun onPostCreate(savedInstanceState: Bundle?) {
         super.onPostCreate(savedInstanceState)
         drawerToggle.syncState()
@@ -56,8 +61,7 @@ abstract class BaseActivity : AppCompatActivity() {
         }
     }
 
-    //Use this to change/add stuff to the side menu
-    //Only loads one new instance of each, if its already in the stack it just brings it to the front
+    //This handles the logic of when a user taps a menu option
     private fun handleMenuItemClick(menuItem: MenuItem, drawerLayout: DrawerLayout) {
         drawerLayout.closeDrawer(GravityCompat.START)
 
@@ -68,8 +72,8 @@ abstract class BaseActivity : AppCompatActivity() {
             }
 
             R.id.nav_schedule -> {
-                Utils.setLastActivity(this, "Calendar")
-                openActivity(Calendar::class.java)
+                Utils.setLastActivity(this, "CalendarActivity")
+                openActivity(CalendarActivity::class.java)
             }
 
             R.id.nav_habits -> {
@@ -80,6 +84,7 @@ abstract class BaseActivity : AppCompatActivity() {
     }
 
     //Opens given activity unless user is already in that activity
+    //Only loads one new instance of each, if its already in the stack it just brings it to the front
     private fun openActivity(activityClass: Class<*>) {
         if (activityClass != this::class.java) {
             startActivity(Intent(this, activityClass).apply {
@@ -88,11 +93,13 @@ abstract class BaseActivity : AppCompatActivity() {
         }
     }
 
+    //Handles the 3 dots icon menu
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
         menuInflater.inflate(R.menu.app_drawer, menu)
         return true
     }
 
+    //Lets user touch and hold to draw the menu to the right
     override fun onSupportNavigateUp(): Boolean {
         val drawerLayout: DrawerLayout = findViewById(R.id.drawer_layout)
         val navView: NavigationView = findViewById(R.id.nav_view)
@@ -106,11 +113,13 @@ abstract class BaseActivity : AppCompatActivity() {
         }
     }
 
+    //Updates highlighted menu item
     override fun onResume() {
         super.onResume()
         updateCheckedNavigationItem()
     }
 
+    //Checks ActivityPrefs for the current activity and sets highlight to that
     private fun updateCheckedNavigationItem() {
         val lastActivity = Utils.getLastActivity(this)
 
@@ -118,7 +127,7 @@ abstract class BaseActivity : AppCompatActivity() {
 
         when (lastActivity) {
             "TasksActivity" -> navView.setCheckedItem(R.id.nav_tasks)
-            "Calendar" -> navView.setCheckedItem(R.id.nav_schedule)
+            "CalendarActivity" -> navView.setCheckedItem(R.id.nav_schedule)
             "HabitsActivity" -> navView.setCheckedItem(R.id.nav_habits)
         }
     }

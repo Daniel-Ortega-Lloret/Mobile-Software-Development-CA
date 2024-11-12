@@ -21,7 +21,7 @@
         android:gravity="center"
         android:orientation="vertical"
         android:id="@+id/Linear_layout"
-        tools:context=".Calendar">
+        tools:context=".CalendarActivity">
 
 
         <CalendarView

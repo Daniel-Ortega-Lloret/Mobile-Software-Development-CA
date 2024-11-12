@@ -1,10 +1,12 @@
+//Calendar Activity - Extends BaseActivity
+
 package com.example.mobiledevca_taskapp
 
 import android.os.Bundle
 import com.example.mobiledevca_taskapp.common.BaseActivity
 import com.example.mobiledevca_taskapp.databinding.ActivityCalendarBinding
 
-class Calendar : BaseActivity() {
+class CalendarActivity : BaseActivity() {
     override lateinit var binding: ActivityCalendarBinding
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -18,5 +20,4 @@ class Calendar : BaseActivity() {
 
         setUpDrawer(binding.navView, binding.drawerLayout)
     }
-
 }

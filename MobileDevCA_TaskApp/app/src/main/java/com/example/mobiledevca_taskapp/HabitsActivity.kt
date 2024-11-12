@@ -1,3 +1,5 @@
+// Habits Activity - Extends BaseActivity
+
 package com.example.mobiledevca_taskapp
 
 import android.os.Bundle
