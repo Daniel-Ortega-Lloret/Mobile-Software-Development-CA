@@ -10,26 +10,29 @@ import androidx.appcompat.app.ActionBarDrawerToggle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.GravityCompat
 import androidx.drawerlayout.widget.DrawerLayout
-import com.example.mobiledevca_taskapp.CalendarActivity
+import com.example.mobiledevca_taskapp.ScheduleActivity
 import com.example.mobiledevca_taskapp.HabitsActivity
 import com.example.mobiledevca_taskapp.R
 import com.example.mobiledevca_taskapp.TasksActivity
+import com.example.mobiledevca_taskapp.databinding.ActivityBaseBinding
 import com.google.android.material.navigation.NavigationView
 
 abstract class BaseActivity : AppCompatActivity() {
-    protected abstract val binding : androidx.viewbinding.ViewBinding
+    private lateinit var binding: ActivityBaseBinding
     private lateinit var drawerToggle: ActionBarDrawerToggle
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-    }
+        setContentView(R.layout.activity_base)
 
-    //Sets up navigation and settings buttons
-    protected fun setUpDrawer(navView: NavigationView, drawerLayout: DrawerLayout) {
+        binding = ActivityBaseBinding.inflate(layoutInflater)
+        setContentView(binding.root)
+
         //Creates top action bar with buttons
         setSupportActionBar(findViewById(R.id.toolbar))
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
 
+        val drawerLayout: DrawerLayout = findViewById(R.id.drawer_layout)
         //Hamburger icon logic
         drawerToggle = ActionBarDrawerToggle(
             this,
@@ -40,10 +43,26 @@ abstract class BaseActivity : AppCompatActivity() {
         drawerLayout.addDrawerListener(drawerToggle)
         drawerToggle.syncState()
 
+        val navView: NavigationView = findViewById(R.id.nav_view)
         navView.setNavigationItemSelectedListener { menuItem ->
             handleMenuItemClick(menuItem, drawerLayout)
             true
         }
+    }
+
+    //Sets up content layout for each activity
+    //Sets up actionBar title string
+    protected fun setActivityContent(layoutResID: Int, layoutName: String) {
+        val frameLayout = binding.contentFrame
+
+        // Clear previous views from content frame to prevent overlaying or reuse issues
+        frameLayout.removeAllViewsInLayout()
+
+        // Inflate the provided layout resource into the content frame
+        layoutInflater.inflate(layoutResID, frameLayout, true)
+
+        // Set ActionBar title for current activity
+        supportActionBar?.title = layoutName
     }
 
     //Called after onCreate to sync the state of the hamburger button
@@ -67,17 +86,14 @@ abstract class BaseActivity : AppCompatActivity() {
 
         when (menuItem.itemId) {
             R.id.nav_tasks -> {
-                Utils.setLastActivity(this, "TasksActivity")
                 openActivity(TasksActivity::class.java)
             }
 
             R.id.nav_schedule -> {
-                Utils.setLastActivity(this, "CalendarActivity")
-                openActivity(CalendarActivity::class.java)
+                openActivity(ScheduleActivity::class.java)
             }
 
             R.id.nav_habits -> {
-                Utils.setLastActivity(this, "HabitsActivity")
                 openActivity(HabitsActivity::class.java)
             }
         }
@@ -99,20 +115,6 @@ abstract class BaseActivity : AppCompatActivity() {
         return true
     }
 
-    //Lets user touch and hold to draw the menu to the right
-    override fun onSupportNavigateUp(): Boolean {
-        val drawerLayout: DrawerLayout = findViewById(R.id.drawer_layout)
-        val navView: NavigationView = findViewById(R.id.nav_view)
-
-        return if (drawerLayout.isDrawerOpen(GravityCompat.START)) {
-            drawerLayout.closeDrawer(GravityCompat.START)
-            true
-        }
-        else {
-            super.onSupportNavigateUp()
-        }
-    }
-
     //Updates highlighted menu item
     override fun onResume() {
         super.onResume()
@@ -121,13 +123,13 @@ abstract class BaseActivity : AppCompatActivity() {
 
     //Checks ActivityPrefs for the current activity and sets highlight to that
     private fun updateCheckedNavigationItem() {
-        val lastActivity = Utils.getLastActivity(this)
+        val lastActivity = this::class.java.simpleName
 
         val navView: NavigationView = findViewById(R.id.nav_view)
 
         when (lastActivity) {
             "TasksActivity" -> navView.setCheckedItem(R.id.nav_tasks)
-            "CalendarActivity" -> navView.setCheckedItem(R.id.nav_schedule)
+            "ScheduleActivity" -> navView.setCheckedItem(R.id.nav_schedule)
             "HabitsActivity" -> navView.setCheckedItem(R.id.nav_habits)
         }
     }

@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<CalendarView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/calendarView"
+    android:layout_width="wrap_content"
+    android:layout_height="375dp"
+    android:maxDate="12152024"
+    android:minDate="09012024" />
+

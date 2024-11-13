@@ -17,7 +17,7 @@
             android:name=".HabitsActivity"
             android:exported="false" />
         <activity
-            android:name=".CalendarActivity"
+            android:name=".ScheduleActivity"
             android:exported="false" />
         <activity
             android:name=".TasksActivity"

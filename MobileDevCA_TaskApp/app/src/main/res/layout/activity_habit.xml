@@ -1,41 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.drawerlayout.widget.DrawerLayout
+<TextView
     xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/drawer_layout"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:fitsSystemWindows="true"
-    tools:openDrawer="start">
-
-    <include
-        android:id="@+id/app_bar_app_drawer"
-        layout="@layout/app_bar_app_drawer"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent" />
-
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:gravity="center"
-        android:orientation="vertical"
-        tools:context=".HabitsActivity">
-
-        <TextView
-            style="@style/White"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="This is the Habits Activity"
-        />
-    </LinearLayout>
-
-    <com.google.android.material.navigation.NavigationView
-        android:id="@+id/nav_view"
-        android:layout_width="wrap_content"
-        android:layout_height="match_parent"
-        android:layout_gravity="start"
-        android:fitsSystemWindows="true"
-        app:menu="@menu/activity_app_drawer_drawer" />
-
-</androidx.drawerlayout.widget.DrawerLayout>
+    style="@style/White"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:text="This is the Habits Activity"
+/>
