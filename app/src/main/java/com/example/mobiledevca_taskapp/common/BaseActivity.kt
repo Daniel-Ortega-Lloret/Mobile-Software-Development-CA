@@ -11,21 +11,23 @@ import androidx.appcompat.app.ActionBarDrawerToggle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.GravityCompat
 import androidx.drawerlayout.widget.DrawerLayout
-import com.example.mobiledevca_taskapp.ScheduleActivity
 import com.example.mobiledevca_taskapp.HabitsActivity
 import com.example.mobiledevca_taskapp.R
+import com.example.mobiledevca_taskapp.ScheduleActivity
 import com.example.mobiledevca_taskapp.TasksActivity
+import com.example.mobiledevca_taskapp.background.CreateActivityThread
+import com.example.mobiledevca_taskapp.background.ThreadHandler
 import com.example.mobiledevca_taskapp.databinding.ActivityBaseBinding
 import com.google.android.material.navigation.NavigationView
 
 abstract class BaseActivity : AppCompatActivity() {
     private lateinit var binding: ActivityBaseBinding
     private lateinit var drawerToggle: ActionBarDrawerToggle
+    private lateinit var handler: ThreadHandler
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
-        setContentView(R.layout.activity_base)
 
         binding = ActivityBaseBinding.inflate(layoutInflater)
         setContentView(binding.root)
@@ -34,8 +36,8 @@ abstract class BaseActivity : AppCompatActivity() {
         setSupportActionBar(findViewById(R.id.toolbar))
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
 
+        //Before setting up navigation view, set up the nav view drawer
         val drawerLayout: DrawerLayout = findViewById(R.id.drawer_layout)
-        //Hamburger icon logic
         drawerToggle = ActionBarDrawerToggle(
             this,
             drawerLayout,
@@ -45,11 +47,18 @@ abstract class BaseActivity : AppCompatActivity() {
         drawerLayout.addDrawerListener(drawerToggle)
         drawerToggle.syncState()
 
+        //Set up the navigation view
         val navView: NavigationView = findViewById(R.id.nav_view)
         navView.setNavigationItemSelectedListener { menuItem ->
             handleMenuItemClick(menuItem, drawerLayout)
             true
         }
+
+        //Use this to run background tasks for each activity
+        //Handler also instantiates the activity
+        handler = ThreadHandler(this)
+
+        CreateActivityThread(handler, this).start()
     }
 
     //Sets up content layout for each activity
@@ -58,7 +67,9 @@ abstract class BaseActivity : AppCompatActivity() {
         val frameLayout = binding.contentFrame
 
         // Clear previous views from content frame to prevent overlaying or reuse issues
-        frameLayout.removeAllViewsInLayout()
+        if (frameLayout.childCount > 0){
+            frameLayout.removeAllViewsInLayout()
+        }
 
         // Inflate the provided layout resource into the content frame
         layoutInflater.inflate(layoutResID, frameLayout, true)

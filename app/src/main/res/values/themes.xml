@@ -13,5 +13,4 @@
     <style name="Theme.MobileDevCA_TaskApp.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar" />
     <!--  Color style for option menu button words -->
     <style name="Theme.MobileDevCA_TaskApp.PopupOverlay" parent="ThemeOverlay.AppCompat.Light" />
-
 </resources>
