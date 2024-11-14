@@ -2,6 +2,15 @@
     <!-- Base application theme. -->
     <style name="Base.Theme.MobileDevCA_TaskApp" parent="Theme.Material3.DayNight.NoActionBar">
         <!-- Customize your dark theme here. -->
-        <!-- <item name="colorPrimary">@color/my_dark_primary</item> -->
+        <item name="colorPrimary">@color/magenta</item>
     </style>
+    <!-- Removes standard actionBar and title for the custom actionBar-->
+    <style name="Theme.MobileDevCA_TaskApp.NoActionBar">
+        <item name="windowActionBar">false</item>
+        <item name="windowNoTitle">true</item>
+    </style>
+    <!--  Color style for words of the actionBar  -->
+    <style name="Theme.MobileDevCA_TaskApp.AppBarOverlay" parent="ThemeOverlay.AppCompat.Light" />
+    <!--  Color style for option menu button words -->
+    <style name="Theme.MobileDevCA_TaskApp.PopupOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar" />
 </resources>
