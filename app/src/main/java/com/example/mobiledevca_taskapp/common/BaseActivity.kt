@@ -108,7 +108,7 @@ abstract class BaseActivity : AppCompatActivity() {
     private fun openActivity(activityClass: Class<*>) {
         if (activityClass != this::class.java) {
             startActivity(Intent(this, activityClass).apply {
-                addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP)
+                addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT)
             })
         }
     }
@@ -122,19 +122,7 @@ abstract class BaseActivity : AppCompatActivity() {
     //Updates highlighted menu item
     override fun onResume() {
         super.onResume()
-        binding.drawerLayout.addDrawerListener(drawerToggle)
         updateCheckedNavigationItem()
-    }
-
-    //Clears listener when activity is paused
-    override fun onStop() {
-        super.onStop()
-        binding.drawerLayout.removeDrawerListener(drawerToggle)
-    }
-
-    override fun onDestroy() {
-        super.onDestroy()
-        binding.drawerLayout.removeDrawerListener(drawerToggle)
     }
 
     //Checks ActivityPrefs for the current activity and sets highlight to that
