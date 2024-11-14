@@ -25,7 +25,7 @@ abstract class BaseActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
-        setContentView(R.layout.activity_base)
+//        setContentView(R.layout.activity_base)
 
         binding = ActivityBaseBinding.inflate(layoutInflater)
         setContentView(binding.root)
@@ -42,7 +42,7 @@ abstract class BaseActivity : AppCompatActivity() {
             R.string.navigation_drawer_open,
             R.string.navigation_drawer_close
         )
-        drawerLayout.addDrawerListener(drawerToggle)
+//        drawerLayout.addDrawerListener(drawerToggle)
         drawerToggle.syncState()
 
         val navView: NavigationView = findViewById(R.id.nav_view)
@@ -58,7 +58,9 @@ abstract class BaseActivity : AppCompatActivity() {
         val frameLayout = binding.contentFrame
 
         // Clear previous views from content frame to prevent overlaying or reuse issues
-        frameLayout.removeAllViewsInLayout()
+        if (frameLayout.childCount > 0){
+            frameLayout.removeAllViewsInLayout()
+        }
 
         // Inflate the provided layout resource into the content frame
         layoutInflater.inflate(layoutResID, frameLayout, true)
@@ -106,7 +108,7 @@ abstract class BaseActivity : AppCompatActivity() {
     private fun openActivity(activityClass: Class<*>) {
         if (activityClass != this::class.java) {
             startActivity(Intent(this, activityClass).apply {
-                addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT)
+                addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP)
             })
         }
     }
@@ -120,7 +122,19 @@ abstract class BaseActivity : AppCompatActivity() {
     //Updates highlighted menu item
     override fun onResume() {
         super.onResume()
+        binding.drawerLayout.addDrawerListener(drawerToggle)
         updateCheckedNavigationItem()
+    }
+
+    //Clears listener when activity is paused
+    override fun onStop() {
+        super.onStop()
+        binding.drawerLayout.removeDrawerListener(drawerToggle)
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        binding.drawerLayout.removeDrawerListener(drawerToggle)
     }
 
     //Checks ActivityPrefs for the current activity and sets highlight to that
