@@ -13,4 +13,7 @@
     <style name="Theme.MobileDevCA_TaskApp.AppBarOverlay" parent="ThemeOverlay.AppCompat.Light" />
     <!--  Color style for option menu button words -->
     <style name="Theme.MobileDevCA_TaskApp.PopupOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar" />
+    <style name="NoBackground">
+        <item name="android:windowBackground">@null</item>
+    </style>
 </resources>
