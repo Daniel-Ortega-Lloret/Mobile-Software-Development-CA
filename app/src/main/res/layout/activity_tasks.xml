@@ -9,12 +9,13 @@
         android:id="@+id/Add_Card"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginLeft="300dp"
         android:text="+"
         />
 
     <androidx.recyclerview.widget.RecyclerView
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="match_parent"
         android:id="@+id/recyclerview" />
 
 </LinearLayout>

@@ -15,11 +15,11 @@ class Tasks
 
     fun get_name(): String
     {
-        return "Task Name: $Task_Name"
+        return Task_Name
     }
 
     fun get_description(): String
     {
-        return "Task Description: $Description"
+        return Description
     }
 }
