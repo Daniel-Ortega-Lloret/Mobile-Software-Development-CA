@@ -15,7 +15,7 @@ import com.example.mobiledevca_taskapp.HabitsActivity
 import com.example.mobiledevca_taskapp.R
 import com.example.mobiledevca_taskapp.ScheduleActivity
 import com.example.mobiledevca_taskapp.TasksActivity
-import com.example.mobiledevca_taskapp.background.RoomThread
+import com.example.mobiledevca_taskapp.background.TestThread
 import com.example.mobiledevca_taskapp.background.ThreadHandler
 import com.example.mobiledevca_taskapp.databinding.ActivityBaseBinding
 import com.google.android.material.navigation.NavigationView
@@ -58,7 +58,7 @@ abstract class BaseActivity : AppCompatActivity() {
         //Handler also instantiates the activity
         handler = ThreadHandler(this)
 
-        RoomThread(handler, this).start()
+        TestThread(handler, this).start()
     }
 
     //Sets up content layout for each activity

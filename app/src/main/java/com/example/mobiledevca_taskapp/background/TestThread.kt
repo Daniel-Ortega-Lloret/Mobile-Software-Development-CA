@@ -5,7 +5,7 @@ import android.os.Bundle
 import android.os.Message
 import com.example.mobiledevca_taskapp.common.BaseActivity
 
-class RoomThread(handler: ThreadHandler, activity: BaseActivity) : Thread() {
+class TestThread(handler: ThreadHandler, activity: BaseActivity) : Thread() {
 
     private var _handler: ThreadHandler = handler
     private var _activity: BaseActivity = activity
