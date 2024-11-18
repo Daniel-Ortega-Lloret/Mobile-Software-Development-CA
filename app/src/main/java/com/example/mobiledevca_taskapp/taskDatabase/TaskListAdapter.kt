@@ -19,20 +19,25 @@ class TaskListAdapter : ListAdapter<Task, TaskViewHolder>(TASK_COMPARATOR) {
 
     override fun onBindViewHolder(holder: TaskViewHolder, position: Int) {
         val current = getItem(position)
-        holder.bind(current.taskName)
+        holder.bind(current)
     }
 
     class TaskViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
-        private val taskItemView: TextView = itemView.findViewById(R.id.textView)
+        private val taskNameView: TextView = itemView.findViewById(R.id.Task_Name)
+        private val taskDescriptionView: TextView = itemView.findViewById(R.id.Task_Description)
 
-        fun bind(text: String?) {
-            taskItemView.text = text
+        fun bind(task: Task) {
+            taskNameView.text = task.taskName
+            taskDescriptionView.text = task.description ?: ""
+
+            taskNameView.contentDescription = "Task name: ${task.taskName}"
+            taskDescriptionView.contentDescription = "Task description: ${task.description ?: ""}"
         }
 
         companion object {
             fun create(parent: ViewGroup): TaskViewHolder {
                 val view: View = LayoutInflater.from(parent.context)
-                    .inflate(R.layout.task_item, parent, false)
+                    .inflate(R.layout.recycler_item, parent, false)
                 return TaskViewHolder(view)
             }
         }

@@ -4,13 +4,15 @@ import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
 import android.content.Context
+import android.util.Log
 import androidx.sqlite.db.SupportSQLiteDatabase
 import com.example.mobiledevca_taskapp.taskDatabase.entities.Task
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-
-@Database(entities = [Task::class], version = 1)
+//Everytime we change the schema (which we will) we update the version number
+//Current version: 2
+@Database(entities = [Task::class], version = 2)
 abstract class TaskRoomDatabase : RoomDatabase() {
     abstract fun taskDao() : TaskDAO
 
@@ -21,7 +23,7 @@ abstract class TaskRoomDatabase : RoomDatabase() {
         fun getDatabase(context: Context, applicationScope: CoroutineScope): TaskRoomDatabase {
             return INSTANCE ?: synchronized(this) {
                 val instance = Room.databaseBuilder(context.applicationContext, TaskRoomDatabase::class.java, "task_database")
-                    .fallbackToDestructiveMigrationFrom()
+                    .fallbackToDestructiveMigration()
                     .addCallback(TaskDatabaseCallback(applicationScope))
                     .build()
                 INSTANCE = instance
@@ -45,9 +47,10 @@ abstract class TaskRoomDatabase : RoomDatabase() {
         suspend fun populateDatabase(taskDao: TaskDAO) {
             taskDao.deleteAllTasks()
 
-            var task = Task(1, "Make Database")
+            var task = Task(0, "Make Database", "bababoie")
             taskDao.insertTask(task)
-            task = Task(2, "Destroy Dylan")
+
+            task = Task(0, "Destroy Dylan", "with hammers")
             taskDao.insertTask(task)
         }
     }

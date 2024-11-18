@@ -4,34 +4,24 @@ package com.example.mobiledevca_taskapp
 
 import android.app.AlertDialog
 import android.content.DialogInterface
-import android.app.Activity
-import android.content.Intent
 import android.os.Bundle
 import android.widget.Button
 import android.widget.EditText
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.activity.viewModels
-import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.LifecycleOwner
 import com.example.mobiledevca_taskapp.common.BaseActivity
+import com.example.mobiledevca_taskapp.recyclerView.RecyclerItem
 import com.example.mobiledevca_taskapp.taskDatabase.TaskApplication
 
 import com.example.mobiledevca_taskapp.taskDatabase.TaskListAdapter
 import com.example.mobiledevca_taskapp.taskDatabase.TaskViewModel
 import com.example.mobiledevca_taskapp.taskDatabase.TaskViewModelFactory
 import com.example.mobiledevca_taskapp.taskDatabase.entities.Task
-import com.google.android.material.floatingactionbutton.FloatingActionButton
 
 class TasksActivity : BaseActivity() {
-
-    private val Card_Array = mutableListOf<Tasks>()
-    // Private Fields
     private lateinit var _recyclerview: RecyclerView
-    private var _rl_arraylist: ArrayList<RecyclerItem> = ArrayList<RecyclerItem>()
-    private var _count: Int = 0
-
-
-    private val newTaskActivityRequestCode = 1
     private val taskViewModel: TaskViewModel by viewModels {
         TaskViewModelFactory((application as TaskApplication).repository)
     }
@@ -42,30 +32,22 @@ class TasksActivity : BaseActivity() {
 
         _recyclerview = findViewById<RecyclerView>(R.id.recyclerview)
         val adapter = TaskListAdapter()
+        _recyclerview.adapter = adapter
         // Set a linear layout manager on the recycler view then generate an adapter and attach it
         _recyclerview.layoutManager = LinearLayoutManager(this)
-//        var recycler_adapter: RecyclerAdapter = RecyclerAdapter(this, _rl_arraylist)
-        _recyclerview.adapter = adapter
 
+        taskViewModel.allTasks.observe(this as LifecycleOwner) {tasks ->
+            tasks?.let { adapter.submitList(it) }
+        }
 
         val Add_Card_Button: Button = findViewById<Button>(R.id.Add_Card)
         Add_Card_Button.setOnClickListener {
-
-            inputDialog(Card_Array)
-            if (Card_Array.size > 0)
-            {
-
-            }
-
-
+            inputDialog()
         }
 
     }
 
-
-
-
-    fun inputDialog(Card_Array: MutableList<Tasks>)
+    fun inputDialog()
     {
         var builder: AlertDialog.Builder = AlertDialog.Builder(this)
 
@@ -83,24 +65,14 @@ class TasksActivity : BaseActivity() {
         val Card_Description = dialogLayout.findViewById<EditText>(R.id.Dialog_Task_Description)
         Card_Description.hint = "Card Description"
 
-
         builder.setView(dialogLayout)
-
-
-
-
-
 
 
         // Confirm Button To Accept Text Fields
         builder.setPositiveButton("Confirm", object : DialogInterface.OnClickListener {
             override fun onClick(p0: DialogInterface?, p1: Int) {
-                // We Instantiate A Task If We Confirm
-                var Task = Tasks()
-                Task.set_Card(Card_Name.getText().toString(), Card_Description.getText().toString())
-                _rl_arraylist.add(RecyclerItem(Task))
-                _recyclerview.adapter?.notifyItemInserted(_rl_arraylist.size - 1)
-                //Card_Array.add(Task)
+                val task = Task(0, Card_Name.text.toString(), Card_Description.text.toString())
+                taskViewModel.insert(task)
             }
         })
 
@@ -114,8 +86,10 @@ class TasksActivity : BaseActivity() {
         // Build The Dialog And Show It
         var dialog: AlertDialog = builder.create()
         dialog.show()
-
     }
 
+    companion object {
+        const val EXTRA_REPLY = "com.example.android.taskList.sql.REPLY"
+    }
 
 }

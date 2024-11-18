@@ -1,4 +1,4 @@
-package com.example.mobiledevca_taskapp
+package com.example.mobiledevca_taskapp.recyclerView
 
 class RecyclerItem constructor(var Card: Tasks)
 {

@@ -1,4 +1,4 @@
-package com.example.mobiledevca_taskapp
+package com.example.mobiledevca_taskapp.recyclerView
 
 import android.content.Context
 import android.util.Log
@@ -7,6 +7,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
+import com.example.mobiledevca_taskapp.R
 
 class RecyclerAdapter(val context: Context, var ri_arraylist: ArrayList<RecyclerItem>) :
 RecyclerView.Adapter<RecyclerAdapter.ItemHolder>()

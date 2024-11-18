@@ -1,6 +1,4 @@
-package com.example.mobiledevca_taskapp
-
-import java.sql.Types.NULL
+package com.example.mobiledevca_taskapp.recyclerView
 
 class Tasks
 {

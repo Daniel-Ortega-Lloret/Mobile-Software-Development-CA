@@ -12,18 +12,6 @@ import kotlinx.coroutines.flow.Flow
 
 @Dao //Data Access Object pattern for accessing DB
 interface TaskDAO {
-//    @Insert //Inserts given profile into DB
-//    fun insertProfile(profile: Profile)
-//
-//    @Update //Updates 0 or more profiles
-//    fun updateProfile(vararg profiles: Profile)
-//
-//    @Delete //Deletes 0 or more profiles
-//    fun deleteProfile(vararg profiles: Profile)
-//
-//    @Query("SELECT * FROM Profile WHERE pId == :pId") //Selects given profile
-//    fun getAllProfiles(pId: Int): Flow<List<Profile>>
-
     @Insert(onConflict = OnConflictStrategy.IGNORE)
     suspend fun insertTask(task: Task)
 
