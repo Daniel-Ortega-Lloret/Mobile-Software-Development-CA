@@ -4,12 +4,25 @@ package com.example.mobiledevca_taskapp
 
 import android.app.AlertDialog
 import android.content.DialogInterface
+import android.app.Activity
+import android.content.Intent
 import android.os.Bundle
 import android.widget.Button
 import android.widget.EditText
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import androidx.activity.viewModels
+import androidx.appcompat.app.AppCompatActivity
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import com.example.mobiledevca_taskapp.common.BaseActivity
+import com.example.mobiledevca_taskapp.taskDatabase.TaskApplication
+
+import com.example.mobiledevca_taskapp.taskDatabase.TaskListAdapter
+import com.example.mobiledevca_taskapp.taskDatabase.TaskViewModel
+import com.example.mobiledevca_taskapp.taskDatabase.TaskViewModelFactory
+import com.example.mobiledevca_taskapp.taskDatabase.entities.Task
+import com.google.android.material.floatingactionbutton.FloatingActionButton
 
 class TasksActivity : BaseActivity() {
 
@@ -20,8 +33,13 @@ class TasksActivity : BaseActivity() {
     private var _count: Int = 0
 
 
+    private val newTaskActivityRequestCode = 1
+    private val taskViewModel: TaskViewModel by viewModels {
+        TaskViewModelFactory((application as TaskApplication).repository)
+    }
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
         setActivityContent(R.layout.activity_tasks, getString(R.string.menu_tasks))
 
         _recyclerview = findViewById<RecyclerView>(R.id.recyclerview)
@@ -43,6 +61,7 @@ class TasksActivity : BaseActivity() {
 
 
         }
+
     }
 
 
