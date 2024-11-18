@@ -13,8 +13,6 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
-import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView
 import com.example.mobiledevca_taskapp.common.BaseActivity
 import com.example.mobiledevca_taskapp.taskDatabase.TaskApplication
 
@@ -43,11 +41,11 @@ class TasksActivity : BaseActivity() {
         setActivityContent(R.layout.activity_tasks, getString(R.string.menu_tasks))
 
         _recyclerview = findViewById<RecyclerView>(R.id.recyclerview)
-
+        val adapter = TaskListAdapter()
         // Set a linear layout manager on the recycler view then generate an adapter and attach it
         _recyclerview.layoutManager = LinearLayoutManager(this)
-        var recycler_adapter: RecyclerAdapter = RecyclerAdapter(this, _rl_arraylist)
-        _recyclerview.adapter = recycler_adapter
+//        var recycler_adapter: RecyclerAdapter = RecyclerAdapter(this, _rl_arraylist)
+        _recyclerview.adapter = adapter
 
 
         val Add_Card_Button: Button = findViewById<Button>(R.id.Add_Card)
