@@ -7,6 +7,7 @@ import android.content.DialogInterface
 import android.os.Bundle
 import android.widget.Button
 import android.widget.EditText
+import android.widget.Toast
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.activity.viewModels
@@ -43,6 +44,12 @@ class TasksActivity : BaseActivity() {
         val Add_Card_Button: Button = findViewById<Button>(R.id.Add_Card)
         Add_Card_Button.setOnClickListener {
             inputDialog()
+        }
+
+        val resetButton: Button = findViewById(R.id.Delete_Card)
+        resetButton.setOnClickListener{
+            taskViewModel.deleteAllTasks()
+            Toast.makeText(this, "All tasks deleted", Toast.LENGTH_SHORT).show()
         }
 
     }

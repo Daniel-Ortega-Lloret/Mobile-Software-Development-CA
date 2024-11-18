@@ -47,10 +47,7 @@ abstract class TaskRoomDatabase : RoomDatabase() {
         suspend fun populateDatabase(taskDao: TaskDAO) {
             taskDao.deleteAllTasks()
 
-            var task = Task(0, "Make Database", "bababoie")
-            taskDao.insertTask(task)
-
-            task = Task(0, "Destroy Dylan", "with hammers")
+            val task = Task(0, "Make Database", "For Tasks")
             taskDao.insertTask(task)
         }
     }
