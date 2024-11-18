@@ -10,22 +10,14 @@ import android.widget.EditText
 import android.widget.Toast
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import androidx.activity.viewModels
 import androidx.lifecycle.LifecycleOwner
 import com.example.mobiledevca_taskapp.common.BaseActivity
-import com.example.mobiledevca_taskapp.recyclerView.RecyclerItem
-import com.example.mobiledevca_taskapp.taskDatabase.TaskApplication
 
-import com.example.mobiledevca_taskapp.taskDatabase.TaskListAdapter
-import com.example.mobiledevca_taskapp.taskDatabase.TaskViewModel
-import com.example.mobiledevca_taskapp.taskDatabase.TaskViewModelFactory
+import com.example.mobiledevca_taskapp.taskDatabase.taskClasses.TaskListAdapter
 import com.example.mobiledevca_taskapp.taskDatabase.entities.Task
 
 class TasksActivity : BaseActivity() {
     private lateinit var _recyclerview: RecyclerView
-    private val taskViewModel: TaskViewModel by viewModels {
-        TaskViewModelFactory((application as TaskApplication).repository)
-    }
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -79,7 +71,7 @@ class TasksActivity : BaseActivity() {
         builder.setPositiveButton("Confirm", object : DialogInterface.OnClickListener {
             override fun onClick(p0: DialogInterface?, p1: Int) {
                 val task = Task(0, Card_Name.text.toString(), Card_Description.text.toString())
-                taskViewModel.insert(task)
+                taskViewModel.insertTask(task)
             }
         })
 
@@ -94,9 +86,4 @@ class TasksActivity : BaseActivity() {
         var dialog: AlertDialog = builder.create()
         dialog.show()
     }
-
-    companion object {
-        const val EXTRA_REPLY = "com.example.android.taskList.sql.REPLY"
-    }
-
 }

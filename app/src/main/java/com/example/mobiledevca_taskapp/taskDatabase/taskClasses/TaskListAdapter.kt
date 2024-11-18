@@ -1,4 +1,4 @@
-package com.example.mobiledevca_taskapp.taskDatabase
+package com.example.mobiledevca_taskapp.taskDatabase.taskClasses
 
 import android.view.LayoutInflater
 import android.view.View
@@ -9,7 +9,7 @@ import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.example.mobiledevca_taskapp.R
 import com.example.mobiledevca_taskapp.taskDatabase.entities.Task
-import com.example.mobiledevca_taskapp.taskDatabase.TaskListAdapter.TaskViewHolder
+import com.example.mobiledevca_taskapp.taskDatabase.taskClasses.TaskListAdapter.TaskViewHolder
 
 class TaskListAdapter : ListAdapter<Task, TaskViewHolder>(TASK_COMPARATOR) {
 

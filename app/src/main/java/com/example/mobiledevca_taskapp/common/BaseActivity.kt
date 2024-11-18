@@ -11,6 +11,7 @@ import androidx.appcompat.app.ActionBarDrawerToggle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.GravityCompat
 import androidx.drawerlayout.widget.DrawerLayout
+import androidx.lifecycle.ViewModelProvider
 import com.example.mobiledevca_taskapp.HabitsActivity
 import com.example.mobiledevca_taskapp.R
 import com.example.mobiledevca_taskapp.ScheduleActivity
@@ -18,12 +19,16 @@ import com.example.mobiledevca_taskapp.TasksActivity
 import com.example.mobiledevca_taskapp.background.TestThread
 import com.example.mobiledevca_taskapp.background.ThreadHandler
 import com.example.mobiledevca_taskapp.databinding.ActivityBaseBinding
+import com.example.mobiledevca_taskapp.taskDatabase.TaskViewModel
+import com.example.mobiledevca_taskapp.taskDatabase.TaskViewModelFactory
+import com.example.mobiledevca_taskapp.taskDatabase.TaskAppApplication
 import com.google.android.material.navigation.NavigationView
 
 abstract class BaseActivity : AppCompatActivity() {
     private lateinit var binding: ActivityBaseBinding
     private lateinit var drawerToggle: ActionBarDrawerToggle
     private lateinit var handler: ThreadHandler
+    public lateinit var taskViewModel: TaskViewModel
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -59,6 +64,11 @@ abstract class BaseActivity : AppCompatActivity() {
         handler = ThreadHandler(this)
 
         TestThread(handler, this).start()
+
+        //Set up View model, will dynamically create one if class has an implementation
+        val app = application as TaskAppApplication
+        val factory = TaskViewModelFactory(app)
+        taskViewModel = ViewModelProvider(this, factory).get(TaskViewModel::class.java)
     }
 
     //Sets up content layout for each activity

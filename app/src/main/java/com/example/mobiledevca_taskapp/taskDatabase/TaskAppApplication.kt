@@ -4,12 +4,13 @@ import android.app.Application
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.SupervisorJob
 
-class TaskApplication: Application() {
+class TaskAppApplication: Application() {
 
     val applicationScope = CoroutineScope(SupervisorJob())
 
     //by lazy makes it so that these are only made when they are needed, not as the activity starts
-    val database by lazy { TaskRoomDatabase.getDatabase(this, applicationScope)}
-    val repository by lazy { TaskRepository(database.taskDao()) }
+    val database by lazy { TaskAppRoomDatabase.getDatabase(this, applicationScope) }
+    val taskRepository by lazy { TaskAppRepository(database.taskDao()) }
+    val habitRepository by lazy { TaskAppRepository(database.habitDao())}
 
 }
