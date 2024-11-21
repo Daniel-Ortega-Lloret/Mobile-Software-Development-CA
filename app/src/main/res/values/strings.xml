@@ -15,4 +15,9 @@
     <string name="menu_tasks">Tasks</string>
     <string name="menu_schedule">Schedule</string>
     <string name="menu_habits">Habits</string>
+
+    <string-array name="habit_spinner_items">
+        <item>Counter Habit</item>
+        <item>Step Counter Habit</item>
+    </string-array>
 </resources>

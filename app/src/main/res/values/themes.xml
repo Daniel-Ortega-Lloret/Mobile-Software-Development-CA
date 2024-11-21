@@ -1,8 +1,11 @@
-<resources xmlns:tools="http://schemas.android.com/tools">
+<resources
+    xmlns:tools="http://schemas.android.com/tools"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
     <!-- Base application theme. -->
     <style name="Base.Theme.MobileDevCA_TaskApp" parent="Theme.Material3.DayNight.NoActionBar">
         <!-- Customize your light theme here. -->
          <item name="colorPrimary">@color/magenta</item>
+        <item name="editTextStyle">@style/EditTextStyle</item>
     </style>
     <!-- Removes standard actionBar and title for the custom actionBar   -->
     <style name="Theme.MobileDevCA_TaskApp.NoActionBar">
@@ -13,4 +16,12 @@
     <style name="Theme.MobileDevCA_TaskApp.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar" />
     <!--  Color style for option menu button words -->
     <style name="Theme.MobileDevCA_TaskApp.PopupOverlay" parent="ThemeOverlay.AppCompat.Light" />
+    
+    <style name="EditTextStyle" parent="Widget.Material3.TextInputEditText.FilledBox">
+        <item name="android:backgroundTint">@color/light_background_hint_color</item>
+        <item name="android:textColor">@color/light_text_color</item>
+        <item name="android:textColorHint">@color/light_hint_text_color</item>
+        <item name="android:background">@drawable/input_text_box</item>
+        <item name="editTextBorderColor">@color/light_border_color</item>
+    </style>
 </resources>

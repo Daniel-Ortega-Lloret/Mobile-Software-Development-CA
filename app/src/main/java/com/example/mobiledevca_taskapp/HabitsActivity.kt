@@ -3,20 +3,24 @@
 package com.example.mobiledevca_taskapp
 
 import android.app.AlertDialog
+import android.app.Dialog
 import android.content.DialogInterface
 import android.os.Bundle
+import android.view.View
+import android.widget.AdapterView
+import android.widget.ArrayAdapter
 import android.widget.Button
 import android.widget.EditText
+import android.widget.Spinner
 import android.widget.Toast
 import androidx.lifecycle.LifecycleOwner
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.mobiledevca_taskapp.common.BaseActivity
 import com.example.mobiledevca_taskapp.taskDatabase.entities.Habit
-import com.example.mobiledevca_taskapp.taskDatabase.entities.Task
 import com.example.mobiledevca_taskapp.taskDatabase.habitClasses.HabitListAdapter
 
-class HabitsActivity : BaseActivity() {
+class HabitsActivity : BaseActivity(), AdapterView.OnItemSelectedListener {
     private lateinit var _recyclerview: RecyclerView
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -55,9 +59,8 @@ class HabitsActivity : BaseActivity() {
 
         // Title For Card
         builder.setTitle("Enter Habit Details")
-        // Task Name
+        // Habit Name
         val Card_Name = dialogLayout.findViewById<EditText>(R.id.dialogHabitName)
-        Card_Name.hint = "Card Name"
 
         builder.setView(dialogLayout)
 
@@ -78,6 +81,28 @@ class HabitsActivity : BaseActivity() {
 
         // Build The Dialog And Show It
         var dialog: AlertDialog = builder.create()
+
+        dialog.setOnShowListener{
+//            val habitSpinner: Spinner = findViewById(R.id.habit_spinner)
+//            habitSpinner.onItemSelectedListener = this
+//            val spinnerAdapter = ArrayAdapter.createFromResource(
+//                this, R.array.habit_spinner_items, android.R.layout.simple_spinner_item
+//            )
+//            spinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+//            habitSpinner.adapter = spinnerAdapter
+
+        }
+
         dialog.show()
     }
+
+    override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
+        Toast.makeText(this, "All habits deleted", Toast.LENGTH_SHORT).show()
+    }
+
+    override fun onNothingSelected(parent: AdapterView<*>?) {
+        TODO("Not yet implemented")
+    }
+
+
 }

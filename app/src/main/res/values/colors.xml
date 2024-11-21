@@ -6,5 +6,12 @@
     <color name="magenta">#FF7EE5</color>
     <color name="nav_header_start">#B53389</color>
     <color name="nav_header_end">#FE4164</color>
-
+    <color name="light_hint_text_color">#000000</color>
+    <color name="dark_hint_text_color">#AAAAAA</color>
+    <color name="dark_text_color">#FFFFFF</color>
+    <color name="dark_editText_background_tint">#333333</color>
+    <color name="light_text_color">#000000</color>
+    <color name="light_background_hint_color">#E8E9EB</color>
+    <color name="light_border_color">#4A4A4A</color>
+    <color name="dark_border_color">#555555</color>
 </resources>

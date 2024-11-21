@@ -3,6 +3,7 @@
     <style name="Base.Theme.MobileDevCA_TaskApp" parent="Theme.Material3.DayNight.NoActionBar">
         <!-- Customize your dark theme here. -->
         <item name="colorPrimary">@color/magenta</item>
+        <item name="editTextStyle">@style/EditTextStyle</item>
     </style>
     <!-- Removes standard actionBar and title for the custom actionBar-->
     <style name="Theme.MobileDevCA_TaskApp.NoActionBar">
@@ -15,5 +16,13 @@
     <style name="Theme.MobileDevCA_TaskApp.PopupOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar" />
     <style name="NoBackground">
         <item name="android:windowBackground">@null</item>
+    </style>
+
+    <style name="EditTextStyle" parent="Widget.Material3.TextInputEditText.FilledBox">
+        <item name="android:background">@drawable/input_text_box</item>
+        <item name="android:backgroundTint">@color/dark_editText_background_tint</item>
+        <item name="android:textColor">@color/dark_text_color</item>
+        <item name="android:textColorHint">@color/dark_hint_text_color</item>
+        <item name="editTextBorderColor">@color/dark_border_color</item>
     </style>
 </resources>
