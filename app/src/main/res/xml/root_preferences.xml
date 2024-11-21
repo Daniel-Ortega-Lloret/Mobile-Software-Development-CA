@@ -17,19 +17,25 @@
 
     </PreferenceCategory>
 
-    <PreferenceCategory app:title="@string/sync_header">
+    <PreferenceCategory app:title="@string/themes_header">
 
         <SwitchPreferenceCompat
-            app:key="sync"
-            app:title="@string/sync_title" />
+            app:key="Themes"
+            app:title="@string/Dark_Mode_title"/>
 
         <SwitchPreferenceCompat
-            app:dependency="sync"
+            app:dependency="Themes"
             app:key="attachment"
             app:summaryOff="@string/attachment_summary_off"
             app:summaryOn="@string/attachment_summary_on"
             app:title="@string/attachment_title" />
 
+    </PreferenceCategory>
+
+    <PreferenceCategory app:title="@string/Extras">
+        <SeekBarPreference app:key="Test" app:title="Test" />
+        <!--<DropDownPreference app:title="Drop" /> -->
+        <
     </PreferenceCategory>
 
 </PreferenceScreen>
