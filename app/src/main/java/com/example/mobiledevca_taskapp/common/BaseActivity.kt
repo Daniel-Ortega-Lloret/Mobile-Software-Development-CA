@@ -14,6 +14,7 @@ import androidx.drawerlayout.widget.DrawerLayout
 import com.example.mobiledevca_taskapp.HabitsActivity
 import com.example.mobiledevca_taskapp.R
 import com.example.mobiledevca_taskapp.ScheduleActivity
+import com.example.mobiledevca_taskapp.SettingsActivity
 import com.example.mobiledevca_taskapp.TasksActivity
 import com.example.mobiledevca_taskapp.background.CreateActivityThread
 import com.example.mobiledevca_taskapp.background.ThreadHandler
@@ -100,6 +101,10 @@ abstract class BaseActivity : AppCompatActivity() {
         when (menuItem.itemId) {
             R.id.nav_tasks -> {
                 openActivity(TasksActivity::class.java)
+            }
+
+            R.id.nav_settings -> {
+                openActivity(SettingsActivity::class.java)
             }
 
             R.id.nav_schedule -> {
