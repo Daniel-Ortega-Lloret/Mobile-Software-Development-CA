@@ -28,7 +28,7 @@ abstract class BaseActivity : AppCompatActivity() {
     private lateinit var binding: ActivityBaseBinding
     private lateinit var drawerToggle: ActionBarDrawerToggle
     private lateinit var handler: ThreadHandler
-    public lateinit var taskViewModel: TaskViewModel
+    lateinit var taskViewModel: TaskViewModel
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
