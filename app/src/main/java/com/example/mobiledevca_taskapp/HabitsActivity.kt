@@ -2,16 +2,8 @@
 
 package com.example.mobiledevca_taskapp
 
-import android.app.AlertDialog
-import android.app.Dialog
-import android.content.DialogInterface
 import android.os.Bundle
-import android.view.View
-import android.widget.AdapterView
-import android.widget.ArrayAdapter
 import android.widget.Button
-import android.widget.EditText
-import android.widget.Spinner
 import android.widget.Toast
 import androidx.fragment.app.FragmentManager
 import androidx.lifecycle.LifecycleOwner
@@ -25,6 +17,8 @@ import com.example.mobiledevca_taskapp.taskDatabase.habitClasses.HabitListAdapte
 class HabitsActivity : BaseActivity() {
     private lateinit var _recyclerview: RecyclerView
     private lateinit var fragmentManager: FragmentManager
+    private lateinit var id : String
+    private lateinit var name: String
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -42,12 +36,14 @@ class HabitsActivity : BaseActivity() {
 
         fragmentManager = supportFragmentManager
 
+        id = getString(R.string.habits_id)
+        name = getString(R.string.habits_name)
 
         val addHabitBtn: Button = findViewById(R.id.addHabitBtn)
         addHabitBtn.setOnClickListener{
-//            inputDialog()
-            AddDataDialogFragment().show(
-                fragmentManager, "AddDataDialog"
+            val addDataDialog = AddDataDialogFragment.newInstance(id, name)
+            addDataDialog.show(
+                fragmentManager, AddDataDialogFragment.TAG
             )
         }
 
