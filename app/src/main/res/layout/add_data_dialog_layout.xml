@@ -60,7 +60,7 @@
         android:layout_height="wrap_content"
         android:id="@+id/habitSection"
         android:orientation="vertical"
-        android:visibility="gone">
+        android:visibility="visible">
 
         <com.google.android.material.textfield.TextInputLayout
             android:layout_width="match_parent"
@@ -97,27 +97,64 @@
                 android:inputType="textMultiLine" />
         </com.google.android.material.textfield.TextInputLayout>
 
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Reset Counter"
+            android:layout_marginTop="@dimen/activity_vertical_margin"/>
+
+        <RadioGroup
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/habitTimeSection"
+            android:orientation="horizontal"
+            android:gravity="center">
+            <RadioButton
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Daily"
+                android:id="@+id/habitDailyCounter"
+                android:checked="true"/>
+            <RadioButton
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Weekly"
+                android:id="@+id/habitWeeklyCounter"/>
+            <RadioButton
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Monthly"
+                android:id="@+id/habitMonthlyCounter"/>
+        </RadioGroup>
+
         <Spinner
             android:id="@+id/habit_spinner"
             android:layout_width="match_parent"
             android:layout_height="0dp"
-            android:layout_weight="1"/>
+            android:layout_weight="1"
+            android:layout_marginTop="@dimen/activity_vertical_margin"
+            android:layout_marginBottom="@dimen/activity_vertical_margin"/>
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
             android:gravity="center"
-            android:visibility="gone"
+            android:visibility="visible"
             android:id="@+id/habitCheckboxLayout">
 
             <CheckBox
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content"/>
+                android:layout_height="wrap_content"
+                android:text="Positive"
+                android:checked="true"
+                android:id="@+id/habitPositiveCheckbox"/>
 
             <CheckBox
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content"/>
+                android:layout_height="wrap_content"
+                android:text="Negative"
+                android:id="@+id/habitNegativeCheckbox"/>
         </LinearLayout>
 
         <LinearLayout
@@ -141,5 +178,7 @@
                     style="@style/EditTextStyle"/>
             </com.google.android.material.textfield.TextInputLayout>
         </LinearLayout>
+
+
     </LinearLayout>
 </LinearLayout>

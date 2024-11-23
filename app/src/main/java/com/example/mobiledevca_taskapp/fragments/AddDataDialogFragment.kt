@@ -7,8 +7,12 @@ import android.util.Log
 import android.view.View
 import android.widget.AdapterView
 import android.widget.ArrayAdapter
+import android.widget.CheckBox
 import android.widget.EditText
+import android.widget.RadioButton
+import android.widget.RadioGroup
 import android.widget.Spinner
+import android.widget.Toast
 import androidx.fragment.app.DialogFragment
 import androidx.lifecycle.ViewModelProvider
 import com.example.mobiledevca_taskapp.R
@@ -17,6 +21,7 @@ import com.example.mobiledevca_taskapp.taskDatabase.TaskViewModel
 import com.example.mobiledevca_taskapp.taskDatabase.TaskViewModelFactory
 import com.example.mobiledevca_taskapp.taskDatabase.entities.Habit
 import com.example.mobiledevca_taskapp.taskDatabase.entities.Task
+import com.google.android.material.textfield.TextInputEditText
 
 // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
 private const val DIALOG_TYPE = "param1"
@@ -51,6 +56,9 @@ class AddDataDialogFragment : DialogFragment(), AdapterView.OnItemSelectedListen
 
         //Habit variables
         val habitName = dialogView.findViewById<EditText>(R.id.dialogHabitNameInput)
+        val habitPositiveCheckbox = dialogView.findViewById<CheckBox>(R.id.habitPositiveCheckbox)
+        val habitNegativeCheckbox = dialogView.findViewById<CheckBox>(R.id.habitNegativeCheckbox)
+        val stepCounter = dialogView.findViewById<TextInputEditText>(R.id.stepCounterTextInput)
         val habitSpinner = dialogView.findViewById<Spinner>(R.id.habit_spinner)
         val spinnerAdapter = ArrayAdapter.createFromResource(
             requireContext(),
@@ -67,26 +75,52 @@ class AddDataDialogFragment : DialogFragment(), AdapterView.OnItemSelectedListen
         return AlertDialog.Builder(requireContext())
             .setView(dialogView)
             .setTitle("Enter $dialogName Details")
-            .setPositiveButton("Confirm") { dialog, _ ->
-                //If tasks called it
-                if (dialogType == "1") {
-                    addTask(taskName.text.toString(), taskDescription.text.toString())
-                    dialog.dismiss()
-                }
-                else if (dialogType == "2") {
-                    //do something for schedule logic
-                    dialog.dismiss()
-                }
-                else if (dialogType == "3") {
-                    addHabit(habitName.text.toString())
-                    dialog.dismiss()
-                }
-                else {
-                    dialog.dismiss()
+            .setPositiveButton("Confirm", null)
+            .setNegativeButton("Cancel") { _, _ -> } //Do nothing for now
+            .create().also { dialog ->
+                dialog.setOnShowListener {
+                    val confirmBtn = dialog.getButton(AlertDialog.BUTTON_POSITIVE)
+
+                    confirmBtn.setOnClickListener {
+                        //Habit validation values
+                        val habitNameText = habitName.text.toString().trim()
+                        val habitPositiveState = habitPositiveCheckbox.isChecked
+                        val habitNegativeState = habitNegativeCheckbox.isChecked
+                        val stepCounterText = stepCounter.text.toString().trim()
+                        val spinnerSelection = habitSpinner.selectedItemPosition
+
+                        when (dialogType) {
+                            "1" -> {
+                                addTask(taskName.text.toString(), taskDescription.text.toString())
+                                dialog.dismiss()
+                            }
+                            "2" -> {
+                                //do something for schedule logic
+                                dialog.dismiss()
+                            }
+                            "3" -> {
+                                if (habitNameText.isEmpty()) {
+                                    Toast.makeText(requireContext(), "Please enter a Habit name", Toast.LENGTH_SHORT).show()
+                                }
+                                else if (spinnerSelection == 0) {
+                                    Toast.makeText(requireContext(), "Please select a Habit type", Toast.LENGTH_SHORT).show()
+                                }
+                                else if (spinnerSelection == 1 && habitPositiveState == false && habitNegativeState == false) {
+                                    Toast.makeText(requireContext(), "Please check at least one counter", Toast.LENGTH_SHORT).show()
+                                }
+                                else if(spinnerSelection == 2 && stepCounterText.isEmpty()) {
+                                    Toast.makeText(requireContext(),"Please enter amount of steps", Toast.LENGTH_SHORT).show()
+                                }
+                                else {
+                                    addHabit(habitName.text.toString())
+                                    dialog.dismiss()
+                                }
+                            }
+                            else -> dialog.dismiss()
+                        }
+                    }
                 }
             }
-            .setNegativeButton("Cancel") { _, _ -> } //Do nothing for now
-            .create()
     }
     //Sets appropriate layouts to visible depending on what activity instantiated the fragment
     private fun changeVisibility (view:View) {
@@ -94,7 +128,7 @@ class AddDataDialogFragment : DialogFragment(), AdapterView.OnItemSelectedListen
         view.findViewById<View>(R.id.tasksSection).visibility = View.GONE
         view.findViewById<View>(R.id.habitSection).visibility = View.GONE
         view.findViewById<View>(R.id.stepCounterLayout).visibility = View.GONE
-        view.findViewById<View?>(R.id.habitCheckboxLayout).visibility = View.VISIBLE
+        view.findViewById<View?>(R.id.habitCheckboxLayout).visibility = View.GONE
 
         when(dialogType) {
             //Task visibility
