@@ -17,6 +17,7 @@
     <string name="menu_habits">Habits</string>
 
     <string-array name="habit_spinner_items">
+        <item>Select a Habit type</item> <!-- Placeholder item -->
         <item>Counter Habit</item>
         <item>Step Counter Habit</item>
     </string-array>

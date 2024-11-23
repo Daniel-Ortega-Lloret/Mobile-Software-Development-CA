@@ -25,8 +25,9 @@ private const val DIALOG_NAME = "param2"
 class AddDataDialogFragment : DialogFragment(), AdapterView.OnItemSelectedListener {
     private var dialogType: String? = null
     private var dialogName: String? = null
+    private lateinit var dialogView : View //So other functions may access the root view
     private lateinit var taskAppViewModel : TaskViewModel
-    private lateinit var habitSpinner : Spinner
+    private lateinit var habitSpinnerItem : String
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -34,7 +35,6 @@ class AddDataDialogFragment : DialogFragment(), AdapterView.OnItemSelectedListen
             dialogType = it.getString(DIALOG_TYPE)
             dialogName = it.getString(DIALOG_NAME)
         }
-        Log.d("debug","Passed this argument: $dialogType")
 
         val app = requireActivity().application as TaskAppApplication
         val factory = TaskViewModelFactory(app)
@@ -43,7 +43,7 @@ class AddDataDialogFragment : DialogFragment(), AdapterView.OnItemSelectedListen
 
     //Create the dialog buttons and elements
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
-        val dialogView = layoutInflater.inflate(R.layout.add_data_dialog_layout, null)
+        dialogView = layoutInflater.inflate(R.layout.add_data_dialog_layout, null)
 
         //Task variables
         val taskName = dialogView.findViewById<EditText>(R.id.taskNameInput)
@@ -59,6 +59,7 @@ class AddDataDialogFragment : DialogFragment(), AdapterView.OnItemSelectedListen
         )
         spinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
         habitSpinner.adapter = spinnerAdapter
+        habitSpinner.setSelection(0) //Set default selection to placeholder
         habitSpinner.onItemSelectedListener = this
 
         changeVisibility(dialogView) //Set appropriate layouts to visible
@@ -92,6 +93,8 @@ class AddDataDialogFragment : DialogFragment(), AdapterView.OnItemSelectedListen
         //Reset to invisible for edge-cases
         view.findViewById<View>(R.id.tasksSection).visibility = View.GONE
         view.findViewById<View>(R.id.habitSection).visibility = View.GONE
+        view.findViewById<View>(R.id.stepCounterLayout).visibility = View.GONE
+        view.findViewById<View?>(R.id.habitCheckboxLayout).visibility = View.VISIBLE
 
         when(dialogType) {
             //Task visibility
@@ -105,18 +108,32 @@ class AddDataDialogFragment : DialogFragment(), AdapterView.OnItemSelectedListen
             //Habit visibility
             getString(R.string.habits_id) -> {
                 view.findViewById<View>(R.id.habitSection).visibility = View.VISIBLE
-                view.findViewById<View>(R.id.habitCheckboxLayout).visibility = View.VISIBLE
             }
         }
     }
     //Spinner function for selection
     override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
+        habitSpinnerItem = parent?.getItemAtPosition(position).toString()
 
+        if (view != null) {
+            if (position == 0){
+                dialogView.findViewById<View>(R.id.stepCounterLayout).visibility = View.GONE
+                dialogView.findViewById<View?>(R.id.habitCheckboxLayout).visibility = View.GONE
+            }
+            else if (position == 1) {
+                dialogView.findViewById<View>(R.id.stepCounterLayout).visibility = View.GONE
+                dialogView.findViewById<View?>(R.id.habitCheckboxLayout).visibility = View.VISIBLE
+            }
+            else if (position == 2) {
+                dialogView.findViewById<View?>(R.id.habitCheckboxLayout).visibility = View.GONE
+                dialogView.findViewById<View>(R.id.stepCounterLayout).visibility = View.VISIBLE
+            }
+        }
     }
 
     //Do nothing if user selects nothing on spinner
     override fun onNothingSelected(parent: AdapterView<*>?) {
-
+        //This is just here because the class using a spinner needs to implement it
     }
 
     //Task database function
