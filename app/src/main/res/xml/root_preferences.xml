@@ -1,4 +1,5 @@
-<PreferenceScreen xmlns:app="http://schemas.android.com/apk/res-auto">
+<PreferenceScreen xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:android="http://schemas.android.com/apk/res/android">
 
     <PreferenceCategory app:title="@string/messages_header">
 
@@ -20,11 +21,11 @@
     <PreferenceCategory app:title="@string/themes_header">
 
         <SwitchPreferenceCompat
-            app:key="Themes"
+            app:key="Dark_Mode_Switch"
             app:title="@string/Dark_Mode_title"/>
 
         <SwitchPreferenceCompat
-            app:dependency="Themes"
+            app:dependency="Dark_Mode_Switch"
             app:key="attachment"
             app:summaryOff="@string/attachment_summary_off"
             app:summaryOn="@string/attachment_summary_on"
@@ -35,7 +36,6 @@
     <PreferenceCategory app:title="@string/Extras">
         <SeekBarPreference app:key="Test" app:title="Test" />
         <!--<DropDownPreference app:title="Drop" /> -->
-        <
     </PreferenceCategory>
 
 </PreferenceScreen>
