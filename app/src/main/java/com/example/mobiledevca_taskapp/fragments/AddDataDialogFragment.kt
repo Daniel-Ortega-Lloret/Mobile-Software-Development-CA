@@ -100,7 +100,7 @@ class AddDataDialogFragment : DialogFragment(), AdapterView.OnItemSelectedListen
                             }
                             "3" -> {
                                 if (habitNameText.isEmpty()) {
-                                    Toast.makeText(requireContext(), "Please enter a Habit name", Toast.LENGTH_SHORT).show()
+                                    Toast.makeText(requireContext(), "Please enter a Habit habitName", Toast.LENGTH_SHORT).show()
                                 }
                                 else if (spinnerSelection == 0) {
                                     Toast.makeText(requireContext(), "Please select a Habit type", Toast.LENGTH_SHORT).show()

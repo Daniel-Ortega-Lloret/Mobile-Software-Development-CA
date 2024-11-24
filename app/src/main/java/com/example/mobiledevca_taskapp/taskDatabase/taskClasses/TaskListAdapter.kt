@@ -30,8 +30,9 @@ class TaskListAdapter : ListAdapter<Task, TaskViewHolder>(TASK_COMPARATOR) {
             taskNameView.text = task.taskName
             taskDescriptionView.text = task.description ?: ""
 
-            taskNameView.contentDescription = "Task name: ${task.taskName}"
-            taskDescriptionView.contentDescription = "Task description: ${task.description ?: ""}"
+            //Content description for accessibility
+            taskNameView.contentDescription = "Task habitName for task number ${task.taskId + 1} is ${task.taskName}"
+            taskDescriptionView.contentDescription = "Task description for task ${task.taskId + 1} is ${task.description ?: ""}"
         }
 
         companion object {

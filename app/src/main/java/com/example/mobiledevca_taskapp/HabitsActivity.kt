@@ -26,7 +26,7 @@ class HabitsActivity : BaseActivity() {
         setActivityContent(R.layout.activity_habit, getString(R.string.menu_habits))
 
         _recyclerview = findViewById(R.id.habitRecyclerView)
-        val adapter = HabitListAdapter()
+        val adapter = HabitListAdapter(taskViewModel)
         _recyclerview.adapter = adapter
         _recyclerview.layoutManager = LinearLayoutManager(this)
 

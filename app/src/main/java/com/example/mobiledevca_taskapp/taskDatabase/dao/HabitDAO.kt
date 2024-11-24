@@ -12,4 +12,10 @@ interface HabitDAO : BaseDAO<Habit>{
 
     @Query("DELETE FROM Habit")
     override suspend fun deleteAll()
+
+    @Query("UPDATE Habit SET habitCount = :newCount WHERE habitId = :habitId")
+    suspend fun updateHabitCount(habitId: Int, newCount: Int)
+
+    @Query("SELECT * FROM Habit WHERE habitId = :habitId LIMIT 1")
+    suspend fun getHabitById(habitId: Int): Habit?
 }
