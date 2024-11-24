@@ -1,0 +1,38 @@
+<PreferenceScreen xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <PreferenceCategory app:title="@string/messages_header">
+
+        <EditTextPreference
+            app:key="signature"
+            app:title="@string/signature_title"
+            app:useSimpleSummaryProvider="true" />
+
+        <ListPreference
+            app:defaultValue="reply"
+            app:entries="@array/reply_entries"
+            app:entryValues="@array/reply_values"
+            app:key="reply"
+            app:title="@string/reply_title"
+            app:useSimpleSummaryProvider="true" />
+
+    </PreferenceCategory>
+
+    <PreferenceCategory app:title="@string/themes_header">
+
+        <SwitchPreferenceCompat
+            app:key="Dark_Mode_Switch"
+            app:title="@string/Dark_Mode_title"/>
+
+    </PreferenceCategory>
+
+    <PreferenceCategory app:title="@string/Extras">
+        <SeekBarPreference app:key="Test" app:title="Test" />
+        <!--<DropDownPreference app:title="Drop" /> -->
+    </PreferenceCategory>
+
+    <Preference
+        app:title="Delete Profile"
+        app:key="Reset_Database">
+    </Preference>
+</PreferenceScreen>

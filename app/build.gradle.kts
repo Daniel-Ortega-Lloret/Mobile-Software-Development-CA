@@ -64,6 +64,7 @@ dependencies {
     implementation(libs.androidx.room.runtime)
     implementation(libs.androidx.ui.desktop)
     ksp(libs.androidx.room.compiler)
+    implementation(libs.androidx.preference)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)

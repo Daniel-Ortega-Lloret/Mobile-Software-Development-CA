@@ -28,4 +28,23 @@
     <string name="schedule_name">Schedule</string>
     <string name="habits_name">Habit</string>
 
+    <string name="title_activity_settings">SettingsActivity</string>
+
+    <!-- Preference Titles -->
+    <string name="messages_header">Messages</string>
+    <string name="themes_header">Themes</string>
+
+    <!-- Messages Preferences -->
+    <string name="signature_title">Your signature</string>
+    <string name="reply_title">Default reply action</string>
+
+    <!-- Dark Mode Preferences -->
+    <string name="Dark_Mode_title">Dark Mode</string>
+    <string name="attachment_title">Download incoming attachments</string>
+    <string name="attachment_summary_on">Automatically download attachments for incoming emails
+    </string>
+    <string name="attachment_summary_off">Only download attachments when manually requested</string>
+
+    <!-- Extras Preferences -->
+    <string name="Extras">Extra Settings</string>
 </resources>
