@@ -3,6 +3,7 @@ package com.example.mobiledevca_taskapp
 import android.os.Bundle
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.app.AppCompatDelegate
 import androidx.preference.PreferenceFragmentCompat
 import androidx.preference.SwitchPreferenceCompat
 import java.util.prefs.Preferences
@@ -32,11 +33,13 @@ class SettingsActivity : AppCompatActivity() {
             SwichPreference?.setOnPreferenceClickListener {
                 if (SwichPreference.isChecked)
                 {
+                    AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES)
                     Toast.makeText(context, "Dark Mode Enabled", Toast.LENGTH_SHORT).show()
                     true
                 }
                 else
                 {
+                    AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
                     Toast.makeText(context,"Dark Mode Disabled", Toast.LENGTH_SHORT).show()
                     true
                 }
