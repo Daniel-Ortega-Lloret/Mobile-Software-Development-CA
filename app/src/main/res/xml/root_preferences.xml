@@ -24,13 +24,6 @@
             app:key="Dark_Mode_Switch"
             app:title="@string/Dark_Mode_title"/>
 
-        <SwitchPreferenceCompat
-            app:dependency="Dark_Mode_Switch"
-            app:key="attachment"
-            app:summaryOff="@string/attachment_summary_off"
-            app:summaryOn="@string/attachment_summary_on"
-            app:title="@string/attachment_title" />
-
     </PreferenceCategory>
 
     <PreferenceCategory app:title="@string/Extras">
@@ -38,4 +31,8 @@
         <!--<DropDownPreference app:title="Drop" /> -->
     </PreferenceCategory>
 
+    <Preference
+        app:title="Delete Profile"
+        app:key="Reset_Database">
+    </Preference>
 </PreferenceScreen>
