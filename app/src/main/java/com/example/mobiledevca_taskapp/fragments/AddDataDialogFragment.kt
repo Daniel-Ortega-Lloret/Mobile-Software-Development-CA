@@ -71,25 +71,15 @@ class AddDataDialogFragment : DialogFragment(), AdapterView.OnItemSelectedListen
             "1" -> "Enter Task Details"
             "2" -> "Enter Schedule Details"
             "3" -> "Enter Habits Details"
-            "4" -> "Edit Task Details"
-            "5" -> "Edit Schedule Details"
-            "6" -> "Edit Habit Details"
             else -> "Invalid DialogType"
         }
 
 
         // Confirm button must change to save if it is an edit dialog
-        val DialogConfirm = when(dialogType)
-        {
-            "4" -> "Save"
-            "5" -> "Save"
-            "6" -> "Save"
-            else -> "Confirm"
-        }
         return AlertDialog.Builder(requireContext())
             .setView(dialogView)
             .setTitle(Dialog_Title)
-            .setPositiveButton(DialogConfirm) { dialog, _ ->
+            .setPositiveButton("Confirm") { dialog, _ ->
                 //If tasks called it
                 if (dialogType == "1") {
                     addTask(taskName.text.toString(), taskDescription.text.toString())

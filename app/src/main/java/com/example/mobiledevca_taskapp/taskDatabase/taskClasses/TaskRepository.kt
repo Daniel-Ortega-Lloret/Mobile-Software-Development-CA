@@ -11,4 +11,9 @@ class TaskRepository (private val taskDAO: TaskDAO): TaskAppRepository<Task>(tas
     {
         taskDAO.updateTaskById(task.taskId, task.taskName, task.description)
     }
+
+    @WorkerThread
+    suspend fun deleteTask(taskId: Int){
+        taskDAO.deleteTaskById(taskId)
+    }
 }

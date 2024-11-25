@@ -30,6 +30,7 @@ class UpdateDataDialogFragment : DialogFragment(), AdapterView.OnItemSelectedLis
     private var taskName: String? = null
     private var taskDescription: String? = null
     private var taskId: String? = null
+    private lateinit var task: Task
     private lateinit var taskAppViewModel : TaskViewModel
     private lateinit var habitSpinner : Spinner
 
@@ -41,6 +42,8 @@ class UpdateDataDialogFragment : DialogFragment(), AdapterView.OnItemSelectedLis
             taskDescription = it.getString(Task_Description)
             taskId = it.getString(Task_Id)
         }
+        // Pass this task into funtions for readability
+        task = Task(taskId.toString().toInt(), taskName.toString(), taskDescription.toString())
         Log.d("debug","Passed this argument: $dialogType")
 
         val app = requireActivity().application as TaskAppApplication
@@ -92,22 +95,27 @@ class UpdateDataDialogFragment : DialogFragment(), AdapterView.OnItemSelectedLis
         return AlertDialog.Builder(requireContext())
             .setView(dialogView)
             .setTitle(Dialog_Title)
+            .setNeutralButton("Delete") {_, _ ->} // Do nothing until clicked
             .setPositiveButton(DialogConfirm) { dialog, _ ->
-                //If tasks called it
-                if (dialogType == "4")
-                {
-                    dialog.dismiss()
-                }
-                else {
-                    dialog.dismiss()
-                }
+
             }
             .setNegativeButton("Cancel") { _, _ -> } //Do nothing for now
             .create().also { dialog ->
                 dialog.setOnShowListener{
+                    // Confirm Button Pressed
                     val confirmBtn = dialog.getButton(AlertDialog.BUTTON_POSITIVE)
                     confirmBtn.setOnClickListener{
-                        updateTask(taskId.toString().toInt(), taskName.text.toString(), taskDescription.text.toString())
+                        if (task != null) {
+                            updateTask(task)
+                        }
+                        dialog.dismiss()
+                    }
+
+                    val deleteBtn = dialog.getButton((AlertDialog.BUTTON_NEUTRAL))
+                    deleteBtn.setOnClickListener {
+                        if (task != null) {
+                            deleteTask(task)
+                        }
                         dialog.dismiss()
                     }
                 }
@@ -147,12 +155,16 @@ class UpdateDataDialogFragment : DialogFragment(), AdapterView.OnItemSelectedLis
 
     }
 
-    fun updateTask(taskId: Int, taskName: String, taskDescription: String)
+    fun updateTask(task: Task)
     {
-        val task = Task(taskId, taskName, taskDescription)
         taskAppViewModel.updateTask(task)
     }
 
+    // We just need to pass the task id
+    fun deleteTask(task: Task)
+    {
+        taskAppViewModel.deleteTask(task.taskId)
+    }
 
     //Factory object for creating instances of the fragment
     companion object {

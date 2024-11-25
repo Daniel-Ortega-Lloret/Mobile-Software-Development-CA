@@ -35,6 +35,10 @@ class TaskViewModel(application: Application, private val applicationScope: Coro
         taskRepository.updateTask(task)
     }
 
+    fun deleteTask(taskId: Int) = viewModelScope.launch {
+        taskRepository.deleteTask(taskId)
+    }
+
     val allHabits: LiveData<List<Habit>> = habitRepository.allItems.asLiveData()
 
     fun insertHabit(habit: Habit) = viewModelScope.launch {

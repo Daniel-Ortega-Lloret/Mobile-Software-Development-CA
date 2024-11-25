@@ -15,4 +15,7 @@ interface TaskDAO : BaseDAO<Task>{
 
     @Query("UPDATE Task SET taskName = :task_Name, description = :task_Description WHERE taskId = :task_Id")
     suspend fun updateTaskById(task_Id: Int, task_Name: String, task_Description: String)
+
+    @Query("DELETE FROM Task WHERE taskId = :task_Id")
+    suspend fun deleteTaskById(task_Id: Int)
 }
