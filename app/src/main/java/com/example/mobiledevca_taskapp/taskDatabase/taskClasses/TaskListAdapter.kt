@@ -54,7 +54,7 @@ class TaskListAdapter(fragmentManager: FragmentManager): ListAdapter<Task, TaskV
 
         override fun onClick(v: View?) {
             val task: Task = Task(0, taskNameView.text.toString(), taskDescriptionView.text.toString())
-            val UpdateDataDialog = UpdateDataDialogFragment.newInstance("4", task)
+            val UpdateDataDialog = UpdateDataDialogFragment.newInstance("4", task.taskName, task.description)
             UpdateDataDialog.show(fragmentManager, UpdateDataDialogFragment.TAG)
         }
 

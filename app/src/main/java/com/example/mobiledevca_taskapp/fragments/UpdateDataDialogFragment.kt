@@ -26,6 +26,8 @@ private const val Task_Description = "param3"
 
 class UpdateDataDialogFragment : DialogFragment(), AdapterView.OnItemSelectedListener {
     private var dialogType: String? = null
+    private var taskName: String? = null
+    private var taskDescription: String? = null
     private lateinit var taskAppViewModel : TaskViewModel
     private lateinit var habitSpinner : Spinner
 
@@ -33,6 +35,8 @@ class UpdateDataDialogFragment : DialogFragment(), AdapterView.OnItemSelectedLis
         super.onCreate(savedInstanceState)
         arguments?.let {
             dialogType = it.getString(DIALOG_TYPE)
+            taskName = it.getString(Task_Name)
+            taskDescription = it.getString(Task_Description)
         }
         Log.d("debug","Passed this argument: $dialogType")
 
@@ -113,7 +117,9 @@ class UpdateDataDialogFragment : DialogFragment(), AdapterView.OnItemSelectedLis
 
                 // Prefill the textbox with the task current text
                 val Title_Textbox =  view.findViewById<EditText>(R.id.taskNameInput)
-                //Title_Textbox.text = Textname
+                val Description_Textbox =  view.findViewById<EditText>(R.id.taskDescriptionInput)
+                Title_Textbox.setText(taskName)
+                Description_Textbox.setText(taskDescription)
 
             }
         }
@@ -137,12 +143,12 @@ class UpdateDataDialogFragment : DialogFragment(), AdapterView.OnItemSelectedLis
     companion object {
         const val TAG = "UpdateDataDialog"
         @JvmStatic
-        fun newInstance(param1: String, bundle: Bundle) =
+        fun newInstance(param1: String, param2: String, param3: String) =
             UpdateDataDialogFragment().apply {
                 arguments = Bundle().apply {
                     putString(DIALOG_TYPE, param1)
-                    putBundle(Task_Name, bundle)
-                    putBundle(Task_Description, bundle)
+                    putString(Task_Name, param2)
+                    putString(Task_Description, param3)
                 }
             }
     }
