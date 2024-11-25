@@ -158,13 +158,14 @@ class UpdateDataDialogFragment : DialogFragment(), AdapterView.OnItemSelectedLis
     companion object {
         const val TAG = "UpdateDataDialog"
         @JvmStatic
-        fun newInstance(param1: String, param2: String, param3: String, param4: String) =
+        fun newInstance(param1: ArrayList<String>) =
             UpdateDataDialogFragment().apply {
                 arguments = Bundle().apply {
-                    putString(DIALOG_TYPE, param1)
-                    putString(Task_Name, param2)
-                    putString(Task_Description, param3)
-                    putString(Task_Id, param4)
+                    putString(DIALOG_TYPE, param1[0])
+                    putString(Task_Id, param1[1])
+                    putString(Task_Name, param1[2])
+                    putString(Task_Description, param1[3])
+
                 }
             }
     }

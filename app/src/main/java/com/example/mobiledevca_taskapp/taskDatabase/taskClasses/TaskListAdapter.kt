@@ -55,8 +55,16 @@ class TaskListAdapter(fragmentManager: FragmentManager): ListAdapter<Task, TaskV
         }
 
         override fun onClick(v: View?) {
-            val task: Task = Task(taskId, taskNameView.text.toString(), taskDescriptionView.text.toString())
-            val UpdateDataDialog = UpdateDataDialogFragment.newInstance("4", task.taskName, task.description, taskId.toString())
+
+            // The Parameters of tasks are passed as Strings then converted to whatever
+            val stringArray: ArrayList<String> = ArrayList()
+            stringArray.add("4")    // This is how we know we came from TasksActivity
+            stringArray.add(taskId.toString())
+            stringArray.add(taskNameView.text.toString())
+            stringArray.add(taskDescriptionView.text.toString())
+
+
+            val UpdateDataDialog = UpdateDataDialogFragment.newInstance(stringArray)
             UpdateDataDialog.show(fragmentManager, UpdateDataDialogFragment.TAG)
         }
 
