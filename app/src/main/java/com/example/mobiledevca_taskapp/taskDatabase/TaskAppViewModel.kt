@@ -12,6 +12,7 @@ import com.example.mobiledevca_taskapp.taskDatabase.entities.Habit
 import com.example.mobiledevca_taskapp.taskDatabase.entities.Task
 import com.example.mobiledevca_taskapp.taskDatabase.habitClasses.HabitRepository
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.launch
 import java.util.Calendar
 
@@ -54,10 +55,13 @@ class TaskViewModel(application: Application, private val applicationScope: Coro
         allHabits
     }
 
-    fun resetHabits(resetType: Int) {
+    fun resetHabits(resetType: Int) = viewModelScope.launch {
         val currentTime = Calendar.getInstance()
         Log.d("debug", "Resetting habits for type: $resetType at ${currentTime.time}")
-        allHabits.value?.forEach { habit ->
+
+        val habits = habitRepository.getAllHabitsReset()
+
+        habits.forEach { habit ->
             val resetRequired = when (habit.habitReset) {
                 1 -> true
                 2 -> currentTime.get(Calendar.DAY_OF_WEEK) == Calendar.MONDAY
@@ -71,6 +75,8 @@ class TaskViewModel(application: Application, private val applicationScope: Coro
             }
         }
     }
+
+
 }
 
 class TaskViewModelFactory(

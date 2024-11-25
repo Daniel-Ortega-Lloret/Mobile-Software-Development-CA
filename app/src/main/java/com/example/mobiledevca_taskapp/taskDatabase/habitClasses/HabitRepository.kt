@@ -15,4 +15,9 @@ class HabitRepository(private val habitDao: HabitDAO) : TaskAppRepository<Habit>
     suspend fun getHabitById(habitId: Int): Habit? {
         return habitDao.getHabitById(habitId)
     }
+
+    @WorkerThread
+    suspend fun getAllHabitsReset() : List<Habit>{
+        return habitDao.getAllHabitsReset()
+    }
 }

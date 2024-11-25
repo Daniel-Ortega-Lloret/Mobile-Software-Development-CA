@@ -4,6 +4,7 @@ package com.example.mobiledevca_taskapp
 
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import android.widget.Button
 import android.widget.Toast
 import androidx.fragment.app.FragmentManager
@@ -33,6 +34,7 @@ class HabitsActivity : BaseActivity() {
         _recyclerview.layoutManager = LinearLayoutManager(this)
 
         taskViewModel.allHabits.observe(this as LifecycleOwner) { habits ->
+            Log.d("debug", "Observed habits: ${habits?.size} items")
             habits?.let{ adapter.submitList(it)}
         }
 
@@ -43,13 +45,18 @@ class HabitsActivity : BaseActivity() {
 
         val addHabitBtn: Button = findViewById(R.id.addHabitBtn)
         addHabitBtn.setOnClickListener{
-            val intent = Intent(this, HabitResetReceiver::class.java)
-            intent.putExtra("RESET_TYPE", 1)
-            this.sendBroadcast(intent)
             val addDataDialog = AddDataDialogFragment.newInstance(id, name)
             addDataDialog.show(
                 fragmentManager, AddDataDialogFragment.TAG
             )
+        }
+
+        val resetHabitCountBtn: Button = findViewById(R.id.resetDailyBtn)
+        resetHabitCountBtn.setOnClickListener{
+            Log.d("debug", "Tried to reset")
+            val intent = Intent(this, HabitResetReceiver::class.java)
+            intent.putExtra("RESET_TYPE", 1)
+            this.sendBroadcast(intent)
         }
 
         val deleteHabitsBtn: Button = findViewById(R.id.deleteHabitBtn)
