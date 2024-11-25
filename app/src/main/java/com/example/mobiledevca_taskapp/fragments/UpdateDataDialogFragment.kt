@@ -101,7 +101,15 @@ class UpdateDataDialogFragment : DialogFragment(), AdapterView.OnItemSelectedLis
                 }
             }
             .setNegativeButton("Cancel") { _, _ -> } //Do nothing for now
-            .create()
+            .create().also { dialog ->
+                dialog.setOnShowListener{
+                    val confirmBtn = dialog.getButton(AlertDialog.BUTTON_POSITIVE)
+                    confirmBtn.setOnClickListener{
+                        updateTask(taskName.text.toString(), taskDescription.text.toString())
+                        dialog.dismiss()
+                    }
+                }
+            }
     }
     //Sets appropriate layouts to visible depending on what activity instantiated the fragment
     private fun changeVisibility (view:View) {
@@ -121,6 +129,9 @@ class UpdateDataDialogFragment : DialogFragment(), AdapterView.OnItemSelectedLis
                 Title_Textbox.setText(taskName)
                 Description_Textbox.setText(taskDescription)
 
+                // Send To Dao
+
+
             }
         }
     }
@@ -137,8 +148,10 @@ class UpdateDataDialogFragment : DialogFragment(), AdapterView.OnItemSelectedLis
     fun updateTask(taskName: String, taskDescription: String)
     {
         val task = Task(0, taskName, taskDescription)
-        //taskAppViewModel.updateTask(task)
+        taskAppViewModel.updateTask(task)
     }
+
+
     //Factory object for creating instances of the fragment
     companion object {
         const val TAG = "UpdateDataDialog"

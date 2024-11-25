@@ -9,13 +9,14 @@ import androidx.lifecycle.asLiveData
 import androidx.lifecycle.viewModelScope
 import com.example.mobiledevca_taskapp.taskDatabase.entities.Habit
 import com.example.mobiledevca_taskapp.taskDatabase.entities.Task
+import com.example.mobiledevca_taskapp.taskDatabase.taskClasses.TaskRepository
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
 class TaskViewModel(application: Application, private val applicationScope: CoroutineScope) : AndroidViewModel(application) {
     private val database = TaskAppRoomDatabase.getDatabase(application, applicationScope)
 
-    private val taskRepository = TaskAppRepository(database.taskDao())
+    private val taskRepository = TaskRepository(database.taskDao())
     private val habitRepository = TaskAppRepository(database.habitDao())
 
     //Observer for the tasks repository, only updates UI if data changes
@@ -23,10 +24,15 @@ class TaskViewModel(application: Application, private val applicationScope: Coro
 
     fun insertTask(task: Task) = viewModelScope.launch {
         taskRepository.insert(task)
+
     }
 
     fun deleteAllTasks() = viewModelScope.launch {
         taskRepository.deleteAll()
+    }
+
+    fun updateTask(task: Task) = viewModelScope.launch {
+        taskRepository.updateTask(task)
     }
 
     val allHabits: LiveData<List<Habit>> = habitRepository.allItems.asLiveData()
