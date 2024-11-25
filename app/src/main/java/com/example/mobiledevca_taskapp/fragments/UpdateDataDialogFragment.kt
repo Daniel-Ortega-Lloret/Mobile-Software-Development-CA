@@ -21,11 +21,11 @@ import com.example.mobiledevca_taskapp.taskDatabase.entities.Task
 
 // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
 private const val DIALOG_TYPE = "param1"
-private const val DIALOG_NAME = "param2"
+private const val Task_Name = "param2"
+private const val Task_Description = "param3"
 
-class AddDataDialogFragment : DialogFragment(), AdapterView.OnItemSelectedListener {
+class UpdateDataDialogFragment : DialogFragment(), AdapterView.OnItemSelectedListener {
     private var dialogType: String? = null
-    private var dialogName: String? = null
     private lateinit var taskAppViewModel : TaskViewModel
     private lateinit var habitSpinner : Spinner
 
@@ -33,7 +33,6 @@ class AddDataDialogFragment : DialogFragment(), AdapterView.OnItemSelectedListen
         super.onCreate(savedInstanceState)
         arguments?.let {
             dialogType = it.getString(DIALOG_TYPE)
-            dialogName = it.getString(DIALOG_NAME)
         }
         Log.d("debug","Passed this argument: $dialogType")
 
@@ -64,13 +63,10 @@ class AddDataDialogFragment : DialogFragment(), AdapterView.OnItemSelectedListen
 
         changeVisibility(dialogView) //Set appropriate layouts to visible
 
-/*     The titles of the Dialog button need to change
-              based on which type it is */
+        /*     The titles of the Dialog button need to change
+                      based on which type it is */
         val Dialog_Title = when(dialogType)
         {
-            "1" -> "Enter Task Details"
-            "2" -> "Enter Schedule Details"
-            "3" -> "Enter Habits Details"
             "4" -> "Edit Task Details"
             "5" -> "Edit Schedule Details"
             "6" -> "Edit Habit Details"
@@ -91,19 +87,11 @@ class AddDataDialogFragment : DialogFragment(), AdapterView.OnItemSelectedListen
             .setTitle(Dialog_Title)
             .setPositiveButton(DialogConfirm) { dialog, _ ->
                 //If tasks called it
-                if (dialogType == "1") {
-                    addTask(taskName.text.toString(), taskDescription.text.toString())
+                if (dialogType == "4")
+                {
+                    updateTask(taskName.text.toString(), taskDescription.text.toString())
                     dialog.dismiss()
                 }
-                else if (dialogType == "2") {
-                    //do something for schedule logic
-                    dialog.dismiss()
-                }
-                else if (dialogType == "3") {
-                    addHabit(habitName.text.toString())
-                    dialog.dismiss()
-                }
-
                 else {
                     dialog.dismiss()
                 }
@@ -116,20 +104,17 @@ class AddDataDialogFragment : DialogFragment(), AdapterView.OnItemSelectedListen
         //Reset to invisible for edge-cases
         view.findViewById<View>(R.id.tasksSection).visibility = View.GONE
         view.findViewById<View>(R.id.habitSection).visibility = View.GONE
+        view.findViewById<View>(R.id.tasksSection).visibility = View.GONE
 
         when(dialogType) {
-            //Task visibility
-            getString(R.string.tasks_id) -> {
+            // Update Task visibility
+            "4" -> {
                 view.findViewById<View>(R.id.tasksSection).visibility = View.VISIBLE
-            }
-            //Schedule visibility
-            getString(R.string.schedule_id) -> {
-                //set schedule layout elements to visible here
-            }
-            //Habit visibility
-            getString(R.string.habits_id) -> {
-                view.findViewById<View>(R.id.habitSection).visibility = View.VISIBLE
-                view.findViewById<View>(R.id.habitCheckboxLayout).visibility = View.VISIBLE
+
+                // Prefill the textbox with the task current text
+                val Title_Textbox =  view.findViewById<EditText>(R.id.taskNameInput)
+                //Title_Textbox.text = Textname
+
             }
         }
     }
@@ -143,27 +128,21 @@ class AddDataDialogFragment : DialogFragment(), AdapterView.OnItemSelectedListen
 
     }
 
-    //Task database function
-    fun addTask(taskName : String, taskDescription : String) {
+    fun updateTask(taskName: String, taskDescription: String)
+    {
         val task = Task(0, taskName, taskDescription)
-        taskAppViewModel.insertTask(task)
+        //taskAppViewModel.updateTask(task)
     }
-
-    //Habit database function
-    fun addHabit(habitName: String) {
-        val habit = Habit(0, habitName)
-        taskAppViewModel.insertHabit(habit)
-    }
-
     //Factory object for creating instances of the fragment
     companion object {
-        const val TAG = "AddDataDialog"
+        const val TAG = "UpdateDataDialog"
         @JvmStatic
-        fun newInstance(param1: String, param2: String) =
-            AddDataDialogFragment().apply {
+        fun newInstance(param1: String, bundle: Bundle) =
+            UpdateDataDialogFragment().apply {
                 arguments = Bundle().apply {
                     putString(DIALOG_TYPE, param1)
-                    putString(DIALOG_NAME,param2)
+                    putBundle(Task_Name, bundle)
+                    putBundle(Task_Description, bundle)
                 }
             }
     }

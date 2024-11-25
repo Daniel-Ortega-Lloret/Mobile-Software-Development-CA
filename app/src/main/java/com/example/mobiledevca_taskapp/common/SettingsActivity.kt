@@ -1,4 +1,4 @@
-package com.example.mobiledevca_taskapp
+package com.example.mobiledevca_taskapp.common
 
 import android.os.Bundle
 import android.widget.Toast
@@ -6,7 +6,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.preference.PreferenceFragmentCompat
 import androidx.preference.SwitchPreferenceCompat
-import java.util.prefs.Preferences
+import com.example.mobiledevca_taskapp.R
 
 class SettingsActivity : AppCompatActivity() {
 

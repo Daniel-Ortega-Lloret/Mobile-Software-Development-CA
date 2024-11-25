@@ -11,6 +11,7 @@ import androidx.recyclerview.widget.RecyclerView
 import androidx.lifecycle.LifecycleOwner
 import com.example.mobiledevca_taskapp.common.BaseActivity
 import com.example.mobiledevca_taskapp.fragments.AddDataDialogFragment
+import com.example.mobiledevca_taskapp.fragments.UpdateDataDialogFragment
 
 import com.example.mobiledevca_taskapp.taskDatabase.taskClasses.TaskListAdapter
 import com.example.mobiledevca_taskapp.taskDatabase.entities.Task
@@ -27,16 +28,21 @@ class TasksActivity : BaseActivity() {
         setActivityContent(R.layout.activity_tasks, getString(R.string.menu_tasks))
 
         _recyclerview = findViewById(R.id.recyclerview)
-        val adapter = TaskListAdapter()
+        fragmentManager = supportFragmentManager
+
+        // Passing Update Dialog
+        val adapter = TaskListAdapter(supportFragmentManager)
         _recyclerview.adapter = adapter
         // Set a linear layout manager on the recycler view then generate an adapter and attach it
         _recyclerview.layoutManager = LinearLayoutManager(this)
+
 
         taskViewModel.allTasks.observe(this as LifecycleOwner) {tasks ->
             tasks?.let { adapter.submitList(it) }
         }
 
-        fragmentManager = supportFragmentManager
+
+
         id = getString(R.string.tasks_id)
         name = getString(R.string.tasks_name)
 
