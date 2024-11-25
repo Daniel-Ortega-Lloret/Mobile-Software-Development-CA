@@ -24,39 +24,52 @@
 
     <LinearLayout
         android:id="@+id/habitCounterTextLayout"
-        android:layout_width="wrap_content"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
+        android:backgroundTint="@color/dark_border_color"
         android:orientation="vertical"
         app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/habitCounterRemoveBtn"
         app:layout_constraintStart_toEndOf="@+id/habitCounterAddBtn"
-        app:layout_constraintEnd_toStartOf="@id/habitCountText"
         app:layout_constraintTop_toTopOf="parent"
-        android:backgroundTint="@color/dark_border_color">
+        android:layout_marginStart="@dimen/activity_horizontal_margin"
+        android:layout_marginEnd="@dimen/activity_horizontal_margin">
 
         <TextView
             android:id="@+id/habitName"
             android:layout_width="wrap_content"
-            android:layout_height="0dp"
-            android:layout_weight="2"
+            android:layout_height="wrap_content"
             android:text="Habit Counter Name"
             android:textAlignment="center"
             android:textSize="@dimen/habit_title_size" />
 
-        <TextView
-            android:layout_width="wrap_content"
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Habit Description"
-            android:id="@+id/habitDescription"/>
+            android:orientation="horizontal">
+
+            <TextView
+                android:id="@+id/habitResetCounterText"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Reset counter"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <TextView
+                android:id="@+id/habitCountText"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="0"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="parent"/>
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+
     </LinearLayout>
 
-    <TextView
-        android:id="@+id/habitCountText"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="0"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toStartOf="@+id/habitCounterRemoveBtn"
-        app:layout_constraintStart_toEndOf="@+id/habitCounterTextLayout"/>
+
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/habitCounterRemoveBtn"

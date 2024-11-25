@@ -1,5 +1,6 @@
 package com.example.mobiledevca_taskapp.taskDatabase.habitClasses
 
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -26,36 +27,80 @@ class HabitListAdapter(private val taskViewModel: TaskViewModel) : ListAdapter<H
 
     class HabitViewHolder(itemView: View, taskViewModel: TaskViewModel) : RecyclerView.ViewHolder(itemView) {
         private val habitNameView: TextView = itemView.findViewById(R.id.habitName)
-        private val habitDescriptionView: TextView = itemView.findViewById(R.id.habitDescription)
         private var habitCountText: TextView = itemView.findViewById(R.id.habitCountText)
         private val habitAddBtn: FloatingActionButton = itemView.findViewById(R.id.habitCounterAddBtn)
         private val habitRemoveBtn: FloatingActionButton = itemView.findViewById(R.id.habitCounterRemoveBtn)
+        private val resetCountText: TextView = itemView.findViewById(R.id.habitResetCounterText)
 
         fun bind(habit: Habit, taskViewModel: TaskViewModel) {
             habitNameView.text = habit.habitName
-            habitDescriptionView.text = habit.habitDescription
-            habitCountText.text = habit.habitCount.toString()
+            habitCountText.text = formatCountText(habit.habitCount)
 
+            val resetValue: Int? = habit.habitReset
+            val stringResetText : String = when (resetValue) {
+                1 -> {
+                    "Resets Daily"
+                }
+
+                2 -> {
+                    "Resets Weekly"
+                }
+
+                3 -> {
+                    "Resets Monthly"
+                }
+                else -> ""
+            }
+            resetCountText.text = stringResetText
+
+            //Accessibility for screen reader
             habitNameView.contentDescription = "Habit name for habit number ${habit.habitId.plus(1)} is ${habit.habitName}"
-            habitDescriptionView.contentDescription = "Description for habit numer ${habit.habitId.plus(1)} is ${habit.habitDescription}"
+            resetCountText.contentDescription = "This habit is set to: $stringResetText"
 
+            habitAddBtn.setOnClickListener(null)
+            habitRemoveBtn.setOnClickListener(null)
+
+            if (habit.habitCountCheck == 0) {
+                addPositiveListener(habitAddBtn, habit, habitCountText, taskViewModel)
+                addNegativeListener(habitRemoveBtn, habit, habitCountText, taskViewModel)
+            }
+            else if (habit.habitCountCheck == 1) {
+                addPositiveListener(habitAddBtn, habit, habitCountText, taskViewModel)
+
+            }
+            else if (habit.habitCountCheck == -1) {
+                addNegativeListener(habitRemoveBtn, habit, habitCountText, taskViewModel)
+            }
+        }
+
+        private fun formatCountText(count: Int?): String {
+            val countStr : String = if (count!! > 0) {
+                "+$count"
+            } else {
+                count.toString()
+            }
+            return countStr
+        }
+
+        private fun addPositiveListener(habitAddBtn: FloatingActionButton,habit : Habit, habitCountText: TextView, taskViewModel: TaskViewModel) {
             habitAddBtn.setOnClickListener{
                 val newCount : Int? = habit.habitCount?.plus(1)
-                habitCountText.text = habit.habitCount.toString()
-                if (newCount != null) {
-                    taskViewModel.updateHabitCount(habit.habitId, newCount)
-                }
-            }
-
-            habitRemoveBtn.setOnClickListener{
-                val newCount : Int? = habit.habitCount?.minus(1)
-                habitCountText.text = habit.habitCount.toString()
+                habitCountText.text = formatCountText(newCount)
                 if (newCount != null) {
                     taskViewModel.updateHabitCount(habit.habitId, newCount)
                 }
             }
         }
 
+        private fun addNegativeListener(habitRemoveBtn: FloatingActionButton, habit: Habit, habitCountText: TextView, taskViewModel: TaskViewModel) {
+            habitRemoveBtn.setOnClickListener{
+                val newCount : Int? = habit.habitCount?.minus(1)
+                habitCountText.text = formatCountText(newCount)
+                if (newCount != null) {
+                    taskViewModel.updateHabitCount(habit.habitId, newCount)
+                }
+            }
+        }
         companion object {
             fun create(parent: ViewGroup, taskViewModel: TaskViewModel): HabitViewHolder {
                 val view: View = LayoutInflater.from(parent.context)
@@ -68,11 +113,11 @@ class HabitListAdapter(private val taskViewModel: TaskViewModel) : ListAdapter<H
     companion object {
         private val HABIT_COMPARATOR = object : DiffUtil.ItemCallback<Habit>() {
             override fun areItemsTheSame(oldItem: Habit, newItem: Habit): Boolean {
-                return oldItem === newItem
+                return oldItem.habitId == newItem.habitId
             }
 
             override fun areContentsTheSame(oldItem: Habit, newItem: Habit): Boolean {
-                return oldItem.habitId == newItem.habitId
+                return oldItem == newItem
             }
         }
     }

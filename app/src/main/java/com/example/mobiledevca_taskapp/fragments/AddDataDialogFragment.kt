@@ -55,7 +55,8 @@ class AddDataDialogFragment : DialogFragment(), AdapterView.OnItemSelectedListen
         val taskDescription = dialogView.findViewById<EditText>(R.id.taskDescriptionInput)
 
         //Habit variables
-        val habitName = dialogView.findViewById<EditText>(R.id.dialogHabitNameInput)
+        val habitName = dialogView.findViewById<TextInputEditText>(R.id.dialogHabitNameInput)
+        val habitResetRadioGroup = dialogView.findViewById<RadioGroup>(R.id.habitTimeSection)
         val habitPositiveCheckbox = dialogView.findViewById<CheckBox>(R.id.habitPositiveCheckbox)
         val habitNegativeCheckbox = dialogView.findViewById<CheckBox>(R.id.habitNegativeCheckbox)
         val stepCounter = dialogView.findViewById<TextInputEditText>(R.id.stepCounterTextInput)
@@ -88,7 +89,12 @@ class AddDataDialogFragment : DialogFragment(), AdapterView.OnItemSelectedListen
                         val habitNegativeState = habitNegativeCheckbox.isChecked
                         val stepCounterText = stepCounter.text.toString().trim()
                         val spinnerSelection = habitSpinner.selectedItemPosition
-
+                        val habitResetValue: Int = when (habitResetRadioGroup.checkedRadioButtonId) {
+                            R.id.habitDailyCounter -> 1
+                            R.id.habitWeeklyCounter -> 2
+                            R.id.habitMonthlyCounter -> 3
+                            else -> 0
+                        }
                         when (dialogType) {
                             "1" -> {
                                 addTask(taskName.text.toString(), taskDescription.text.toString())
@@ -105,14 +111,25 @@ class AddDataDialogFragment : DialogFragment(), AdapterView.OnItemSelectedListen
                                 else if (spinnerSelection == 0) {
                                     Toast.makeText(requireContext(), "Please select a Habit type", Toast.LENGTH_SHORT).show()
                                 }
-                                else if (spinnerSelection == 1 && habitPositiveState == false && habitNegativeState == false) {
+                                else if (spinnerSelection == 1 && !habitPositiveState && !habitNegativeState) {
                                     Toast.makeText(requireContext(), "Please check at least one counter", Toast.LENGTH_SHORT).show()
                                 }
                                 else if(spinnerSelection == 2 && stepCounterText.isEmpty()) {
                                     Toast.makeText(requireContext(),"Please enter amount of steps", Toast.LENGTH_SHORT).show()
                                 }
                                 else {
-                                    addHabit(habitName.text.toString())
+                                    //Initialized here to ensure validation check is passed before inserting to entity table
+                                    var habitCountCheckValue: Int? = 0
+                                    if (habitPositiveState && habitNegativeState) {
+                                        habitCountCheckValue = 0
+                                    }
+                                    else if (habitPositiveState && !habitNegativeState) {
+                                        habitCountCheckValue = 1
+                                    }
+                                    else if (!habitPositiveState && habitNegativeState) {
+                                        habitCountCheckValue = -1
+                                    }
+                                    addHabit(habitName.text.toString(), habitResetValue, habitCountCheckValue)
                                     dialog.dismiss()
                                 }
                             }
@@ -171,14 +188,14 @@ class AddDataDialogFragment : DialogFragment(), AdapterView.OnItemSelectedListen
     }
 
     //Task database function
-    fun addTask(taskName : String, taskDescription : String) {
+    private fun addTask(taskName : String, taskDescription : String) {
         val task = Task(0, taskName, taskDescription)
         taskAppViewModel.insertTask(task)
     }
 
     //Habit database function
-    fun addHabit(habitName: String) {
-        val habit = Habit(0, habitName)
+    private fun addHabit(habitName: String, habitResetValue: Int?, habitCountCheckValue: Int?) {
+        val habit = Habit(0, habitName, habitResetValue, habitCountCheckValue)
         taskAppViewModel.insertHabit(habit)
     }
 

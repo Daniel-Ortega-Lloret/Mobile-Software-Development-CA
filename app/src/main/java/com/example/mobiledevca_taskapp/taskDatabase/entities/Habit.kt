@@ -8,7 +8,8 @@ import androidx.room.PrimaryKey
 data class Habit(
     @PrimaryKey(autoGenerate = true) var habitId: Int = 0,
     val habitName: String,
-    val habitDescription: String? = null,
+    val habitReset: Int? = 0,
+    var habitCountCheck: Int? = 0,
     var habitCount: Int? = 0,
     val habitStepCount: Int? = null,
     val habitTotalStepCount: Int? = null
