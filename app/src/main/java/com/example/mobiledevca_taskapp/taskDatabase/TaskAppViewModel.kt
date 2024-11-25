@@ -1,6 +1,7 @@
 package com.example.mobiledevca_taskapp.taskDatabase
 
 import android.app.Application
+import android.util.Log
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.ViewModel
@@ -12,6 +13,7 @@ import com.example.mobiledevca_taskapp.taskDatabase.entities.Task
 import com.example.mobiledevca_taskapp.taskDatabase.habitClasses.HabitRepository
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
+import java.util.Calendar
 
 class TaskViewModel(application: Application, private val applicationScope: CoroutineScope) : AndroidViewModel(application) {
     private val database = TaskAppRoomDatabase.getDatabase(application, applicationScope)
@@ -48,15 +50,37 @@ class TaskViewModel(application: Application, private val applicationScope: Coro
         habitRepository.getHabitById(habitId)
     }
 
+    fun getAllHabits() = viewModelScope.launch {
+        allHabits
+    }
+
+    fun resetHabits(resetType: Int) {
+        val currentTime = Calendar.getInstance()
+        Log.d("debug", "Resetting habits for type: $resetType at ${currentTime.time}")
+        allHabits.value?.forEach { habit ->
+            val resetRequired = when (habit.habitReset) {
+                1 -> true
+                2 -> currentTime.get(Calendar.DAY_OF_WEEK) == Calendar.MONDAY
+                3 -> currentTime.get(Calendar.DAY_OF_MONTH) == 1
+                else -> false
+            }
+
+            if (resetRequired) {
+                Log.d("TaskViewModel", "Resetting habit: ${habit.habitName}")
+                updateHabitCount(habit.habitId, 0)
+            }
+        }
+    }
 }
 
 class TaskViewModelFactory(
     private val application: TaskAppApplication,
+    private val applicationScope: CoroutineScope
 ) : ViewModelProvider.Factory {
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
         if (modelClass.isAssignableFrom(TaskViewModel::class.java)) {
             @Suppress("UNCHECKED_CAST")
-            return TaskViewModel(application, application.applicationScope) as T
+            return TaskViewModel(application, applicationScope) as T
         }
         throw IllegalArgumentException("Unknown ViewModel class")
     }

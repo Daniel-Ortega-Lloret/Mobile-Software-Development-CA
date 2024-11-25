@@ -42,7 +42,7 @@ class AddDataDialogFragment : DialogFragment(), AdapterView.OnItemSelectedListen
         }
 
         val app = requireActivity().application as TaskAppApplication
-        val factory = TaskViewModelFactory(app)
+        val factory = TaskViewModelFactory(app, app.applicationScope)
         taskAppViewModel = ViewModelProvider(this, factory).get(TaskViewModel::class.java)
     }
 

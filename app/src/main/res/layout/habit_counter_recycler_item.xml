@@ -20,7 +20,8 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        android:src="@drawable/add_button_black"/>
+        android:src="@drawable/add_button_black"
+        android:enabled="false"/>
 
     <LinearLayout
         android:id="@+id/habitCounterTextLayout"
@@ -80,6 +81,6 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         android:src="@drawable/remove_button_black"
-        app:backgroundTint="@color/dark_border_color"/>
+        android:enabled="false"/>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

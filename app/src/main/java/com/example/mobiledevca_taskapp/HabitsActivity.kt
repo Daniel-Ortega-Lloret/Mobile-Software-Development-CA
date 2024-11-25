@@ -2,6 +2,7 @@
 
 package com.example.mobiledevca_taskapp
 
+import android.content.Intent
 import android.os.Bundle
 import android.widget.Button
 import android.widget.Toast
@@ -9,6 +10,7 @@ import androidx.fragment.app.FragmentManager
 import androidx.lifecycle.LifecycleOwner
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.example.mobiledevca_taskapp.broadcast_receivers.HabitResetReceiver
 import com.example.mobiledevca_taskapp.common.BaseActivity
 import com.example.mobiledevca_taskapp.fragments.AddDataDialogFragment
 import com.example.mobiledevca_taskapp.taskDatabase.entities.Habit
@@ -41,6 +43,9 @@ class HabitsActivity : BaseActivity() {
 
         val addHabitBtn: Button = findViewById(R.id.addHabitBtn)
         addHabitBtn.setOnClickListener{
+            val intent = Intent(this, HabitResetReceiver::class.java)
+            intent.putExtra("RESET_TYPE", 1)
+            this.sendBroadcast(intent)
             val addDataDialog = AddDataDialogFragment.newInstance(id, name)
             addDataDialog.show(
                 fragmentManager, AddDataDialogFragment.TAG

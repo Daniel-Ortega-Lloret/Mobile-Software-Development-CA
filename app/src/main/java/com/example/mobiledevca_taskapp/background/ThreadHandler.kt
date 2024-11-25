@@ -6,6 +6,7 @@ import android.os.Handler
 import android.os.Looper
 import android.os.Message
 import android.util.Log
+import android.widget.Toast
 import com.example.mobiledevca_taskapp.common.BaseActivity
 
 class ThreadHandler(ba: BaseActivity): Handler(Looper.myLooper()!!) {
@@ -16,10 +17,8 @@ class ThreadHandler(ba: BaseActivity): Handler(Looper.myLooper()!!) {
         super.handleMessage(msg)
 
         //Start or display activity on the main thread here
-        val result = msg.obj // Example of return object from thread
-        val activityName = msg.data.getString("activityName")
-        Log.d("ThreadHandler", "Preload result received from $activityName")
+        val result = msg.obj as String// Reset message
+        Toast.makeText(_ba, result, Toast.LENGTH_SHORT).show()
 
-        // e.g: _ma.updateUI(msg.arg1)
     }
 }

@@ -57,7 +57,9 @@ class HabitListAdapter(private val taskViewModel: TaskViewModel) : ListAdapter<H
             habitNameView.contentDescription = "Habit name for habit number ${habit.habitId.plus(1)} is ${habit.habitName}"
             resetCountText.contentDescription = "This habit is set to: $stringResetText"
 
+            habitAddBtn.isEnabled = false
             habitAddBtn.setOnClickListener(null)
+            habitRemoveBtn.isEnabled = false
             habitRemoveBtn.setOnClickListener(null)
 
             if (habit.habitCountCheck == 0) {
@@ -83,6 +85,7 @@ class HabitListAdapter(private val taskViewModel: TaskViewModel) : ListAdapter<H
         }
 
         private fun addPositiveListener(habitAddBtn: FloatingActionButton,habit : Habit, habitCountText: TextView, taskViewModel: TaskViewModel) {
+            habitAddBtn.isEnabled = true
             habitAddBtn.setOnClickListener{
                 val newCount : Int? = habit.habitCount?.plus(1)
                 habitCountText.text = formatCountText(newCount)
@@ -93,6 +96,7 @@ class HabitListAdapter(private val taskViewModel: TaskViewModel) : ListAdapter<H
         }
 
         private fun addNegativeListener(habitRemoveBtn: FloatingActionButton, habit: Habit, habitCountText: TextView, taskViewModel: TaskViewModel) {
+            habitRemoveBtn.isEnabled = true
             habitRemoveBtn.setOnClickListener{
                 val newCount : Int? = habit.habitCount?.minus(1)
                 habitCountText.text = formatCountText(newCount)
@@ -101,6 +105,7 @@ class HabitListAdapter(private val taskViewModel: TaskViewModel) : ListAdapter<H
                 }
             }
         }
+
         companion object {
             fun create(parent: ViewGroup, taskViewModel: TaskViewModel): HabitViewHolder {
                 val view: View = LayoutInflater.from(parent.context)
