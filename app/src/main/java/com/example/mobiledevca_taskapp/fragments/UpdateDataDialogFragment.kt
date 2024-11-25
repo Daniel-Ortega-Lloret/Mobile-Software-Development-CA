@@ -23,11 +23,13 @@ import com.example.mobiledevca_taskapp.taskDatabase.entities.Task
 private const val DIALOG_TYPE = "param1"
 private const val Task_Name = "param2"
 private const val Task_Description = "param3"
+private const val Task_Id = "param4"
 
 class UpdateDataDialogFragment : DialogFragment(), AdapterView.OnItemSelectedListener {
     private var dialogType: String? = null
     private var taskName: String? = null
     private var taskDescription: String? = null
+    private var taskId: String? = null
     private lateinit var taskAppViewModel : TaskViewModel
     private lateinit var habitSpinner : Spinner
 
@@ -37,6 +39,7 @@ class UpdateDataDialogFragment : DialogFragment(), AdapterView.OnItemSelectedLis
             dialogType = it.getString(DIALOG_TYPE)
             taskName = it.getString(Task_Name)
             taskDescription = it.getString(Task_Description)
+            taskId = it.getString(Task_Id)
         }
         Log.d("debug","Passed this argument: $dialogType")
 
@@ -93,7 +96,6 @@ class UpdateDataDialogFragment : DialogFragment(), AdapterView.OnItemSelectedLis
                 //If tasks called it
                 if (dialogType == "4")
                 {
-                    updateTask(taskName.text.toString(), taskDescription.text.toString())
                     dialog.dismiss()
                 }
                 else {
@@ -105,7 +107,7 @@ class UpdateDataDialogFragment : DialogFragment(), AdapterView.OnItemSelectedLis
                 dialog.setOnShowListener{
                     val confirmBtn = dialog.getButton(AlertDialog.BUTTON_POSITIVE)
                     confirmBtn.setOnClickListener{
-                        updateTask(taskName.text.toString(), taskDescription.text.toString())
+                        updateTask(taskId.toString().toInt(), taskName.text.toString(), taskDescription.text.toString())
                         dialog.dismiss()
                     }
                 }
@@ -145,9 +147,9 @@ class UpdateDataDialogFragment : DialogFragment(), AdapterView.OnItemSelectedLis
 
     }
 
-    fun updateTask(taskName: String, taskDescription: String)
+    fun updateTask(taskId: Int, taskName: String, taskDescription: String)
     {
-        val task = Task(0, taskName, taskDescription)
+        val task = Task(taskId, taskName, taskDescription)
         taskAppViewModel.updateTask(task)
     }
 
@@ -156,12 +158,13 @@ class UpdateDataDialogFragment : DialogFragment(), AdapterView.OnItemSelectedLis
     companion object {
         const val TAG = "UpdateDataDialog"
         @JvmStatic
-        fun newInstance(param1: String, param2: String, param3: String) =
+        fun newInstance(param1: String, param2: String, param3: String, param4: String) =
             UpdateDataDialogFragment().apply {
                 arguments = Bundle().apply {
                     putString(DIALOG_TYPE, param1)
                     putString(Task_Name, param2)
                     putString(Task_Description, param3)
+                    putString(Task_Id, param4)
                 }
             }
     }

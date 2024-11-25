@@ -29,6 +29,7 @@ class TaskListAdapter(fragmentManager: FragmentManager): ListAdapter<Task, TaskV
     class TaskViewHolder(itemView: View, fragmentManager: FragmentManager) : RecyclerView.ViewHolder(itemView), View.OnClickListener {
         private val taskNameView: TextView = itemView.findViewById(R.id.Task_Name)
         private val taskDescriptionView: TextView = itemView.findViewById(R.id.Task_Description)
+        private var taskId = 0
         private val fragmentManager = fragmentManager
 
         init
@@ -39,6 +40,7 @@ class TaskListAdapter(fragmentManager: FragmentManager): ListAdapter<Task, TaskV
         fun bind(task: Task) {
             taskNameView.text = task.taskName
             taskDescriptionView.text = task.description ?: ""
+            taskId  = task.taskId
 
             taskNameView.contentDescription = "Task name: ${task.taskName}"
             taskDescriptionView.contentDescription = "Task description: ${task.description ?: ""}"
@@ -53,8 +55,8 @@ class TaskListAdapter(fragmentManager: FragmentManager): ListAdapter<Task, TaskV
         }
 
         override fun onClick(v: View?) {
-            val task: Task = Task(0, taskNameView.text.toString(), taskDescriptionView.text.toString())
-            val UpdateDataDialog = UpdateDataDialogFragment.newInstance("4", task.taskName, task.description)
+            val task: Task = Task(taskId, taskNameView.text.toString(), taskDescriptionView.text.toString())
+            val UpdateDataDialog = UpdateDataDialogFragment.newInstance("4", task.taskName, task.description, taskId.toString())
             UpdateDataDialog.show(fragmentManager, UpdateDataDialogFragment.TAG)
         }
 
