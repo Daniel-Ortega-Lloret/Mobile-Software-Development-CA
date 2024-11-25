@@ -32,7 +32,7 @@ class AddDataDialogFragment : DialogFragment(), AdapterView.OnItemSelectedListen
     private var dialogName: String? = null
     private lateinit var dialogView : View //So other functions may access the root view
     private lateinit var taskAppViewModel : TaskViewModel
-    private lateinit var habitSpinnerItem : String
+    private var habitSpinnerItem : Int? = 0
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -129,7 +129,7 @@ class AddDataDialogFragment : DialogFragment(), AdapterView.OnItemSelectedListen
                                     else if (!habitPositiveState && habitNegativeState) {
                                         habitCountCheckValue = -1
                                     }
-                                    addHabit(habitName.text.toString(), habitResetValue, habitCountCheckValue)
+                                    addHabit(habitName.text.toString(), habitResetValue, habitCountCheckValue, habitSpinnerItem)
                                     dialog.dismiss()
                                 }
                             }
@@ -164,7 +164,7 @@ class AddDataDialogFragment : DialogFragment(), AdapterView.OnItemSelectedListen
     }
     //Spinner function for selection
     override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
-        habitSpinnerItem = parent?.getItemAtPosition(position).toString()
+        habitSpinnerItem = position
 
         if (view != null) {
             if (position == 0){
@@ -194,8 +194,8 @@ class AddDataDialogFragment : DialogFragment(), AdapterView.OnItemSelectedListen
     }
 
     //Habit database function
-    private fun addHabit(habitName: String, habitResetValue: Int?, habitCountCheckValue: Int?) {
-        val habit = Habit(0, habitName, habitResetValue, habitCountCheckValue)
+    private fun addHabit(habitName: String, habitResetValue: Int?, habitCountCheckValue: Int?, habitSwitchValue : Int?) {
+        val habit = Habit(0, habitName, habitResetValue, habitCountCheckValue, habitSwitchValue)
         taskAppViewModel.insertHabit(habit)
     }
 

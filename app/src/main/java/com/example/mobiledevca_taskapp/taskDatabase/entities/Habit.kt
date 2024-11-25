@@ -10,6 +10,7 @@ data class Habit(
     val habitName: String,
     val habitReset: Int? = 0,
     var habitCountCheck: Int? = 0,
+    var habitSwitch: Int? = 0,
     var habitCount: Int? = 0,
     val habitStepCount: Int? = null,
     val habitTotalStepCount: Int? = null

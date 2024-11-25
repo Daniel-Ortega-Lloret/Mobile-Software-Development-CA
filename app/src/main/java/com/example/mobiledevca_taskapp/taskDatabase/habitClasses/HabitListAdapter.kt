@@ -8,24 +8,55 @@ import android.widget.TextView
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
+import androidx.recyclerview.widget.RecyclerView.ViewHolder
 import com.example.mobiledevca_taskapp.R
 import com.example.mobiledevca_taskapp.taskDatabase.TaskViewModel
 import com.example.mobiledevca_taskapp.taskDatabase.entities.Habit
-import com.example.mobiledevca_taskapp.taskDatabase.habitClasses.HabitListAdapter.HabitViewHolder
+import com.example.mobiledevca_taskapp.taskDatabase.habitClasses.HabitListAdapter.HabitCountViewHolder
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 
-class HabitListAdapter(private val taskViewModel: TaskViewModel) : ListAdapter<Habit, HabitViewHolder>(HABIT_COMPARATOR) {
+class HabitListAdapter(private val taskViewModel: TaskViewModel) : ListAdapter<Habit, RecyclerView.ViewHolder>(HABIT_COMPARATOR) {
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): HabitViewHolder {
-        return HabitViewHolder.create(parent, taskViewModel)
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
+        Log.d("debug", "ma shit is $viewType")
+        return when (viewType) {
+            TYPE_COUNT -> HabitCountViewHolder(
+                LayoutInflater.from(parent.context).inflate(R.layout.habit_counter_recycler_item, parent, false),
+                taskViewModel
+            )
+            TYPE_STEP -> StepCountViewHolder(
+                LayoutInflater.from(parent.context).inflate(R.layout.habit_step_counter_recycler_item, parent, false),
+                taskViewModel
+            )
+            else -> throw IllegalArgumentException("Invalid view type")
+        }
     }
 
-    override fun onBindViewHolder(holder: HabitViewHolder, position: Int) {
+    override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
         val current = getItem(position)
-        holder.bind(current, taskViewModel)
+
+        when(holder) {
+            is HabitCountViewHolder -> holder.bind(current, taskViewModel)
+            is StepCountViewHolder -> holder.bind(current, taskViewModel)
+        }
+
     }
 
-    class HabitViewHolder(itemView: View, taskViewModel: TaskViewModel) : RecyclerView.ViewHolder(itemView) {
+    override fun getItemViewType(position: Int): Int {
+        Log.d("debug", "ma shit is ${getItem(position).habitSwitch}")
+        if (getItem(position).habitSwitch == 1){
+            return 1
+        }
+        else if (getItem(position).habitSwitch == 2) {
+            return 2
+        }
+        else {
+            return -1
+        }
+
+    }
+
+    class HabitCountViewHolder(itemView: View, taskViewModel: TaskViewModel) : RecyclerView.ViewHolder(itemView) {
         private val habitNameView: TextView = itemView.findViewById(R.id.habitName)
         private var habitCountText: TextView = itemView.findViewById(R.id.habitCountText)
         private val habitAddBtn: FloatingActionButton = itemView.findViewById(R.id.habitCounterAddBtn)
@@ -107,15 +138,33 @@ class HabitListAdapter(private val taskViewModel: TaskViewModel) : ListAdapter<H
         }
 
         companion object {
-            fun create(parent: ViewGroup, taskViewModel: TaskViewModel): HabitViewHolder {
+            fun create(parent: ViewGroup, taskViewModel: TaskViewModel): HabitCountViewHolder {
                 val view: View = LayoutInflater.from(parent.context)
                     .inflate(R.layout.habit_counter_recycler_item, parent, false)
-                return HabitViewHolder(view, taskViewModel)
+                return HabitCountViewHolder(view, taskViewModel)
+            }
+        }
+    }
+
+    class StepCountViewHolder(itemView: View, taskViewModel: TaskViewModel) : RecyclerView.ViewHolder(itemView) {
+
+        fun bind(habit: Habit, taskViewModel: TaskViewModel) {
+
+        }
+        companion object {
+            fun create(parent: ViewGroup, taskViewModel: TaskViewModel): HabitCountViewHolder {
+                val view: View = LayoutInflater.from(parent.context)
+                    .inflate(R.layout.habit_step_counter_recycler_item, parent, false)
+                return HabitCountViewHolder(view, taskViewModel)
             }
         }
     }
 
     companion object {
+
+        private const val TYPE_COUNT = 1
+        private const val TYPE_STEP = 2
+
         private val HABIT_COMPARATOR = object : DiffUtil.ItemCallback<Habit>() {
             override fun areItemsTheSame(oldItem: Habit, newItem: Habit): Boolean {
                 return oldItem.habitId == newItem.habitId
