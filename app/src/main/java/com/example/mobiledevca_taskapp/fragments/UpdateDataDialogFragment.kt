@@ -29,7 +29,7 @@ class UpdateDataDialogFragment : DialogFragment(), AdapterView.OnItemSelectedLis
     private var dialogType: String? = null
     private var taskName: String? = null
     private var taskDescription: String? = null
-    private var taskId: String? = null
+    private var taskId: String? = ""
     private lateinit var task: Task
     private lateinit var taskAppViewModel : TaskViewModel
     private lateinit var habitSpinner : Spinner
@@ -105,6 +105,8 @@ class UpdateDataDialogFragment : DialogFragment(), AdapterView.OnItemSelectedLis
                     // Confirm Button Pressed
                     val confirmBtn = dialog.getButton(AlertDialog.BUTTON_POSITIVE)
                     confirmBtn.setOnClickListener{
+                        // Task Must Take The Edit Text Values To Save Changed
+                        task = Task(task.taskId, taskName.text.toString(), taskDescription.text.toString())
                         if (task != null) {
                             updateTask(task)
                         }
@@ -113,6 +115,7 @@ class UpdateDataDialogFragment : DialogFragment(), AdapterView.OnItemSelectedLis
 
                     val deleteBtn = dialog.getButton((AlertDialog.BUTTON_NEUTRAL))
                     deleteBtn.setOnClickListener {
+                        // We just use the initialised task at the top of this class otherwise if we want to delete
                         if (task != null) {
                             deleteTask(task)
                         }
