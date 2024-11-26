@@ -16,4 +16,10 @@ class TaskRepository (private val taskDAO: TaskDAO): TaskAppRepository<Task>(tas
     suspend fun deleteTask(taskId: Int){
         taskDAO.deleteTaskById(taskId)
     }
+
+    @WorkerThread
+    suspend fun ChangeCheckbox(task: Task)
+    {
+        taskDAO.changeTaskById(task.taskId, task.isChecked)
+    }
 }

@@ -39,6 +39,10 @@ class TaskViewModel(application: Application, private val applicationScope: Coro
         taskRepository.deleteTask(taskId)
     }
 
+    fun ChangeCheckbox(task: Task) = viewModelScope.launch {
+        taskRepository.ChangeCheckbox(task)
+    }
+
     val allHabits: LiveData<List<Habit>> = habitRepository.allItems.asLiveData()
 
     fun insertHabit(habit: Habit) = viewModelScope.launch {

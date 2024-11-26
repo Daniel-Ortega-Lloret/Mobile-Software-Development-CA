@@ -18,4 +18,7 @@ interface TaskDAO : BaseDAO<Task>{
 
     @Query("DELETE FROM Task WHERE taskId = :task_Id")
     suspend fun deleteTaskById(task_Id: Int)
+
+    @Query("UPDATE Task Set isChecked = :is_Checked WHERE taskId = :task_Id")
+    suspend fun changeTaskById(task_Id: Int, is_Checked: Boolean)
 }
