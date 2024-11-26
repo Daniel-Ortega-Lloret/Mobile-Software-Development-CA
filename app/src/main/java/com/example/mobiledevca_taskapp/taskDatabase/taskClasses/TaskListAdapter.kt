@@ -28,7 +28,7 @@ class TaskListAdapter(fragmentManager: FragmentManager): ListAdapter<Task, TaskV
 
     class TaskViewHolder(itemView: View, fragmentManager: FragmentManager) : RecyclerView.ViewHolder(itemView), View.OnClickListener {
         private val taskNameView: TextView = itemView.findViewById(R.id.Task_Name)
-        private val taskDescriptionView: TextView = itemView.findViewById(R.id.Task_Description)
+        private lateinit var taskDescriptionView: String
         private var taskId = 0
         private val fragmentManager = fragmentManager
 
@@ -39,11 +39,11 @@ class TaskListAdapter(fragmentManager: FragmentManager): ListAdapter<Task, TaskV
 
         fun bind(task: Task) {
             taskNameView.text = task.taskName
-            taskDescriptionView.text = task.description ?: ""
+            taskDescriptionView = task.description
             taskId  = task.taskId
 
             taskNameView.contentDescription = "Task name: ${task.taskName}"
-            taskDescriptionView.contentDescription = "Task description: ${task.description ?: ""}"
+            //taskDescriptionView.contentDescription = "Task description: ${task.description ?: ""}"
         }
 
         companion object {
@@ -61,7 +61,7 @@ class TaskListAdapter(fragmentManager: FragmentManager): ListAdapter<Task, TaskV
             stringArray.add("4")    // This is how we know we came from TasksActivity
             stringArray.add(taskId.toString())
             stringArray.add(taskNameView.text.toString())
-            stringArray.add(taskDescriptionView.text.toString())
+            stringArray.add(taskDescriptionView)
 
 
             val UpdateDataDialog = UpdateDataDialogFragment.newInstance(stringArray)

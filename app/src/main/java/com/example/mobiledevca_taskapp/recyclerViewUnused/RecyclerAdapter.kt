@@ -52,7 +52,6 @@ RecyclerView.Adapter<RecyclerAdapter.ItemHolder>()
         init {
             // pull references from the layout for the text views
             _task_name = _view.findViewById<TextView>(R.id.Task_Name)
-            _task_description = _view.findViewById<TextView>(R.id.Task_Description)
             // Set A Listener For Clicks On This View Holder
             _view.setOnClickListener(this)
         }
