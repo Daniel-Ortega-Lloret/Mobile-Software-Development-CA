@@ -39,7 +39,7 @@ abstract class BaseActivity : AppCompatActivity() {
         val sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this)
         val CheckSwitch = sharedPreferences?.getBoolean("Dark_Mode_Switch", false) // If it hasnt been set, default light mode
 
-        // Check if Whats Stored in Root Prefences is Light Mode / Dark Mode
+        // Check if Whats Stored in Root Preferences is Light Mode / Dark Mode
         // Change the theme for the base == Every / Activity
         if (CheckSwitch != null && CheckSwitch == true)
         {

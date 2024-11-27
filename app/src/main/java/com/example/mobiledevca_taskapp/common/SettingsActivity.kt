@@ -43,32 +43,6 @@ class SettingsActivity : AppCompatActivity() {
             {
                 SwichPreference?.isChecked = false
             }
-            /*
-            when(currentMode)
-            {
-                // Night Mode Enabled
-                AppCompatDelegate.MODE_NIGHT_YES ->
-                {
-                    SwichPreference?.isChecked = true
-                }
-
-                // Night Mode Disabled
-                AppCompatDelegate.MODE_NIGHT_NO ->
-                {
-                    SwichPreference?.isChecked = false
-                }
-
-                // Its not specified, So We Must Find Out If Its Light or Dark
-                AppCompatDelegate.MODE_NIGHT_UNSPECIFIED ->
-                {
-                    if (resources.configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK == Configuration.UI_MODE_NIGHT_YES)
-                    {
-                        SwichPreference?.isChecked = true
-                    }
-                }
-                // If There is a problem its probably cause i didnt check for sys default (= follow_system)
-            } */
-
 
             // Listen for clicks
             SwichPreference?.setOnPreferenceClickListener {

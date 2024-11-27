@@ -29,11 +29,12 @@
         </CheckBox>
 
         <TextView
+            android:layout_marginLeft="2dp"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="2"
             android:text="string"
-            android:textAlignment="center"
+            android:textAlignment="viewStart"
             android:textSize="@dimen/font_size"
             android:id="@+id/Task_Name"/>
 
