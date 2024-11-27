@@ -5,8 +5,6 @@ package com.example.mobiledevca_taskapp
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
-import android.hardware.Sensor
-import android.hardware.SensorManager
 import android.Manifest
 import android.content.ComponentName
 import android.content.ServiceConnection

@@ -41,6 +41,7 @@ class StepCounterService : Service(), SensorEventListener {
 
     //Keeps service running in the background
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
+        Log.d("debug", "starting foreground service")
         val notification = createNotification()
         startForeground(1, notification)
 
@@ -72,13 +73,15 @@ class StepCounterService : Service(), SensorEventListener {
                 NotificationManager.IMPORTANCE_LOW
             )
             notificationManager.createNotificationChannel(channel)
+            Log.d("debug", "notification channel created")
         }
 
         return NotificationCompat.Builder(this, channelId)
             .setContentTitle("Step Counter Active")
             .setContentText("Tracking your steps in the background")
             .setSmallIcon(R.mipmap.ic_launcher_custom)
-            .setPriority(NotificationCompat.PRIORITY_LOW)
+            .setPriority(NotificationCompat.PRIORITY_HIGH)
+            .setOngoing(true)
             .build()
     }
 
