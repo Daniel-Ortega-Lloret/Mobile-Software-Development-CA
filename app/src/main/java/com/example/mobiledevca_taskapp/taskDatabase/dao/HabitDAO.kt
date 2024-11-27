@@ -19,6 +19,9 @@ interface HabitDAO : BaseDAO<Habit>{
     @Query("SELECT * FROM Habit WHERE habitId = :habitId LIMIT 1")
     suspend fun getHabitById(habitId: Int): Habit?
 
-    @Query("SELECT * FROM Habit")
-    suspend fun getAllHabitsReset(): List<Habit>
+    @Query("SELECT habitTotalStepCount FROM Habit WHERE habitId = :habitId")
+    suspend fun getTotalStepsById(habitId: Int): Int?
+
+    @Query("UPDATE Habit SET habitStepCount = :newCount WHERE habitId = :habitId")
+    suspend fun updateHabitStepCount(habitId: Int, newCount: Int)
 }

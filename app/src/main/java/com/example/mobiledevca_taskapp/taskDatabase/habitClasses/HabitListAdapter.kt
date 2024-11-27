@@ -1,5 +1,6 @@
 package com.example.mobiledevca_taskapp.taskDatabase.habitClasses
 
+import android.content.Intent
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
@@ -10,6 +11,7 @@ import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.RecyclerView.ViewHolder
 import com.example.mobiledevca_taskapp.R
+import com.example.mobiledevca_taskapp.services.StepCounterService
 import com.example.mobiledevca_taskapp.taskDatabase.TaskViewModel
 import com.example.mobiledevca_taskapp.taskDatabase.entities.Habit
 import com.example.mobiledevca_taskapp.taskDatabase.habitClasses.HabitListAdapter.HabitCountViewHolder
@@ -18,7 +20,6 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton
 class HabitListAdapter(private val taskViewModel: TaskViewModel) : ListAdapter<Habit, RecyclerView.ViewHolder>(HABIT_COMPARATOR) {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
-        Log.d("debug", "ma shit is $viewType")
         return when (viewType) {
             TYPE_COUNT -> HabitCountViewHolder(
                 LayoutInflater.from(parent.context).inflate(R.layout.habit_counter_recycler_item, parent, false),
@@ -43,7 +44,6 @@ class HabitListAdapter(private val taskViewModel: TaskViewModel) : ListAdapter<H
     }
 
     override fun getItemViewType(position: Int): Int {
-        Log.d("debug", "ma shit is ${getItem(position).habitSwitch}")
         if (getItem(position).habitSwitch == 1){
             return 1
         }
@@ -136,27 +136,35 @@ class HabitListAdapter(private val taskViewModel: TaskViewModel) : ListAdapter<H
                 }
             }
         }
-
-        companion object {
-            fun create(parent: ViewGroup, taskViewModel: TaskViewModel): HabitCountViewHolder {
-                val view: View = LayoutInflater.from(parent.context)
-                    .inflate(R.layout.habit_counter_recycler_item, parent, false)
-                return HabitCountViewHolder(view, taskViewModel)
-            }
-        }
     }
 
     class StepCountViewHolder(itemView: View, taskViewModel: TaskViewModel) : RecyclerView.ViewHolder(itemView) {
+        private val stepCountName: TextView = itemView.findViewById(R.id.stepCountName)
+        private val stepResetText: TextView = itemView.findViewById(R.id.stepResetCounterText)
+        private val stepCurrentNumber: TextView = itemView.findViewById(R.id.stepNumCurrent)
+        private val stepTotalNumber: TextView = itemView.findViewById(R.id.stepNumTotal)
 
         fun bind(habit: Habit, taskViewModel: TaskViewModel) {
+            stepCountName.text = habit.habitName
+            val resetValue: Int? = habit.habitReset
+            val stringResetText : String = when (resetValue) {
+                1 -> {
+                    "Resets Daily"
+                }
 
-        }
-        companion object {
-            fun create(parent: ViewGroup, taskViewModel: TaskViewModel): HabitCountViewHolder {
-                val view: View = LayoutInflater.from(parent.context)
-                    .inflate(R.layout.habit_step_counter_recycler_item, parent, false)
-                return HabitCountViewHolder(view, taskViewModel)
+                2 -> {
+                    "Resets Weekly"
+                }
+
+                3 -> {
+                    "Resets Monthly"
+                }
+                else -> ""
             }
+            stepResetText.text = stringResetText
+            stepCurrentNumber.text =  habit.habitStepCount.toString()
+            stepTotalNumber.text = habit.habitTotalStepCount.toString()
+
         }
     }
 

@@ -2,6 +2,12 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools">
 
+    <uses-permission android:name="android.permission.ACTIVITY_RECOGNITION"/>
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE"/>
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_HEALTH"/>
+
+
+
     <application
         android:name=".taskDatabase.TaskAppApplication"
         android:allowBackup="true"
@@ -13,6 +19,11 @@
         tools:targetApi="31">
 
         <receiver android:name=".broadcast_receivers.HabitResetReceiver" android:enabled="true" android:exported="false"/>
+        <service
+            android:name=".services.StepCounterService"
+            android:enabled="true"
+            android:exported="true"
+            android:foregroundServiceType="health"/>
 
         <activity
             android:name=".HabitsActivity"

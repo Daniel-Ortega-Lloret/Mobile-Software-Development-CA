@@ -12,7 +12,6 @@ import com.example.mobiledevca_taskapp.taskDatabase.entities.Habit
 import com.example.mobiledevca_taskapp.taskDatabase.entities.Task
 import com.example.mobiledevca_taskapp.taskDatabase.habitClasses.HabitRepository
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.launch
 import java.util.Calendar
 
@@ -55,13 +54,23 @@ class TaskViewModel(application: Application, private val applicationScope: Coro
         allHabits
     }
 
+    fun getTotalStepsById(habitId: Int) = viewModelScope.launch {
+        habitRepository.getTotalStepsById(habitId)
+    }
+
+    fun updateStepCount(currentSteps: Float) = viewModelScope.launch {
+        allHabits.value?.forEach { habit ->
+            val newCount = habit.habitStepCount?.plus(currentSteps.toInt())
+            if (newCount != null) {
+                habitRepository.updateHabitStepCount(habit.habitId, newCount)
+            }
+        }
+    }
+
     fun resetHabits(resetType: Int) = viewModelScope.launch {
         val currentTime = Calendar.getInstance()
         Log.d("debug", "Resetting habits for type: $resetType at ${currentTime.time}")
-
-        val habits = habitRepository.getAllHabitsReset()
-
-        habits.forEach { habit ->
+        allHabits.value?.forEach { habit ->
             val resetRequired = when (habit.habitReset) {
                 1 -> true
                 2 -> currentTime.get(Calendar.DAY_OF_WEEK) == Calendar.MONDAY

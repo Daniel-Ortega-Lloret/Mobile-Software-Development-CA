@@ -4,6 +4,7 @@ import androidx.annotation.WorkerThread
 import com.example.mobiledevca_taskapp.taskDatabase.TaskAppRepository
 import com.example.mobiledevca_taskapp.taskDatabase.dao.HabitDAO
 import com.example.mobiledevca_taskapp.taskDatabase.entities.Habit
+import kotlinx.coroutines.flow.forEach
 
 class HabitRepository(private val habitDao: HabitDAO) : TaskAppRepository<Habit>(habitDao){
     @WorkerThread
@@ -17,7 +18,12 @@ class HabitRepository(private val habitDao: HabitDAO) : TaskAppRepository<Habit>
     }
 
     @WorkerThread
-    suspend fun getAllHabitsReset() : List<Habit>{
-        return habitDao.getAllHabitsReset()
+    suspend fun getTotalStepsById(habitId: Int) : Int? {
+        return habitDao.getTotalStepsById(habitId)
+    }
+
+    @WorkerThread
+    suspend fun updateHabitStepCount(habitId: Int, newCount: Int) {
+        habitDao.updateHabitStepCount(habitId, newCount)
     }
 }

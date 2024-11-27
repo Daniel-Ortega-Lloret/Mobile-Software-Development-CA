@@ -12,6 +12,6 @@ data class Habit(
     var habitCountCheck: Int? = 0,
     var habitSwitch: Int? = 0,
     var habitCount: Int? = 0,
-    val habitStepCount: Int? = null,
-    val habitTotalStepCount: Int? = null
+    var habitStepCount: Int? = 0,
+    val habitTotalStepCount: Int? = 0
 )

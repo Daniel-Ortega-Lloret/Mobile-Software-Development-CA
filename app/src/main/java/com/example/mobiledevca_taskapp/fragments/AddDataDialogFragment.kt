@@ -129,7 +129,16 @@ class AddDataDialogFragment : DialogFragment(), AdapterView.OnItemSelectedListen
                                     else if (!habitPositiveState && habitNegativeState) {
                                         habitCountCheckValue = -1
                                     }
-                                    addHabit(habitName.text.toString(), habitResetValue, habitCountCheckValue, habitSpinnerItem)
+
+                                    if (spinnerSelection == 1) {
+                                        addHabit(habitName.text.toString(), habitResetValue, habitCountCheckValue, habitSpinnerItem, 0)
+                                    }
+                                    else if (spinnerSelection == 2) {
+                                        addHabit(habitName.text.toString(), habitResetValue, habitCountCheckValue, habitSpinnerItem,
+                                            stepCounter.text.toString().toInt()
+                                        )
+                                    }
+
                                     dialog.dismiss()
                                 }
                             }
@@ -194,8 +203,8 @@ class AddDataDialogFragment : DialogFragment(), AdapterView.OnItemSelectedListen
     }
 
     //Habit database function
-    private fun addHabit(habitName: String, habitResetValue: Int?, habitCountCheckValue: Int?, habitSwitchValue : Int?) {
-        val habit = Habit(0, habitName, habitResetValue, habitCountCheckValue, habitSwitchValue)
+    private fun addHabit(habitName: String, habitResetValue: Int?, habitCountCheckValue: Int?, habitSwitchValue : Int?, stepTotalValue: Int?) {
+        val habit = Habit(0, habitName, habitResetValue, habitCountCheckValue, habitSwitchValue,0, 0, stepTotalValue)
         taskAppViewModel.insertHabit(habit)
     }
 

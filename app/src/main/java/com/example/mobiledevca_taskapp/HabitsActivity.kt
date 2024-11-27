@@ -2,11 +2,19 @@
 
 package com.example.mobiledevca_taskapp
 
+import android.content.Context
 import android.content.Intent
+import android.content.pm.PackageManager
+import android.hardware.Sensor
+import android.hardware.SensorManager
+import android.Manifest
+import android.os.Build
 import android.os.Bundle
 import android.util.Log
 import android.widget.Button
 import android.widget.Toast
+import androidx.core.app.ActivityCompat
+import androidx.core.content.ContextCompat
 import androidx.fragment.app.FragmentManager
 import androidx.lifecycle.LifecycleOwner
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -14,6 +22,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.mobiledevca_taskapp.broadcast_receivers.HabitResetReceiver
 import com.example.mobiledevca_taskapp.common.BaseActivity
 import com.example.mobiledevca_taskapp.fragments.AddDataDialogFragment
+import com.example.mobiledevca_taskapp.services.StepCounterService
 import com.example.mobiledevca_taskapp.taskDatabase.entities.Habit
 import com.example.mobiledevca_taskapp.taskDatabase.habitClasses.HabitListAdapter
 
@@ -28,13 +37,31 @@ class HabitsActivity : BaseActivity() {
 
         setActivityContent(R.layout.activity_habit, getString(R.string.menu_habits))
 
+        // Check and request permission
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+            if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACTIVITY_RECOGNITION)
+                != PackageManager.PERMISSION_GRANTED
+            ) {
+                ActivityCompat.requestPermissions(
+                    this,
+                    arrayOf(Manifest.permission.ACTIVITY_RECOGNITION),
+                    REQUEST_ACTIVITY_RECOGNITION
+                )
+            } else {
+                // If permission granted, start service
+                startStepCounterService()
+            }
+        } else {
+            // No permission needed for Android 9 and below
+            startStepCounterService()
+        }
+
         _recyclerview = findViewById(R.id.habitRecyclerView)
         val adapter = HabitListAdapter(taskViewModel)
         _recyclerview.adapter = adapter
         _recyclerview.layoutManager = LinearLayoutManager(this)
 
         taskViewModel.allHabits.observe(this as LifecycleOwner) { habits ->
-            Log.d("debug", "Observed habits: ${habits?.size} items")
             habits?.let{ adapter.submitList(it)}
         }
 
@@ -64,5 +91,30 @@ class HabitsActivity : BaseActivity() {
             taskViewModel.deleteAllHabits()
             Toast.makeText(this, "All habits deleted", Toast.LENGTH_SHORT).show()
         }
+    }
+
+    private fun startStepCounterService() {
+        Log.d("debug", "Shtarting my shit uppppp")
+        val serviceIntent = Intent(this, StepCounterService::class.java)
+        //Android 8.0 requirements
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O){
+            startForegroundService(serviceIntent)
+        }
+        else {
+            startService(serviceIntent)
+        }
+    }
+
+    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<String>, grantResults: IntArray) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+        if (requestCode == REQUEST_ACTIVITY_RECOGNITION && grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+            startStepCounterService()
+        } else {
+            Toast.makeText(this, "Permission denied. Cannot count steps.", Toast.LENGTH_SHORT).show()
+        }
+    }
+
+    companion object {
+        const val REQUEST_ACTIVITY_RECOGNITION = 1001
     }
 }
