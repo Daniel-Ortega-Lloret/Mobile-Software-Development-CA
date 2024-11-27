@@ -10,13 +10,13 @@ import android.hardware.Sensor
 import android.hardware.SensorEvent
 import android.hardware.SensorEventListener
 import android.hardware.SensorManager
+import android.os.Binder
 import android.os.Build
 import android.os.IBinder
 import android.util.Log
 import android.widget.Toast
 import androidx.core.app.NotificationCompat
 import com.example.mobiledevca_taskapp.R
-import com.example.mobiledevca_taskapp.common.ViewModelSharer
 import com.example.mobiledevca_taskapp.taskDatabase.TaskViewModel
 import com.example.mobiledevca_taskapp.taskDatabase.habitClasses.HabitRepository
 
@@ -25,10 +25,11 @@ class StepCounterService : Service(), SensorEventListener {
     private var stepCounter: Sensor? = null
     private var previousTotalSteps: Float = 0f
     private var taskViewModel: TaskViewModel? = null
+    private val binder = StepCounterBinder()
 
     override fun onCreate() {
         super.onCreate()
-        Log.d("debug", "I be da step sensorrrr")
+        Log.d("debug", "Creating step sensor")
 
         sensorManager = getSystemService(Context.SENSOR_SERVICE) as SensorManager
         stepCounter = sensorManager.getDefaultSensor(Sensor.TYPE_STEP_COUNTER)
@@ -40,7 +41,6 @@ class StepCounterService : Service(), SensorEventListener {
 
     //Keeps service running in the background
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
-        taskViewModel = ViewModelSharer.taskViewModel
         val notification = createNotification()
         startForeground(1, notification)
 
@@ -48,18 +48,15 @@ class StepCounterService : Service(), SensorEventListener {
     }
 
     override fun onSensorChanged(event: SensorEvent?) {
-        Log.d("debug", "i be shtepping rn")
+        Log.d("debug", "Step detected")
         if (event != null && event.sensor.type == Sensor.TYPE_STEP_COUNTER) {
-            if (previousTotalSteps == 0f) {
+
+            if (previousTotalSteps == 0f){
                 previousTotalSteps = event.values[0]
             }
+            val steps = event.values[0] - previousTotalSteps
 
-            val currentSteps = event.values[0] - previousTotalSteps
-            Log.d("debug", "$currentSteps")
-            taskViewModel?.updateStepCount(currentSteps)
-
-            previousTotalSteps = event.values[0]
-
+            taskViewModel?.updateStepCount(steps.toInt())
         }
     }
 
@@ -96,7 +93,17 @@ class StepCounterService : Service(), SensorEventListener {
     }
 
     //Not a bound service so I return null
-    override fun onBind(intent: Intent?): IBinder? {
-        return null
+    override fun onBind(intent: Intent?): IBinder = binder
+
+    inner class StepCounterBinder: Binder() {
+        fun setTaskViewModel(viewModel: TaskViewModel) {
+            this@StepCounterService.setTaskViewModel(viewModel)
+        }
+        fun getService(): StepCounterService = this@StepCounterService
+    }
+
+    fun setTaskViewModel(viewModel: TaskViewModel) {
+        taskViewModel = viewModel
+        Log.d("debug", "taskview model is set")
     }
 }

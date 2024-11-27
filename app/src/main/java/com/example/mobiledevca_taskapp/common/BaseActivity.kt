@@ -60,8 +60,6 @@ abstract class BaseActivity : AppCompatActivity() {
         val app = application as TaskAppApplication
         val factory = TaskViewModelFactory(app, app.applicationScope)
         taskViewModel = ViewModelProvider(this, factory).get(TaskViewModel::class.java)
-
-        ViewModelSharer.taskViewModel = taskViewModel
     }
 
     //Sets up content layout for each activity

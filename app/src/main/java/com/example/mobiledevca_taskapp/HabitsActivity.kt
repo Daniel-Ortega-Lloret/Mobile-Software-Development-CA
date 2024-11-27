@@ -8,8 +8,11 @@ import android.content.pm.PackageManager
 import android.hardware.Sensor
 import android.hardware.SensorManager
 import android.Manifest
+import android.content.ComponentName
+import android.content.ServiceConnection
 import android.os.Build
 import android.os.Bundle
+import android.os.IBinder
 import android.util.Log
 import android.widget.Button
 import android.widget.Toast
@@ -29,8 +32,24 @@ import com.example.mobiledevca_taskapp.taskDatabase.habitClasses.HabitListAdapte
 class HabitsActivity : BaseActivity() {
     private lateinit var _recyclerview: RecyclerView
     private lateinit var fragmentManager: FragmentManager
+    private var stepCounterService: StepCounterService? = null
+    private var isBound = false
     private lateinit var id : String
     private lateinit var name: String
+    private val connection = object: ServiceConnection {
+        override fun onServiceConnected(name: ComponentName?, service: IBinder?) {
+//            Log.d("debug", "onService is called")
+            val binder = service as StepCounterService.StepCounterBinder
+            stepCounterService = binder.getService()
+            stepCounterService?.setTaskViewModel(taskViewModel)
+            isBound = true
+        }
+
+        override fun onServiceDisconnected(name: ComponentName?) {
+            stepCounterService = null
+            isBound = false
+        }
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -80,7 +99,7 @@ class HabitsActivity : BaseActivity() {
 
         val resetHabitCountBtn: Button = findViewById(R.id.resetDailyBtn)
         resetHabitCountBtn.setOnClickListener{
-            Log.d("debug", "Tried to reset")
+//            Log.d("debug", "Tried to reset")
             val intent = Intent(this, HabitResetReceiver::class.java)
             intent.putExtra("RESET_TYPE", 1)
             this.sendBroadcast(intent)
@@ -94,8 +113,9 @@ class HabitsActivity : BaseActivity() {
     }
 
     private fun startStepCounterService() {
-        Log.d("debug", "Shtarting my shit uppppp")
+        Log.d("debug", "Starting service bind")
         val serviceIntent = Intent(this, StepCounterService::class.java)
+        bindService(serviceIntent, connection, Context.BIND_AUTO_CREATE)
         //Android 8.0 requirements
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O){
             startForegroundService(serviceIntent)
@@ -111,6 +131,14 @@ class HabitsActivity : BaseActivity() {
             startStepCounterService()
         } else {
             Toast.makeText(this, "Permission denied. Cannot count steps.", Toast.LENGTH_SHORT).show()
+        }
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        if (isBound) {
+            unbindService(connection)
+            isBound = false
         }
     }
 

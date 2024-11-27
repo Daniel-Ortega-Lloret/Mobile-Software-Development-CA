@@ -58,9 +58,9 @@ class TaskViewModel(application: Application, private val applicationScope: Coro
         habitRepository.getTotalStepsById(habitId)
     }
 
-    fun updateStepCount(currentSteps: Float) = viewModelScope.launch {
+    fun updateStepCount(currentSteps: Int) = viewModelScope.launch {
         allHabits.value?.forEach { habit ->
-            val newCount = habit.habitStepCount?.plus(currentSteps.toInt())
+            val newCount = habit.habitStepCount?.plus(currentSteps)
             if (newCount != null) {
                 habitRepository.updateHabitStepCount(habit.habitId, newCount)
             }
