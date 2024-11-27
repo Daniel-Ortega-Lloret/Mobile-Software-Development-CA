@@ -9,9 +9,11 @@ import android.view.MenuItem
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.ActionBarDrawerToggle
 import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.app.AppCompatDelegate
 import androidx.core.view.GravityCompat
 import androidx.drawerlayout.widget.DrawerLayout
 import androidx.lifecycle.ViewModelProvider
+import androidx.preference.PreferenceManager
 import com.example.mobiledevca_taskapp.HabitsActivity
 import com.example.mobiledevca_taskapp.R
 import com.example.mobiledevca_taskapp.ScheduleActivity
@@ -33,6 +35,20 @@ abstract class BaseActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
+
+        val sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this)
+        val CheckSwitch = sharedPreferences?.getBoolean("Dark_Mode_Switch", false) // If it hasnt been set, default light mode
+
+        // Check if Whats Stored in Root Prefences is Light Mode / Dark Mode
+        // Change the theme for the base == Every / Activity
+        if (CheckSwitch != null && CheckSwitch == true)
+        {
+            AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES)
+        }
+        else
+        {
+            AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
+        }
 
         binding = ActivityBaseBinding.inflate(layoutInflater)
         setContentView(binding.root)
