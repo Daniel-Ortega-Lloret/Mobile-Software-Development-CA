@@ -96,6 +96,10 @@ class AddDataDialogFragment : DialogFragment(), AdapterView.OnItemSelectedListen
                 override fun onTimeSet(view: TimePicker?, hourOfDay: Int, minute: Int) {
                     hour = hourOfDay
                     min = minute
+
+                    // We must set dateString Here. And Last line changes button to display after we set date
+                    taskTime.setText("%02d:%02d".format(hour, min))
+
                 }
             }
 
@@ -112,6 +116,7 @@ class AddDataDialogFragment : DialogFragment(), AdapterView.OnItemSelectedListen
                     d = dayOfMonth
                     m = month
                     y = year
+                    taskDate.setText("%02d:%02d:%04d".format(d, m, y))
                 }
             }
 
@@ -131,10 +136,6 @@ class AddDataDialogFragment : DialogFragment(), AdapterView.OnItemSelectedListen
                 if (dialogType == "1") {
 
                     val timeString = "%02d:%02d".format(hour, min)
-
-                    //val day = taskDate.dayOfMonth
-                    //val month = taskDate.month
-                    //val year = taskDate.year
                     val dateString = "%02d:%02d:%04d".format(d, m, y)
 
                     var task: Task = Task(0, taskName.text.toString(), taskDescription.text.toString(), false, timeString, dateString)

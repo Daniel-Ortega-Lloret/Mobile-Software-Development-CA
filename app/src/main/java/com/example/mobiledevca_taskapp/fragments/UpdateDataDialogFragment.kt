@@ -88,10 +88,12 @@ class UpdateDataDialogFragment : DialogFragment(), AdapterView.OnItemSelectedLis
         // For Storing Time And Date
         var hour: Int? = null
         var min: Int? = null
+        var timeString = task.time
 
         var d: Int? = null
         var m: Int? = null
         var y: Int? = null
+        var dateString = task.date
 
         //Habit variables
         val habitName = dialogView.findViewById<EditText>(R.id.dialogHabitNameInput)
@@ -133,6 +135,9 @@ class UpdateDataDialogFragment : DialogFragment(), AdapterView.OnItemSelectedLis
             override fun onTimeSet(view: TimePicker?, hourOfDay: Int, minute: Int) {
                 hour = hourOfDay
                 min = minute
+
+                timeString = "%02d:%02d".format(hour, min)
+                taskTime.setText(timeString)
             }
         }
 
@@ -162,6 +167,10 @@ class UpdateDataDialogFragment : DialogFragment(), AdapterView.OnItemSelectedLis
                 d = dayOfMonth
                 m = month
                 y = year
+
+                // We must set dateString Here. And Last line changes button to display after we set date
+                dateString = "%02d:%02d:%04d".format(d, m, y)
+                taskDate.setText(dateString)
             }
         }
 
@@ -196,7 +205,9 @@ class UpdateDataDialogFragment : DialogFragment(), AdapterView.OnItemSelectedLis
                     val confirmBtn = dialog.getButton(AlertDialog.BUTTON_POSITIVE)
                     confirmBtn.setOnClickListener{
                         // Task Must Take The Edit Text Values To Save Changed
-                        task = Task(task.taskId, taskName.text.toString(), taskDescription.text.toString(), false, taskTime.toString(), taskDate.toString())
+                        //val timeString = "%02d:%02d".format(hour, min)
+                        //val dateString = "%02d:%02d:%04d".format(d, m, y)
+                        task = Task(task.taskId, taskName.text.toString(), taskDescription.text.toString(), false, timeString, dateString)
                         if (task != null) {
                             updateTask(task)
                         }
