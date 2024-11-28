@@ -24,12 +24,16 @@ private const val DIALOG_TYPE = "param1"
 private const val Task_Name = "param2"
 private const val Task_Description = "param3"
 private const val Task_Id = "param4"
+private const val Task_Time = "param5"
+private const val Task_Date = "param6"
 
 class UpdateDataDialogFragment : DialogFragment(), AdapterView.OnItemSelectedListener {
     private var dialogType: String? = null
     private var taskName: String? = null
     private var taskDescription: String? = null
     private var taskId: String? = ""
+    private var taskTime: String? = null
+    private var taskDate: String? = null
     private lateinit var task: Task
     private lateinit var taskAppViewModel : TaskViewModel
     private lateinit var habitSpinner : Spinner
@@ -41,9 +45,11 @@ class UpdateDataDialogFragment : DialogFragment(), AdapterView.OnItemSelectedLis
             taskName = it.getString(Task_Name)
             taskDescription = it.getString(Task_Description)
             taskId = it.getString(Task_Id)
+            taskTime = it.getString(Task_Time)
+            taskDate = it.getString(Task_Date)
         }
         // Pass this task into funtions for readability
-        task = Task(taskId.toString().toInt(), taskName.toString(), taskDescription.toString())
+        task = Task(taskId.toString().toInt(), taskName.toString(), taskDescription.toString(), false, taskTime, taskDate)
         Log.d("debug","Passed this argument: $dialogType")
 
         val app = requireActivity().application as TaskAppApplication
@@ -55,7 +61,7 @@ class UpdateDataDialogFragment : DialogFragment(), AdapterView.OnItemSelectedLis
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
         val dialogView = layoutInflater.inflate(R.layout.add_data_dialog_layout, null)
 
-        //Task variables
+        //Task EditText variables
         val taskName = dialogView.findViewById<EditText>(R.id.taskNameInput)
         val taskDescription = dialogView.findViewById<EditText>(R.id.taskDescriptionInput)
 
@@ -106,7 +112,7 @@ class UpdateDataDialogFragment : DialogFragment(), AdapterView.OnItemSelectedLis
                     val confirmBtn = dialog.getButton(AlertDialog.BUTTON_POSITIVE)
                     confirmBtn.setOnClickListener{
                         // Task Must Take The Edit Text Values To Save Changed
-                        task = Task(task.taskId, taskName.text.toString(), taskDescription.text.toString())
+                        task = Task(task.taskId, taskName.text.toString(), taskDescription.text.toString(), false, taskTime, taskDate)
                         if (task != null) {
                             updateTask(task)
                         }
@@ -180,6 +186,8 @@ class UpdateDataDialogFragment : DialogFragment(), AdapterView.OnItemSelectedLis
                     putString(Task_Id, param1[1])
                     putString(Task_Name, param1[2])
                     putString(Task_Description, param1[3])
+                    putString(Task_Time, param1[4])
+                    putString(Task_Date, param1[5])
 
                 }
             }

@@ -2,14 +2,18 @@ package com.example.mobiledevca_taskapp.fragments
 
 import android.app.AlertDialog
 import android.app.Dialog
+import android.app.TimePickerDialog
 import android.os.Bundle
 import android.util.Log
 import android.view.View
 import android.widget.AdapterView
 import android.widget.ArrayAdapter
+import android.widget.Button
+import android.widget.DatePicker
 import android.widget.EditText
 import android.widget.Spinner
 import android.widget.TextView
+import android.widget.TimePicker
 import androidx.fragment.app.DialogFragment
 import androidx.lifecycle.ViewModelProvider
 import com.example.mobiledevca_taskapp.R
@@ -18,6 +22,7 @@ import com.example.mobiledevca_taskapp.taskDatabase.TaskViewModel
 import com.example.mobiledevca_taskapp.taskDatabase.TaskViewModelFactory
 import com.example.mobiledevca_taskapp.taskDatabase.entities.Habit
 import com.example.mobiledevca_taskapp.taskDatabase.entities.Task
+import java.util.Locale
 
 // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
 private const val DIALOG_TYPE = "param1"
@@ -49,7 +54,11 @@ class AddDataDialogFragment : DialogFragment(), AdapterView.OnItemSelectedListen
         //Task variables
         val taskName = dialogView.findViewById<EditText>(R.id.taskNameInput)
         val taskDescription = dialogView.findViewById<EditText>(R.id.taskDescriptionInput)
+        val taskTime = dialogView.findViewById<Button>(R.id.Task_Time)
+        val taskDate = dialogView.findViewById<Button>(R.id.Task_Date)
 
+        var hour = ""
+        var min = ""
         //Habit variables
         val habitName = dialogView.findViewById<EditText>(R.id.dialogHabitNameInput)
         val habitSpinner = dialogView.findViewById<Spinner>(R.id.habit_spinner)
@@ -75,6 +84,21 @@ class AddDataDialogFragment : DialogFragment(), AdapterView.OnItemSelectedListen
         }
 
 
+            val timePickerDialogListener: TimePickerDialog.OnTimeSetListener = object : TimePickerDialog.OnTimeSetListener {
+                override fun onTimeSet(view: TimePicker?, hourOfDay: Int, minute: Int) {
+                    hour = hourOfDay.toString()
+                    min = minute.toString()
+                }
+            }
+
+            taskTime.setOnClickListener{
+               val timePicker: TimePickerDialog = TimePickerDialog(
+                   requireContext(), timePickerDialogListener, 12, 0, true)
+               timePicker.show()
+            }
+
+
+
         // Confirm button must change to save if it is an edit dialog
         return AlertDialog.Builder(requireContext())
             .setView(dialogView)
@@ -82,7 +106,16 @@ class AddDataDialogFragment : DialogFragment(), AdapterView.OnItemSelectedListen
             .setPositiveButton("Confirm") { dialog, _ ->
                 //If tasks called it
                 if (dialogType == "1") {
-                    addTask(taskName.text.toString(), taskDescription.text.toString())
+
+                    val timeString = "%02d:%02d".format(hour, min)
+
+                    //val day = taskDate.dayOfMonth
+                    //val month = taskDate.month
+                    //val year = taskDate.year
+                    val dateString = "%02d:%02d:%04d"//.format(day, month, year)
+
+                    var task: Task = Task(0, taskName.text.toString(), taskDescription.text.toString(), false, timeString, dateString)
+                    addTask(task)
                     dialog.dismiss()
                 }
                 else if (dialogType == "2") {
@@ -98,8 +131,10 @@ class AddDataDialogFragment : DialogFragment(), AdapterView.OnItemSelectedListen
                     dialog.dismiss()
                 }
             }
+
             .setNegativeButton("Cancel") { _, _ -> } //Do nothing for now
             .create()
+
     }
     //Sets appropriate layouts to visible depending on what activity instantiated the fragment
     private fun changeVisibility (view:View) {
@@ -134,8 +169,7 @@ class AddDataDialogFragment : DialogFragment(), AdapterView.OnItemSelectedListen
     }
 
     //Task database function
-    fun addTask(taskName : String, taskDescription : String) {
-        val task = Task(0, taskName, taskDescription)
+    fun addTask(task: Task) {
         taskAppViewModel.insertTask(task)
     }
 

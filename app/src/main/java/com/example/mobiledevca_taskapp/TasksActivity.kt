@@ -19,10 +19,13 @@ import com.example.mobiledevca_taskapp.taskDatabase.TaskViewModelFactory
 
 import com.example.mobiledevca_taskapp.taskDatabase.taskClasses.TaskListAdapter
 import com.example.mobiledevca_taskapp.taskDatabase.entities.Task
+import java.util.Date
 
 class TasksActivity : BaseActivity() {
     private lateinit var _recyclerview: RecyclerView
     private lateinit var fragmentManager: FragmentManager
+    // For passing to recycler view
+
     private lateinit var id : String
     private lateinit var name : String
     private lateinit var taskAppViewModel : TaskViewModel
