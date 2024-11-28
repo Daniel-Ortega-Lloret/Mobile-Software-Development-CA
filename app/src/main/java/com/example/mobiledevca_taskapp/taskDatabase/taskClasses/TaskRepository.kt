@@ -9,7 +9,7 @@ class TaskRepository (private val taskDAO: TaskDAO): TaskAppRepository<Task>(tas
     @WorkerThread
     suspend fun updateTask(task: Task)
     {
-        taskDAO.updateTaskById(task.taskId, task.taskName, task.description)
+        taskDAO.updateTaskById(task.taskId, task.taskName, task.description, task.time, task.date)
     }
 
     @WorkerThread

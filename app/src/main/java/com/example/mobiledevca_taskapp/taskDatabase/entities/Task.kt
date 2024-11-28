@@ -11,6 +11,6 @@ data class Task(
     val taskName: String,
     val description: String,
     var isChecked: Boolean = false,
-    var time: String?,
-    var date: String?
+    var time: String,
+    var date: String
 )
