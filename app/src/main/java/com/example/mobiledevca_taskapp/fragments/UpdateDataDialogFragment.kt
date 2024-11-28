@@ -47,7 +47,7 @@ class UpdateDataDialogFragment : DialogFragment(), AdapterView.OnItemSelectedLis
         Log.d("debug","Passed this argument: $dialogType")
 
         val app = requireActivity().application as TaskAppApplication
-        val factory = TaskViewModelFactory(app)
+        val factory = TaskViewModelFactory(app, app.applicationScope)
         taskAppViewModel = ViewModelProvider(this, factory).get(TaskViewModel::class.java)
     }
 

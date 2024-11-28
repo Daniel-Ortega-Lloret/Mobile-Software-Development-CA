@@ -33,7 +33,8 @@ class TasksActivity : BaseActivity() {
         super.onCreate(savedInstanceState)
 
         // For passing application to adapter to use for dao (changcheckbox)
-        val factory = TaskViewModelFactory(application as TaskAppApplication) // This casts it to TaskAppApplication
+        val app = application as TaskAppApplication
+        val factory = TaskViewModelFactory(app, app.applicationScope) // This casts it to TaskAppApplication
         taskAppViewModel = ViewModelProvider(this, factory).get(TaskViewModel::class.java)
 
 

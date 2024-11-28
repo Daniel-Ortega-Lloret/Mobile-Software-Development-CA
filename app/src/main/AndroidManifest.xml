@@ -2,6 +2,14 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools">
 
+    <uses-permission android:name="android.permission.ACTIVITY_RECOGNITION"/>
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE"/>
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_HEALTH"/>
+    <uses-permission android:name="android.permission.BODY_SENSORS"/>
+    <uses-permission android:name="android.permission.HIGH_SAMPLING_RATE_SENSORS"
+        tools:ignore="HighSamplingRate" />
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
+
     <application
         android:name=".taskDatabase.TaskAppApplication"
         android:allowBackup="true"
@@ -15,6 +23,30 @@
             android:name=".common.SettingsActivity"
             android:exported="false"
             android:label="@string/title_activity_settings" />
+
+        <receiver android:name=".broadcast_receivers.HabitResetReceiver" android:enabled="true" android:exported="false"/>
+        <receiver android:name=".broadcast_receivers.HabitStepCountReceiver" android:enabled="true" android:exported="false">
+            <intent-filter>
+                <action android:name="android.intent.action.BOOT_COMPLETED"/>
+                <category android:name="android.intent.category.DEFAULT"/>
+            </intent-filter>
+        </receiver>
+        <receiver android:name=".broadcast_receivers.NotificationReceiver"
+            android:exported="true"
+            android:enabled="true">
+            <intent-filter>
+                <action android:name="STOP_FOREGROUND_SERVICE"/>
+            </intent-filter>
+        </receiver>
+        <service
+            android:name=".services.StepCounterService"
+            android:enabled="true"
+            android:exported="true"
+            android:foregroundServiceType="health"
+            android:attributionTags="@string/stepCounterSensor"
+            android:permission="ACTIVITY_RECOGNITION"
+            />
+
         <activity
             android:name=".HabitsActivity"
             android:exported="false" />

@@ -6,4 +6,5 @@
     <dimen name="nav_header_vertical_spacing">8dp</dimen>
     <dimen name="nav_header_height">166dp</dimen>
     <dimen name="font_size">30sp</dimen>
+    <dimen name="habit_title_size">20sp</dimen>
 </resources>

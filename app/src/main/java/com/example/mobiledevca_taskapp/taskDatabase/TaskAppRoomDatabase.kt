@@ -14,7 +14,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
 //Everytime we change the schema (which we will) we update the version number
-@Database(entities = [Task::class, Habit::class], version = 5)
+@Database(entities = [Task::class, Habit::class], version = 17)
 abstract class TaskAppRoomDatabase : RoomDatabase() {
     abstract fun taskDao() : TaskDAO
     abstract fun habitDao() : HabitDAO
@@ -54,9 +54,6 @@ abstract class TaskAppRoomDatabase : RoomDatabase() {
             taskDao.insert(task)
 
             habitDao.deleteAll()
-
-            val habit = Habit(0, "Step Counter")
-            habitDao.insert(habit)
         }
     }
 }
