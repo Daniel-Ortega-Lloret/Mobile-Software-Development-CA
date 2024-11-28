@@ -1,15 +1,20 @@
 package com.example.mobiledevca_taskapp.fragments
 
 import android.app.AlertDialog
+import android.app.DatePickerDialog
 import android.app.Dialog
+import android.app.TimePickerDialog
 import android.os.Bundle
 import android.util.Log
 import android.view.View
 import android.widget.AdapterView
 import android.widget.ArrayAdapter
+import android.widget.Button
+import android.widget.DatePicker
 import android.widget.EditText
 import android.widget.Spinner
 import android.widget.TextView
+import android.widget.TimePicker
 import androidx.fragment.app.DialogFragment
 import androidx.lifecycle.ViewModelProvider
 import com.example.mobiledevca_taskapp.R
@@ -65,6 +70,29 @@ class UpdateDataDialogFragment : DialogFragment(), AdapterView.OnItemSelectedLis
         val taskName = dialogView.findViewById<EditText>(R.id.taskNameInput)
         val taskDescription = dialogView.findViewById<EditText>(R.id.taskDescriptionInput)
 
+        // Calender and Time Variables
+        val taskTime = dialogView.findViewById<Button>(R.id.Task_Time)
+        val taskDate = dialogView.findViewById<Button>(R.id.Task_Date)
+
+        // Set The Button Text To Be The Time And Date Previously Selected
+        if (TimeNotNull(task.time))
+        {
+            taskTime.setText(task.time)
+        }
+        if (CalenderNotNull(task.date))
+        {
+            taskDate.setText(task.date)
+        }
+
+
+        // For Storing Time And Date
+        var hour: Int? = null
+        var min: Int? = null
+
+        var d: Int? = null
+        var m: Int? = null
+        var y: Int? = null
+
         //Habit variables
         val habitName = dialogView.findViewById<EditText>(R.id.dialogHabitNameInput)
         val habitSpinner = dialogView.findViewById<Spinner>(R.id.habit_spinner)
@@ -98,6 +126,62 @@ class UpdateDataDialogFragment : DialogFragment(), AdapterView.OnItemSelectedLis
             "6" -> "Save"
             else -> "Confirm"
         }
+
+
+        // Time Dialog Logic
+        val timePickerDialogListener: TimePickerDialog.OnTimeSetListener = object : TimePickerDialog.OnTimeSetListener {
+            override fun onTimeSet(view: TimePicker?, hourOfDay: Int, minute: Int) {
+                hour = hourOfDay
+                min = minute
+            }
+        }
+
+        taskTime.setOnClickListener{
+            // We can pre set the time to the last one selected, only if it has been done before
+            if (TimeNotNull(task.time))
+            {
+                val timePicker: TimePickerDialog = TimePickerDialog(    // Set Hours To Prev using / slicing of time string
+                    requireContext(), timePickerDialogListener, task.time.substring(0,2).toInt(), task.time.substring(3,5).toInt(), true
+                )
+                timePicker.show()
+            }
+            else
+            {
+                val timePicker: TimePickerDialog = TimePickerDialog(    // Set Time To A Default
+                    requireContext(), timePickerDialogListener, 12, 0, true
+                )
+                timePicker.show()
+            }
+
+        }
+        // End Of Time Dialog Logic
+
+        // Start of Date Dialog
+        val datePickerDialogListener: DatePickerDialog.OnDateSetListener = object : DatePickerDialog.OnDateSetListener {
+            override fun onDateSet(view: DatePicker?, year: Int, month: Int, dayOfMonth: Int) {
+                d = dayOfMonth
+                m = month
+                y = year
+            }
+        }
+
+        taskDate.setOnClickListener{
+            if (CalenderNotNull(task.date))
+            {
+                val datePicker: DatePickerDialog = DatePickerDialog(
+                    requireContext(), datePickerDialogListener, task.date.substring(6, 10).toInt(), task.date.substring(3,5).toInt(), task.date.substring(0,2).toInt())
+                datePicker.show()
+            }
+            else
+            {
+                val datePicker: DatePickerDialog = DatePickerDialog(
+                    requireContext(), datePickerDialogListener, 2024, 0, 1)
+                datePicker.show()
+            }
+
+        }
+
+
         return AlertDialog.Builder(requireContext())
             .setView(dialogView)
             .setTitle(Dialog_Title)
@@ -130,6 +214,19 @@ class UpdateDataDialogFragment : DialogFragment(), AdapterView.OnItemSelectedLis
                 }
             }
     }
+
+    private fun TimeNotNull(t: String): Boolean {
+        if (t != "null:null")
+            return true
+        return false
+    }
+
+    private fun CalenderNotNull(d: String): Boolean {
+        if (d != "null:null:null")
+            return true
+        return false
+    }
+
     //Sets appropriate layouts to visible depending on what activity instantiated the fragment
     private fun changeVisibility (view:View) {
         //Reset to invisible for edge-cases

@@ -34,6 +34,8 @@ class TaskListAdapter(fragmentManager: FragmentManager, taskAppViewModel: TaskVi
         private val taskCheckView: CheckBox = itemView.findViewById(R.id.Task_Checkbox)
         private lateinit var taskDescriptionView: String
         private var taskId = 0
+        private var taskTime = ""
+        private var taskDate = ""
         private val fragmentManager = fragmentManager
         private val taskAppViewModel = taskAppViewModel
 
@@ -48,14 +50,19 @@ class TaskListAdapter(fragmentManager: FragmentManager, taskAppViewModel: TaskVi
             taskDescriptionView = task.description
             taskId  = task.taskId
 
+            // For Screen Readers
             taskNameView.contentDescription = "Task name: ${task.taskName}"
             //taskDescriptionView.contentDescription = "Task description: ${task.description ?: ""}"
+
 
             taskCheckView.isChecked = task.isChecked
             // Checkbox listener
             taskCheckView.setOnClickListener {
                 ChangeCheckbox(task)
             }
+
+            taskTime = task.time
+            taskDate = task.date
         }
 
         companion object {
@@ -74,6 +81,8 @@ class TaskListAdapter(fragmentManager: FragmentManager, taskAppViewModel: TaskVi
             stringArray.add(taskId.toString())
             stringArray.add(taskNameView.text.toString())
             stringArray.add(taskDescriptionView)
+            stringArray.add(taskTime)
+            stringArray.add(taskDate)
 
 
 
