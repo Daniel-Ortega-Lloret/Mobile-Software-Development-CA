@@ -59,6 +59,25 @@ class StepCounterService : Service(), SensorEventListener {
 
     }
 
+    fun cancelNotification() {
+        Log.d("debug", "cancelling")
+        val notificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+        notificationManager.cancel(1)
+        stopForeground(STOP_FOREGROUND_REMOVE)
+        val deleteIntent = Intent(this, NotificationReceiver::class.java).apply {
+            action = "STOP_FOREGROUND_SERVICE"
+        }
+        val pendingDeleteIntent = PendingIntent.getBroadcast(
+            this, 0, deleteIntent, PendingIntent.FLAG_IMMUTABLE
+        )
+
+        try {
+            pendingDeleteIntent.send()
+        } catch (e:PendingIntent.CanceledException) {
+            e.printStackTrace()
+        }
+    }
+
     private fun checkPermission(): Boolean {
         val activityRecognitionPermission = ActivityCompat.checkSelfPermission(
             this,
@@ -179,6 +198,7 @@ class StepCounterService : Service(), SensorEventListener {
             .setSmallIcon(R.mipmap.ic_launcher_custom)
             .setPriority(NotificationCompat.PRIORITY_HIGH)
             .setOngoing(false)
+            .setAutoCancel(true)
             .setDeleteIntent(pendingDeleteIntent)
             .build()
     }

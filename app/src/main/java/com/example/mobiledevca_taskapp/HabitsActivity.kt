@@ -102,6 +102,8 @@ class HabitsActivity : BaseActivity() {
         val deleteHabitsBtn: Button = findViewById(R.id.deleteHabitBtn)
         deleteHabitsBtn.setOnClickListener{
             taskViewModel.deleteAllHabits()
+            stepCounterService?.cancelNotification()
+            taskViewModel.setStepItemAdded(false)
             Toast.makeText(this, "All habits deleted", Toast.LENGTH_SHORT).show()
         }
     }
