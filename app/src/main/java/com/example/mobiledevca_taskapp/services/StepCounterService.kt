@@ -3,6 +3,7 @@ package com.example.mobiledevca_taskapp.services
 import android.app.Notification
 import android.app.NotificationChannel
 import android.app.NotificationManager
+import android.app.PendingIntent
 import android.app.Service
 import android.content.Context
 import android.content.Intent
@@ -22,6 +23,7 @@ import android.widget.Toast
 import androidx.core.app.ActivityCompat
 import androidx.core.app.NotificationCompat
 import com.example.mobiledevca_taskapp.R
+import com.example.mobiledevca_taskapp.broadcast_receivers.NotificationReceiver
 import com.example.mobiledevca_taskapp.broadcast_receivers.ScreenStateReceiver
 import com.example.mobiledevca_taskapp.taskDatabase.TaskViewModel
 
@@ -37,9 +39,14 @@ class StepCounterService : Service(), SensorEventListener {
 
     override fun onCreate() {
         super.onCreate()
-
         val notification = createNotification()
         startForeground(1, notification)
+
+        if (taskViewModel?.isStepItemAdded?.value != true) {
+            Log.d("debug", "no step items yet")
+            stopSelf()
+        }
+
 
         if (checkPermission()) {
             startStepTracking()
@@ -109,14 +116,22 @@ class StepCounterService : Service(), SensorEventListener {
 
     //Keeps service running in the background
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
-        val notification = createNotification()
-        startForeground(1, notification)
+        if (taskViewModel?.isStepItemAdded?.value == true){
+            val notification = createNotification()
+            startForeground(1, notification)
+        }
+
+
+        if (taskViewModel?.isStepItemAdded?.value != true) {
+            Log.d("debug", "no step items yet")
+            stopSelf()
+        }
 
         return START_STICKY
     }
 
     override fun onSensorChanged(event: SensorEvent?) {
-        if (event == null || event.sensor.type != Sensor.TYPE_STEP_COUNTER) return
+        if (event == null || event.sensor.type != Sensor.TYPE_STEP_COUNTER || taskViewModel?.isStepItemAdded?.value != true) return
 
         val currentStepCount = event.values[0].toInt()
 
@@ -151,12 +166,20 @@ class StepCounterService : Service(), SensorEventListener {
             notificationManager.createNotificationChannel(channel)
         }
 
+        val deleteIntent = Intent(this, NotificationReceiver::class.java).apply {
+            action = "STOP_FOREGROUND_SERVICE"
+        }
+        val pendingDeleteIntent = PendingIntent.getBroadcast(
+            this, 0, deleteIntent, PendingIntent.FLAG_IMMUTABLE
+        )
+
         return NotificationCompat.Builder(this, channelId)
             .setContentTitle("Step Counter Active")
             .setContentText("Tracking your steps in the background")
             .setSmallIcon(R.mipmap.ic_launcher_custom)
             .setPriority(NotificationCompat.PRIORITY_HIGH)
-            .setOngoing(true) //Make it persist so that user knows service is running in the background
+            .setOngoing(false)
+            .setDeleteIntent(pendingDeleteIntent)
             .build()
     }
 
@@ -164,7 +187,6 @@ class StepCounterService : Service(), SensorEventListener {
     override fun onAccuracyChanged(sensor: Sensor?, accuracy: Int) {
 
     }
-
     override fun onDestroy() {
         if (::sensorManager.isInitialized) {
             sensorManager.unregisterListener(this)
@@ -211,12 +233,10 @@ class StepCounterService : Service(), SensorEventListener {
             } else {
                 Log.d("debug", "LiveData is null still")
             }
-
-
-
             Log.d("debug", "pushed steps to DB")
         } else {
             Log.d("debug", "no steps to push")
         }
     }
+
 }

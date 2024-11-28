@@ -27,6 +27,13 @@
                 <category android:name="android.intent.category.DEFAULT"/>
             </intent-filter>
         </receiver>
+        <receiver android:name=".broadcast_receivers.NotificationReceiver"
+            android:exported="true"
+            android:enabled="true">
+            <intent-filter>
+                <action android:name="STOP_FOREGROUND_SERVICE"/>
+            </intent-filter>
+        </receiver>
         <service
             android:name=".services.StepCounterService"
             android:enabled="true"

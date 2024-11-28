@@ -145,6 +145,7 @@ class HabitListAdapter(private val taskViewModel: TaskViewModel) : ListAdapter<H
         private val stepTotalNumber: TextView = itemView.findViewById(R.id.stepNumTotal)
 
         fun bind(habit: Habit, taskViewModel: TaskViewModel) {
+            taskViewModel.setStepItemAdded(true)
             stepCountName.text = habit.habitName
             val resetValue: Int? = habit.habitReset
             val stringResetText : String = when (resetValue) {

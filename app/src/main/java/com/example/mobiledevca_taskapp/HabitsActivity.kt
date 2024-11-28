@@ -32,6 +32,7 @@ import com.example.mobiledevca_taskapp.taskDatabase.TaskViewModel
 import com.example.mobiledevca_taskapp.taskDatabase.TaskViewModelFactory
 import com.example.mobiledevca_taskapp.taskDatabase.entities.Habit
 import com.example.mobiledevca_taskapp.taskDatabase.habitClasses.HabitListAdapter
+import com.example.mobiledevca_taskapp.taskDatabase.habitClasses.StepNotificationMaker
 
 class HabitsActivity : BaseActivity() {
     private lateinit var _recyclerview: RecyclerView
@@ -72,19 +73,10 @@ class HabitsActivity : BaseActivity() {
         _recyclerview.adapter = adapter
         _recyclerview.layoutManager = LinearLayoutManager(this)
 
-//        taskViewModel.allHabits.observe(this as LifecycleOwner) { habits ->
-//            habits?.let{ adapter.submitList(it)}
-//            Log.d("debug", "Habits observed: $habits")
-//            if (habits != null && habits.isNotEmpty()) {
-//                if (!pendingStepsProcessed) {
-//                    retrievePendingSteps(habits)
-//                    pendingStepsProcessed = true
-//                }
-//            } else {
-//                Log.d("debug", "Habits not yet loaded")
-//            }
-//        }
+        taskViewModel.allHabits.observe(this as LifecycleOwner) { habits ->
+            habits?.let{ adapter.submitList(it)}}
 
+        checkExistingItems()
 
         fragmentManager = supportFragmentManager
 
@@ -101,7 +93,7 @@ class HabitsActivity : BaseActivity() {
 
         val resetHabitCountBtn: Button = findViewById(R.id.resetDailyBtn)
         resetHabitCountBtn.setOnClickListener{
-//            Log.d("debug", "Tried to reset")
+            Log.d("debug", "Tried to reset")
             val intent = Intent(this, HabitResetReceiver::class.java)
             intent.putExtra("RESET_TYPE", 1)
             this.sendBroadcast(intent)
@@ -130,7 +122,10 @@ class HabitsActivity : BaseActivity() {
                     isBound = false
                 }
             }
-            startStepCounterService()
+            if (taskViewModel.isStepItemAdded.value == true) {
+                startStepCounterService()
+            }
+
         } else {
             requestPermission()
         }
@@ -152,6 +147,7 @@ class HabitsActivity : BaseActivity() {
             REQUEST_ACTIVITY_RECOGNITION
         )
     }
+
 
     private fun startStepCounterService() {
         Log.d("debug", "Starting service bind")
@@ -186,6 +182,12 @@ class HabitsActivity : BaseActivity() {
         }
     }
 
+    fun checkExistingItems() {
+        Log.d("debug", "checking existing items")
+        val hasStepItems = adapter.currentList.any { it.habitTotalStepCount != 0}
+        taskViewModel.setStepItemAdded(hasStepItems)
+    }
+
     private fun retrievePendingSteps(habits: List<Habit>) {
 //        Log.d("debug", "Processing pending steps for habits: $habits")
         if (habits.isNotEmpty()) {
@@ -195,7 +197,14 @@ class HabitsActivity : BaseActivity() {
 
     override fun onStart() {
         super.onStart()
-        startStepCounterService()
+        taskViewModel.isStepItemAdded.observe(this) { isAdded ->
+            if (isAdded) {
+                startStepCounterService()
+            } else {
+                stopStepCounterService()
+            }
+        }
+//        startStepCounterService()
         taskViewModel.allHabits.observe(this as LifecycleOwner) { habits ->
             habits?.let{ adapter.submitList(it)}
 //            Log.d("debug", "Habits observed: $habits")
@@ -209,11 +218,22 @@ class HabitsActivity : BaseActivity() {
             }
         }
 
+        taskViewModel.stepGoalReached.observe(this) { event ->
+            event.getContentIfNotHandled()?.let { totalSteps ->
+                if (taskViewModel.isStepItemAdded.value == true) {
+                    StepNotificationMaker.createNotificationChannel(applicationContext)
+                    StepNotificationMaker.sendGoalNotification(applicationContext, totalSteps)
+                }
+            }
+        }
+
     }
 
     override fun onResume() {
         super.onResume()
-        stepCounterService?.setAppActive(true)
+        if (taskViewModel.isStepItemAdded.value == true){
+            stepCounterService?.setAppActive(true)
+        }
     }
 
     override fun onStop() {
