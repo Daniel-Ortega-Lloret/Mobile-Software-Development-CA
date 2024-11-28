@@ -44,7 +44,6 @@ abstract class BaseActivity : AppCompatActivity() {
                 Log.d("debug", "notifications allowed")
             }
             else {
-                openNotificationSettings()
                 Log.d("debug", "notifications not allowed")
             }
 
@@ -137,14 +136,6 @@ abstract class BaseActivity : AppCompatActivity() {
                 }
             }
         }
-    }
-
-    @RequiresApi(Build.VERSION_CODES.O)
-    private fun openNotificationSettings() {
-        val intent = Intent(Settings.ACTION_APP_NOTIFICATION_SETTINGS).apply {
-            putExtra(Settings.EXTRA_APP_PACKAGE, packageName)
-        }
-        startActivity(intent)
     }
 
     //This handles the logic of when a user taps a menu option

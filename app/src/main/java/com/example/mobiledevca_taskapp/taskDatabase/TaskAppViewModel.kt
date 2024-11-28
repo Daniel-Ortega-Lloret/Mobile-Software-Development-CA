@@ -4,6 +4,7 @@ import android.app.Application
 import android.util.Log
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.asLiveData
@@ -12,6 +13,7 @@ import com.example.mobiledevca_taskapp.taskDatabase.entities.Habit
 import com.example.mobiledevca_taskapp.taskDatabase.entities.Task
 import com.example.mobiledevca_taskapp.taskDatabase.habitClasses.HabitRepository
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.launch
 import java.util.Calendar
 
@@ -58,12 +60,18 @@ class TaskViewModel(application: Application, private val applicationScope: Coro
         habitRepository.getTotalStepsById(habitId)
     }
 
+
     fun updateStepCount(currentSteps: Int) = viewModelScope.launch {
+        Log.d("debug","updating steps: $currentSteps")
+//        Log.d("debug", "habits are: ${allHabits.value}")
         allHabits.value?.forEach { habit ->
             val newCount = habit.habitStepCount?.plus(currentSteps)
+//            Log.d("debug", "habit count is: ${habit.habitStepCount}")
+//            Log.d("debug", "new count is : $newCount")
             if (newCount != null) {
                 habitRepository.updateHabitStepCount(habit.habitId, newCount)
             }
+
         }
     }
 
@@ -80,7 +88,7 @@ class TaskViewModel(application: Application, private val applicationScope: Coro
 
             if (resetRequired) {
                 Log.d("TaskViewModel", "Resetting habit: ${habit.habitName}")
-                updateHabitCount(habit.habitId, 0)
+                habitRepository.updateHabitCount(habit.habitId, 0)
             }
         }
     }

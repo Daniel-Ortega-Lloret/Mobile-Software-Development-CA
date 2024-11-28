@@ -26,4 +26,9 @@ class HabitRepository(private val habitDao: HabitDAO) : TaskAppRepository<Habit>
     suspend fun updateHabitStepCount(habitId: Int, newCount: Int) {
         habitDao.updateHabitStepCount(habitId, newCount)
     }
+
+    @WorkerThread
+    suspend fun getAllHabits() : List<Habit>{
+        return habitDao.getAllHabits()
+    }
 }
