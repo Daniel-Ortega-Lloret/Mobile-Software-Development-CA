@@ -68,8 +68,10 @@ class HabitsActivity : BaseActivity() {
             ActivityCompat.requestPermissions(this, permissions, REQUEST_ACTIVITY_RECOGNITION)
         }
 
+        fragmentManager = supportFragmentManager
+
         _recyclerview = findViewById(R.id.habitRecyclerView)
-        adapter = HabitListAdapter(taskViewModel)
+        adapter = HabitListAdapter(fragmentManager, taskViewModel)
         _recyclerview.adapter = adapter
         _recyclerview.layoutManager = LinearLayoutManager(this)
 
@@ -78,7 +80,7 @@ class HabitsActivity : BaseActivity() {
 
         checkExistingItems()
 
-        fragmentManager = supportFragmentManager
+
 
         id = getString(R.string.habits_id)
         name = getString(R.string.habits_name)

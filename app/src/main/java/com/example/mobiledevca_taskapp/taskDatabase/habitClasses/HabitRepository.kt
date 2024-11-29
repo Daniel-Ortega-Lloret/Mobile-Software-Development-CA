@@ -31,4 +31,22 @@ class HabitRepository(private val habitDao: HabitDAO) : TaskAppRepository<Habit>
     suspend fun getAllHabits() : List<Habit>{
         return habitDao.getAllHabits()
     }
+
+    @WorkerThread
+    suspend fun updateHabit(habit: Habit) {
+        habit.habitReset?.let {
+            habit.habitCountCheck?.let { it1 ->
+                habit.habitTotalStepCount?.let { it2 ->
+                    habitDao.updateHabit(habit.habitId, habit.habitName,
+                        it, it1, it2
+                    )
+                }
+            }
+        }
+    }
+
+    @WorkerThread
+    suspend fun deleteHabit(habit: Habit) {
+        habitDao.deleteHabit(habit.habitId)
+    }
 }

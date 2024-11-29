@@ -82,6 +82,14 @@ class TaskViewModel(application: Application, private val applicationScope: Coro
         habitRepository.getHabitById(habitId)
     }
 
+    fun updateHabit(habit: Habit) = viewModelScope.launch {
+        habitRepository.updateHabit(habit)
+    }
+
+    fun deleteHabit(habit: Habit) = viewModelScope.launch {
+        habitRepository.deleteHabit(habit)
+    }
+
     fun getAllHabits() = viewModelScope.launch {
         allHabits
     }

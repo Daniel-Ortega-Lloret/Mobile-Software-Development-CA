@@ -17,7 +17,7 @@
         android:layout_marginRight="30dp"
         android:layout_marginLeft="30dp"
         android:layout_marginBottom="10dp"
-        android:background="@color/gray">
+        android:background="@drawable/input_text_box">
 
         <CheckBox
             android:id="@+id/Task_Checkbox"

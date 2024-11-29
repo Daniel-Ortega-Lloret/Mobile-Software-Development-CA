@@ -7,9 +7,12 @@ import android.util.Log
 import android.view.View
 import android.widget.AdapterView
 import android.widget.ArrayAdapter
+import android.widget.CheckBox
 import android.widget.EditText
+import android.widget.RadioGroup
 import android.widget.Spinner
 import android.widget.TextView
+import android.widget.Toast
 import androidx.fragment.app.DialogFragment
 import androidx.lifecycle.ViewModelProvider
 import com.example.mobiledevca_taskapp.R
@@ -18,30 +21,53 @@ import com.example.mobiledevca_taskapp.taskDatabase.TaskViewModel
 import com.example.mobiledevca_taskapp.taskDatabase.TaskViewModelFactory
 import com.example.mobiledevca_taskapp.taskDatabase.entities.Habit
 import com.example.mobiledevca_taskapp.taskDatabase.entities.Task
+import com.google.android.material.textfield.TextInputEditText
 
-// the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-private const val DIALOG_TYPE = "param1"
-private const val Task_Name = "param2"
-private const val Task_Description = "param3"
-private const val Task_Id = "param4"
-
-class UpdateDataDialogFragment : DialogFragment(), AdapterView.OnItemSelectedListener {
+class UpdateDataDialogFragment : DialogFragment() {
+    //Generic variables
     private var dialogType: String? = null
+    private lateinit var taskAppViewModel : TaskViewModel
+
+    //Task variables
+    private var taskId: String? = ""
     private var taskName: String? = null
     private var taskDescription: String? = null
-    private var taskId: String? = ""
     private lateinit var task: Task
-    private lateinit var taskAppViewModel : TaskViewModel
-    private lateinit var habitSpinner : Spinner
+
+    //Habit variables
+    private var habitId: Int = 0
+    private var habitName: String = ""
+//    private lateinit var habitNameTextView: EditText
+    private var habitReset: Int = 0
+    private var habitCountCheck: Int = 1
+    private var habitSwitch: Int = 0
+    private var habitTotalStepCount: Int = 0
+//    private lateinit var habitTotalStepsTextView: EditText
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        arguments?.let {
-            dialogType = it.getString(DIALOG_TYPE)
-            taskName = it.getString(Task_Name)
-            taskDescription = it.getString(Task_Description)
-            taskId = it.getString(Task_Id)
+        val dataMap = arguments?.keySet()?.associateWith { key->
+            arguments?.getString(key).orEmpty()
         }
+        Log.d("debug", "in the update fragment")
+        dataMap?.let {
+            //Generic assignment
+            dialogType = it["DIALOG_TYPE"]
+
+            //Task assignment
+            taskId = (it["Task_Id"] ?: 0).toString()
+            taskName = it["Task_Name"] ?: "Blank"
+            taskDescription = it["Task_Description"] ?: "Blank"
+
+            //Habit assignment
+            habitId = it["Habit_Id"]?.toInt() ?: 0
+            habitName = it["Habit_Name"] ?:"Blank"
+            habitReset = it["Habit_Reset"]?.toInt() ?: 0
+            habitCountCheck = it["Habit_CountCheck"]?.toInt() ?: 0
+            habitSwitch = it["Habit_Switch"]?.toInt() ?: 0
+            habitTotalStepCount = it["Habit_TotalSteps"]?.toInt() ?: 0
+        }
+
         // Pass this task into funtions for readability
         task = Task(taskId.toString().toInt(), taskName.toString(), taskDescription.toString())
         Log.d("debug","Passed this argument: $dialogType")
@@ -60,16 +86,11 @@ class UpdateDataDialogFragment : DialogFragment(), AdapterView.OnItemSelectedLis
         val taskDescription = dialogView.findViewById<EditText>(R.id.taskDescriptionInput)
 
         //Habit variables
-        val habitName = dialogView.findViewById<EditText>(R.id.dialogHabitNameInput)
-        val habitSpinner = dialogView.findViewById<Spinner>(R.id.habit_spinner)
-        val spinnerAdapter = ArrayAdapter.createFromResource(
-            requireContext(),
-            R.array.habit_spinner_items,
-            android.R.layout.simple_spinner_item
-        )
-        spinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
-        habitSpinner.adapter = spinnerAdapter
-        habitSpinner.onItemSelectedListener = this
+        val habitNameEditText = dialogView.findViewById<EditText>(R.id.dialogHabitNameInput)
+        val habitResetRadioGroup = dialogView.findViewById<RadioGroup>(R.id.habitTimeSection)
+        val habitPositiveCheckbox = dialogView.findViewById<CheckBox>(R.id.habitPositiveCheckbox)
+        val habitNegativeCheckbox = dialogView.findViewById<CheckBox>(R.id.habitNegativeCheckbox)
+        val stepCounter = dialogView.findViewById<TextInputEditText>(R.id.stepCounterTextInput)
 
         changeVisibility(dialogView) //Set appropriate layouts to visible
 
@@ -83,43 +104,100 @@ class UpdateDataDialogFragment : DialogFragment(), AdapterView.OnItemSelectedLis
             else -> "Invalid DialogType"
         }
 
-
         // Confirm button must change to save if it is an edit dialog
         val DialogConfirm = when(dialogType)
         {
-            "4" -> "Save"
-            "5" -> "Save"
-            "6" -> "Save"
+            "4" -> "Save Task"
+            "5" -> "Save Schedule"
+            "6" -> "Save Habit"
             else -> "Confirm"
         }
         return AlertDialog.Builder(requireContext())
             .setView(dialogView)
             .setTitle(Dialog_Title)
             .setNeutralButton("Delete") {_, _ ->} // Do nothing until clicked
-            .setPositiveButton(DialogConfirm) { dialog, _ ->
-
-            }
+            .setPositiveButton(DialogConfirm) { _, _ -> }
             .setNegativeButton("Cancel") { _, _ -> } //Do nothing for now
             .create().also { dialog ->
                 dialog.setOnShowListener{
                     // Confirm Button Pressed
                     val confirmBtn = dialog.getButton(AlertDialog.BUTTON_POSITIVE)
                     confirmBtn.setOnClickListener{
-                        // Task Must Take The Edit Text Values To Save Changed
-                        task = Task(task.taskId, taskName.text.toString(), taskDescription.text.toString())
-                        if (task != null) {
-                            updateTask(task)
+                        //Task Validation goes here
+
+
+                        //Habit Validation
+                        val habitNameText = habitNameEditText.text.trim()
+                        val habitPositiveState = habitPositiveCheckbox.isChecked
+                        val habitNegativeState = habitNegativeCheckbox.isChecked
+                        val stepCounterText = stepCounter.text.toString().trim()
+                        val habitResetValue: Int = when (habitResetRadioGroup.checkedRadioButtonId) {
+                            R.id.habitDailyCounter -> 1
+                            R.id.habitWeeklyCounter -> 2
+                            R.id.habitMonthlyCounter -> 3
+                            else -> 0
                         }
-                        dialog.dismiss()
+
+                        when (dialogType) {
+                            "4" -> {
+                                // Task Must Take The Edit Text Values To Save Changed
+                                task = Task(task.taskId, taskName.text.toString(), taskDescription.text.toString())
+                                if (task != null) {
+                                    updateTask(task)
+                                }
+                                dialog.dismiss()
+                            }
+
+                            "6" -> {
+                                if (habitNameText.isEmpty()) {
+                                    Toast.makeText(requireContext(), "Please enter a habit name", Toast.LENGTH_SHORT).show()
+                                } else if (habitSwitch == 1 && !habitPositiveState && !habitNegativeState) {
+                                    Toast.makeText(requireContext(), "Please check at least one counter", Toast.LENGTH_SHORT).show()
+                                } else if(habitSwitch == 2 && stepCounterText.isEmpty()) {
+                                    Toast.makeText(requireContext(),"Please enter amount of steps", Toast.LENGTH_SHORT).show()
+                                } else {
+                                    if (habitPositiveState && habitNegativeState) {
+                                        habitCountCheck= 0
+                                    }
+                                    else if (habitPositiveState && !habitNegativeState) {
+                                        habitCountCheck = 1
+                                    }
+                                    else if (!habitPositiveState && habitNegativeState) {
+                                        habitCountCheck = -1
+                                    }
+
+                                    if (habitSwitch == 1) {
+                                        val habit = Habit(habitId, habitNameEditText.text.toString(), habitResetValue, habitCountCheck)
+                                        updateHabit(habit)
+                                    } else if (habitSwitch == 2) {
+                                        val habit = Habit(habitId, habitNameEditText.text.toString(), habitResetValue, 0, 0, 0, 0, stepCounter.text.toString().toInt())
+                                        updateHabit(habit)
+                                    }
+                                    dialog.dismiss()
+                                }
+
+                            } else -> dialog.dismiss()
+                        }
                     }
 
                     val deleteBtn = dialog.getButton((AlertDialog.BUTTON_NEUTRAL))
                     deleteBtn.setOnClickListener {
-                        // We just use the initialised task at the top of this class otherwise if we want to delete
-                        if (task != null) {
-                            deleteTask(task)
+                        when (dialogType) {
+                            "4" -> {
+                                // We just use the initialised task at the top of this class otherwise if we want to delete
+                                if (task != null) {
+                                    deleteTask(task)
+                                }
+                                dialog.dismiss()
+                            }
+
+                            "6" -> {
+                                val habit = Habit(habitId, habitName)
+                                deleteHabit(habit)
+                                dialog.dismiss()
+                            }
                         }
-                        dialog.dismiss()
+
                     }
                 }
             }
@@ -141,21 +219,64 @@ class UpdateDataDialogFragment : DialogFragment(), AdapterView.OnItemSelectedLis
                 val Description_Textbox =  view.findViewById<EditText>(R.id.taskDescriptionInput)
                 Title_Textbox.setText(taskName)
                 Description_Textbox.setText(taskDescription)
+            }
 
-                // Send To Dao
+            "6" -> {
+                val habitNameEditText = view.findViewById<EditText>(R.id.dialogHabitNameInput)
+                val habitResetRadioGroup = view.findViewById<RadioGroup>(R.id.habitTimeSection)
+                val habitPositiveCheckbox = view.findViewById<CheckBox>(R.id.habitPositiveCheckbox)
+                val habitNegativeCheckbox = view.findViewById<CheckBox>(R.id.habitNegativeCheckbox)
+                val totalSteps = view.findViewById<TextInputEditText>(R.id.stepCounterTextInput)
+                val habitResetMap = mapOf(
+                    1 to R.id.habitDailyCounter,
+                    2 to R.id.habitWeeklyCounter,
+                    3 to R.id.habitMonthlyCounter
+                )
+                val radioButtonId = habitResetMap[habitReset] ?: -1
 
+                view.findViewById<View>(R.id.habitSection).visibility = View.VISIBLE
+                view.findViewById<View>(R.id.habit_spinner).visibility = View.GONE
 
+                habitNameEditText.setText(habitName)
+                if (radioButtonId != -1){
+                    habitResetRadioGroup.check(radioButtonId)
+                } else {
+                    habitResetRadioGroup.clearCheck()
+                }
+                Log.d("debug", "mode is $habitSwitch")
+                //Counter Item
+                if (habitSwitch == 1) {
+                    Log.d("debug", "im a count habit")
+                    view.findViewById<View>(R.id.habitCheckboxLayout).visibility = View.VISIBLE
+                    view.findViewById<View>(R.id.stepCounterLayout).visibility = View.GONE
+
+                    //If both are checked
+                    if (habitCountCheck == 0) {
+                        habitPositiveCheckbox.isChecked = true
+                        habitNegativeCheckbox.isChecked = true
+                    }
+                    //If positive is checked
+                    else if (habitCountCheck == 1) {
+                        habitPositiveCheckbox.isChecked = true
+                        habitNegativeCheckbox.isChecked = false
+                    }
+                    //If negative is checked
+                    else if (habitCountCheck == -1) {
+                        habitPositiveCheckbox.isChecked = false
+                        habitNegativeCheckbox.isChecked = true
+                    }
+                }
+                //Step Counter Item
+                else if (habitSwitch == 2) {
+                    Log.d("debug", "im a count habit")
+                    view.findViewById<View>(R.id.habitCheckboxLayout).visibility = View.GONE
+                    view.findViewById<View>(R.id.stepCounterLayout).visibility = View.VISIBLE
+
+                    val stringTotalStepCount = habitTotalStepCount.toString()
+                    totalSteps.setText(stringTotalStepCount)
+                }
             }
         }
-    }
-    //Spinner function for selection
-    override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
-
-    }
-
-    //Do nothing if user selects nothing on spinner
-    override fun onNothingSelected(parent: AdapterView<*>?) {
-
     }
 
     fun updateTask(task: Task)
@@ -169,17 +290,24 @@ class UpdateDataDialogFragment : DialogFragment(), AdapterView.OnItemSelectedLis
         taskAppViewModel.deleteTask(task.taskId)
     }
 
+    fun updateHabit(habit: Habit) {
+        taskAppViewModel.updateHabit(habit)
+    }
+
+    fun deleteHabit(habit: Habit) {
+        taskAppViewModel.deleteHabit(habit)
+    }
+
     //Factory object for creating instances of the fragment
     companion object {
         const val TAG = "UpdateDataDialog"
         @JvmStatic
-        fun newInstance(param1: ArrayList<String>) =
+        fun newInstance(data: HashMap<String, String>) =
             UpdateDataDialogFragment().apply {
                 arguments = Bundle().apply {
-                    putString(DIALOG_TYPE, param1[0])
-                    putString(Task_Id, param1[1])
-                    putString(Task_Name, param1[2])
-                    putString(Task_Description, param1[3])
+                    for ((key, value) in data) {
+                        putString(key, value)
+                    }
 
                 }
             }

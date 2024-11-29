@@ -28,4 +28,10 @@ interface HabitDAO : BaseDAO<Habit>{
 
     @Query("SELECT * FROM Habit")
     suspend fun getAllHabits(): List<Habit>
+
+    @Query("UPDATE Habit SET habitName = :habitName, habitReset = :habitReset, habitCountCheck = :habitCountCheck, habitTotalStepCount = :habitTotalStepCount WHERE habitId = :habitId ")
+    suspend fun updateHabit(habitId: Int, habitName: String, habitReset: Int, habitCountCheck: Int, habitTotalStepCount: Int)
+
+    @Query("DELETE FROM Habit WHERE habitId = :habitId")
+    suspend fun deleteHabit(habitId: Int)
 }

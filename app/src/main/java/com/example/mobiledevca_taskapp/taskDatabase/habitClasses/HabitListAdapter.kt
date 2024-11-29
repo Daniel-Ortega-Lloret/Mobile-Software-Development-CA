@@ -6,28 +6,32 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
+import androidx.fragment.app.FragmentManager
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.RecyclerView.ViewHolder
 import com.example.mobiledevca_taskapp.R
+import com.example.mobiledevca_taskapp.fragments.UpdateDataDialogFragment
 import com.example.mobiledevca_taskapp.services.StepCounterService
 import com.example.mobiledevca_taskapp.taskDatabase.TaskViewModel
 import com.example.mobiledevca_taskapp.taskDatabase.entities.Habit
 import com.example.mobiledevca_taskapp.taskDatabase.habitClasses.HabitListAdapter.HabitCountViewHolder
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 
-class HabitListAdapter(private val taskViewModel: TaskViewModel) : ListAdapter<Habit, RecyclerView.ViewHolder>(HABIT_COMPARATOR) {
+class HabitListAdapter(private val fragmentManager: FragmentManager, private val taskViewModel: TaskViewModel) : ListAdapter<Habit, RecyclerView.ViewHolder>(HABIT_COMPARATOR) {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
         return when (viewType) {
             TYPE_COUNT -> HabitCountViewHolder(
                 LayoutInflater.from(parent.context).inflate(R.layout.habit_counter_recycler_item, parent, false),
-                taskViewModel
+                taskViewModel,
+                fragmentManager
             )
             TYPE_STEP -> StepCountViewHolder(
                 LayoutInflater.from(parent.context).inflate(R.layout.habit_step_counter_recycler_item, parent, false),
-                taskViewModel
+                taskViewModel,
+                fragmentManager
             )
             else -> throw IllegalArgumentException("Invalid view type")
         }
@@ -56,19 +60,31 @@ class HabitListAdapter(private val taskViewModel: TaskViewModel) : ListAdapter<H
 
     }
 
-    class HabitCountViewHolder(itemView: View, taskViewModel: TaskViewModel) : RecyclerView.ViewHolder(itemView) {
+    class HabitCountViewHolder(itemView: View, taskViewModel: TaskViewModel, private val fragmentManager: FragmentManager) : RecyclerView.ViewHolder(itemView), View.OnClickListener {
+        private var habitId: Int = 0
         private val habitNameView: TextView = itemView.findViewById(R.id.habitName)
         private var habitCountText: TextView = itemView.findViewById(R.id.habitCountText)
+        private var habitSwitch: Int? = 0
+        private var habitCountCheck: Int? = 0
+        private var habitReset: Int? = 0
+
         private val habitAddBtn: FloatingActionButton = itemView.findViewById(R.id.habitCounterAddBtn)
         private val habitRemoveBtn: FloatingActionButton = itemView.findViewById(R.id.habitCounterRemoveBtn)
         private val resetCountText: TextView = itemView.findViewById(R.id.habitResetCounterText)
 
+        init {
+            itemView.setOnClickListener(this)
+        }
+
         fun bind(habit: Habit, taskViewModel: TaskViewModel) {
+            habitId = habit.habitId
             habitNameView.text = habit.habitName
             habitCountText.text = formatCountText(habit.habitCount)
+            habitSwitch = habit.habitSwitch!!
+            habitCountCheck = habit.habitCountCheck
 
-            val resetValue: Int? = habit.habitReset
-            val stringResetText : String = when (resetValue) {
+            habitReset = habit.habitReset!!
+            val stringResetText : String = when (habitReset) {
                 1 -> {
                     "Resets Daily"
                 }
@@ -136,19 +152,45 @@ class HabitListAdapter(private val taskViewModel: TaskViewModel) : ListAdapter<H
                 }
             }
         }
+
+        override fun onClick(v:View?) {
+            Log.d("debug", "habit counter got clicked")
+            val dataMap = hashMapOf<String, String>()
+            dataMap["DIALOG_TYPE"] = "6"
+            dataMap["Habit_Id"] = habitId.toString()
+            dataMap["Habit_Name"] = habitNameView.text.toString()
+            dataMap["Habit_Reset"] = habitReset?.toString() ?: "0"
+            dataMap["Habit_CountCheck"] = habitCountCheck?.toString() ?: "0"
+            Log.d("debug", "switch before is $habitSwitch")
+            dataMap["Habit_Switch"] = habitSwitch?.toString() ?: "0"
+
+
+            val updateDataDialog = UpdateDataDialogFragment.newInstance(dataMap)
+            updateDataDialog.show(fragmentManager, UpdateDataDialogFragment.TAG)
+        }
     }
 
-    class StepCountViewHolder(itemView: View, taskViewModel: TaskViewModel) : RecyclerView.ViewHolder(itemView) {
+    class StepCountViewHolder(itemView: View, taskViewModel: TaskViewModel, private val fragmentManager: FragmentManager) : RecyclerView.ViewHolder(itemView), View.OnClickListener {
+        private var habitId: Int = 0
+        private var habitSwitch: Int? = 0
+        private var habitReset: Int? = 0
+
         private val stepCountName: TextView = itemView.findViewById(R.id.stepCountName)
         private val stepResetText: TextView = itemView.findViewById(R.id.stepResetCounterText)
         private val stepCurrentNumber: TextView = itemView.findViewById(R.id.stepNumCurrent)
         private val stepTotalNumber: TextView = itemView.findViewById(R.id.stepNumTotal)
 
+        init {
+            itemView.setOnClickListener(this)
+        }
+
         fun bind(habit: Habit, taskViewModel: TaskViewModel) {
+            habitId = habit.habitId
             taskViewModel.setStepItemAdded(true)
             stepCountName.text = habit.habitName
-            val resetValue: Int? = habit.habitReset
-            val stringResetText : String = when (resetValue) {
+            habitReset = habit.habitReset!!
+            habitSwitch = habit.habitSwitch
+            val stringResetText : String = when (habitReset) {
                 1 -> {
                     "Resets Daily"
                 }
@@ -166,6 +208,21 @@ class HabitListAdapter(private val taskViewModel: TaskViewModel) : ListAdapter<H
             stepCurrentNumber.text =  habit.habitStepCount.toString()
             stepTotalNumber.text = habit.habitTotalStepCount.toString()
 
+        }
+
+        override fun onClick(v: View?) {
+            Log.d("debug", "habit step counter got clicked")
+            val dataMap = hashMapOf<String, String>()
+            dataMap["DIALOG_TYPE"] = "6"
+            dataMap["Habit_Id"] = habitId.toString()
+            dataMap["Habit_Name"] = stepCountName.text.toString()
+            dataMap["Habit_Reset"] = habitReset?.toString() ?: "0"
+            Log.d("debug", "switch before is $habitSwitch")
+            dataMap["Habit_Switch"] = habitSwitch?.toString() ?: "0"
+            dataMap["Habit_TotalSteps"] = stepTotalNumber.text.toString()
+
+            val updateDataDialog = UpdateDataDialogFragment.newInstance(dataMap)
+            updateDataDialog.show(fragmentManager, UpdateDataDialogFragment.TAG)
         }
     }
 

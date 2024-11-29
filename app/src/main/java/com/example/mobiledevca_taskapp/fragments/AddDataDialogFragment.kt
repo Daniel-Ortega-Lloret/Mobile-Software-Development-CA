@@ -96,6 +96,9 @@ class AddDataDialogFragment : DialogFragment(), AdapterView.OnItemSelectedListen
                     val confirmBtn = dialog.getButton(AlertDialog.BUTTON_POSITIVE)
 
                     confirmBtn.setOnClickListener {
+                        //Task Validation goes here
+
+
                         //Habit validation values
                         val habitNameText = habitName.text.toString().trim()
                         val habitPositiveState = habitPositiveCheckbox.isChecked
@@ -119,7 +122,7 @@ class AddDataDialogFragment : DialogFragment(), AdapterView.OnItemSelectedListen
                             }
                             "3" -> {
                                 if (habitNameText.isEmpty()) {
-                                    Toast.makeText(requireContext(), "Please enter a Habit habitName", Toast.LENGTH_SHORT).show()
+                                    Toast.makeText(requireContext(), "Please enter a habit name", Toast.LENGTH_SHORT).show()
                                 }
                                 else if (spinnerSelection == 0) {
                                     Toast.makeText(requireContext(), "Please select a Habit type", Toast.LENGTH_SHORT).show()
