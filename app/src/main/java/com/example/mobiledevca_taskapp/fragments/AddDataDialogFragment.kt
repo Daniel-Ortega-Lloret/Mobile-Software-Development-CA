@@ -1,19 +1,24 @@
 package com.example.mobiledevca_taskapp.fragments
 
 import android.app.AlertDialog
+import android.app.DatePickerDialog
 import android.app.Dialog
+import android.app.TimePickerDialog
 import android.os.Bundle
 import android.util.Log
 import android.view.View
 import android.widget.AdapterView
 import android.widget.ArrayAdapter
 import android.widget.CheckBox
+import android.widget.Button
+import android.widget.DatePicker
 import android.widget.EditText
 import android.widget.RadioButton
 import android.widget.RadioGroup
 import android.widget.Spinner
 import android.widget.Toast
 import android.widget.TextView
+import android.widget.TimePicker
 import androidx.fragment.app.DialogFragment
 import androidx.lifecycle.ViewModelProvider
 import com.example.mobiledevca_taskapp.R
@@ -22,6 +27,8 @@ import com.example.mobiledevca_taskapp.taskDatabase.TaskViewModel
 import com.example.mobiledevca_taskapp.taskDatabase.TaskViewModelFactory
 import com.example.mobiledevca_taskapp.taskDatabase.entities.Habit
 import com.example.mobiledevca_taskapp.taskDatabase.entities.Task
+import java.util.Calendar
+import java.util.Locale
 import com.google.android.material.textfield.TextInputEditText
 
 // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
@@ -51,9 +58,19 @@ class AddDataDialogFragment : DialogFragment(), AdapterView.OnItemSelectedListen
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
         dialogView = layoutInflater.inflate(R.layout.add_data_dialog_layout, null)
 
-        //Task variables
+        //Task View references
         val taskName = dialogView.findViewById<EditText>(R.id.taskNameInput)
         val taskDescription = dialogView.findViewById<EditText>(R.id.taskDescriptionInput)
+        val taskTime = dialogView.findViewById<Button>(R.id.Task_Time)
+        val taskDate = dialogView.findViewById<Button>(R.id.Task_Date)
+
+        // For Storing Time And Date
+        var hour: Int? = null
+        var min: Int? = null
+
+        var d: Int? = null
+        var m: Int? = null
+        var y: Int? = null
 
         //Habit variables
         val habitName = dialogView.findViewById<TextInputEditText>(R.id.dialogHabitNameInput)
@@ -85,6 +102,48 @@ class AddDataDialogFragment : DialogFragment(), AdapterView.OnItemSelectedListen
         }
 
 
+            // Time Dialog Logic
+            val timePickerDialogListener: TimePickerDialog.OnTimeSetListener = object : TimePickerDialog.OnTimeSetListener {
+                override fun onTimeSet(view: TimePicker?, hourOfDay: Int, minute: Int) {
+                    hour = hourOfDay
+                    min = minute
+
+                    // We must set dateString Here. And Last line changes button to display after we set date
+                    taskTime.setText("%02d:%02d".format(hour, min))
+
+                }
+            }
+
+            taskTime.setOnClickListener{
+               val timePicker: TimePickerDialog = TimePickerDialog(
+                   requireContext(), timePickerDialogListener, 12, 0, true)
+               timePicker.show()
+            }
+            // End Of Time Dialog Logic
+
+            // Start of Date Dialog
+            val datePickerDialogListener: DatePickerDialog.OnDateSetListener = object : DatePickerDialog.OnDateSetListener {
+                override fun onDateSet(view: DatePicker?, year: Int, month: Int, dayOfMonth: Int) {
+                    d = dayOfMonth
+                    m = month
+                    y = year
+                    taskDate.setText("%02d:%02d:%04d".format(d, m!! + 1, y)) // Months start at 0: January should be month 1
+                }
+            }
+
+            taskDate.setOnClickListener{
+                // Used to open calendar on current month
+                val calendar = Calendar.getInstance()
+                val curYear = calendar.get(Calendar.YEAR)
+                val curMonth = calendar.get(Calendar.MONTH)
+                val curDate = calendar.get(Calendar.DATE)
+
+                val datePicker: DatePickerDialog = DatePickerDialog(
+                    requireContext(), datePickerDialogListener, curYear, curMonth, curDate)
+                datePicker.show()
+            }
+
+
         // Confirm button must change to save if it is an edit dialog
         return AlertDialog.Builder(requireContext())
             .setView(dialogView)
@@ -113,7 +172,11 @@ class AddDataDialogFragment : DialogFragment(), AdapterView.OnItemSelectedListen
                         }
                         when (dialogType) {
                             "1" -> {
-                                addTask(taskName.text.toString(), taskDescription.text.toString())
+                                val timeString = "%02d:%02d".format(hour, min)
+                                val dateString = "%02d:%02d:%04d".format(d, m, y)
+
+                                var task: Task = Task(0, taskName.text.toString(), taskDescription.text.toString(), false, timeString, dateString)
+                                addTask(task)
                                 dialog.dismiss()
                             }
                             "2" -> {
@@ -213,8 +276,7 @@ class AddDataDialogFragment : DialogFragment(), AdapterView.OnItemSelectedListen
     }
 
     //Task database function
-    private fun addTask(taskName : String, taskDescription : String) {
-        val task = Task(0, taskName, taskDescription)
+    fun addTask(task: Task) {
         taskAppViewModel.insertTask(task)
     }
 

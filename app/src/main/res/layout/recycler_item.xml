@@ -29,14 +29,24 @@
         </CheckBox>
 
         <TextView
+            android:id="@+id/Task_Name"
             android:layout_marginLeft="2dp"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="2"
             android:text="string"
             android:textAlignment="viewStart"
+            android:textSize="@dimen/font_size" />
+
+        <TextView
+            android:id="@+id/RecyclerItemTime"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
             android:textSize="@dimen/font_size"
-            android:id="@+id/Task_Name"/>
+            android:text="Time">
+
+        </TextView>
 
     </LinearLayout>
 </LinearLayout>

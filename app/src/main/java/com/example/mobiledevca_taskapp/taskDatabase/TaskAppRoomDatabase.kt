@@ -50,7 +50,7 @@ abstract class TaskAppRoomDatabase : RoomDatabase() {
         suspend fun populateDatabase(taskDao: TaskDAO, habitDao: HabitDAO) {
             taskDao.deleteAll()
 
-            val task = Task(0, "Make Database", "For Tasks")
+            val task = Task(0, "Make Database", "For Tasks", true, "23:59:59", "01/01/2004")
             taskDao.insert(task)
 
             habitDao.deleteAll()
