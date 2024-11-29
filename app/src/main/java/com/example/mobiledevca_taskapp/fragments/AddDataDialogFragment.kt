@@ -23,6 +23,7 @@ import com.example.mobiledevca_taskapp.taskDatabase.TaskViewModel
 import com.example.mobiledevca_taskapp.taskDatabase.TaskViewModelFactory
 import com.example.mobiledevca_taskapp.taskDatabase.entities.Habit
 import com.example.mobiledevca_taskapp.taskDatabase.entities.Task
+import java.util.Calendar
 import java.util.Locale
 
 // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
@@ -121,8 +122,14 @@ class AddDataDialogFragment : DialogFragment(), AdapterView.OnItemSelectedListen
             }
 
             taskDate.setOnClickListener{
+                // Used to open calendar on current month
+                val calendar = Calendar.getInstance()
+                val curYear = calendar.get(Calendar.YEAR)
+                val curMonth = calendar.get(Calendar.MONTH)
+                val curDate = calendar.get(Calendar.DATE)
+
                 val datePicker: DatePickerDialog = DatePickerDialog(
-                    requireContext(), datePickerDialogListener, 2024, 0, 1)
+                    requireContext(), datePickerDialogListener, curYear, curMonth, curDate)
                 datePicker.show()
             }
 
