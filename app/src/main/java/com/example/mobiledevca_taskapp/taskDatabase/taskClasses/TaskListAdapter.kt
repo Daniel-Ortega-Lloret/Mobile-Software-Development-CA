@@ -141,13 +141,13 @@ class TaskListAdapter(fragmentManager: FragmentManager, taskAppViewModel: TaskVi
 
             // Get The Current Time into a calender format
             val minute = calendar.get(Calendar.MINUTE)
-            val hour = calendar.get(Calendar.HOUR)
+            val hour = calendar.get(Calendar.HOUR_OF_DAY) // Hr of day = 24hr   / Hour =  12
             val date = calendar.get(Calendar.DATE)
             val month = calendar.get(Calendar.MONTH)
             val year = calendar.get(Calendar.YEAR)
             val dateNow = Calendar.getInstance()
             dateNow.set(Calendar.MINUTE, minute)
-            dateNow.set(Calendar.HOUR, hour)
+            dateNow.set(Calendar.HOUR_OF_DAY, hour)
             dateNow.set(Calendar.DATE, date)
             dateNow.set(Calendar.MONTH, month)
             dateNow.set(Calendar.YEAR, year)
@@ -189,7 +189,7 @@ class TaskListAdapter(fragmentManager: FragmentManager, taskAppViewModel: TaskVi
             // Turn the task date into a calender
             val formatTaskDate = Calendar.getInstance()
             formatTaskDate.set(Calendar.MINUTE, min)
-            formatTaskDate.set(Calendar.HOUR, hr)
+            formatTaskDate.set(Calendar.HOUR_OF_DAY, hr)
             formatTaskDate.set(Calendar.DATE, d)
             formatTaskDate.set(Calendar.MONTH, m)
             formatTaskDate.set(Calendar.YEAR, y)

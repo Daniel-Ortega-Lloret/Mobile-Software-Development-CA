@@ -81,7 +81,12 @@ class UpdateDataDialogFragment : DialogFragment(), AdapterView.OnItemSelectedLis
         }
         if (CalenderNotNull(task.date))
         {
-            taskDate.setText(task.date)
+            var dateSplit = task.date.split(":")
+            var month = dateSplit[1].toInt()
+            month = (month + 1)
+
+            var String = "%02d:%02d:%02d".format(dateSplit[0].toInt(), month, dateSplit[2].toInt())
+            taskDate.setText(String)
         }
 
 
@@ -170,7 +175,8 @@ class UpdateDataDialogFragment : DialogFragment(), AdapterView.OnItemSelectedLis
 
                 // We must set dateString Here. And Last line changes button to display after we set date
                 dateString = "%02d:%02d:%04d".format(d, m, y)
-                taskDate.setText(dateString)
+                var displayString = "%02d:%02d:%04d".format(d, m!! + 1, y) // Months start at 0, But Jan should be month 1
+                taskDate.setText(displayString)
             }
         }
 

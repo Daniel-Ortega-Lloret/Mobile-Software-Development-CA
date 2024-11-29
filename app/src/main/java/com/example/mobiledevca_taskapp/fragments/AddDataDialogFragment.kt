@@ -116,7 +116,7 @@ class AddDataDialogFragment : DialogFragment(), AdapterView.OnItemSelectedListen
                     d = dayOfMonth
                     m = month
                     y = year
-                    taskDate.setText("%02d:%02d:%04d".format(d, m, y))
+                    taskDate.setText("%02d:%02d:%04d".format(d, m!! + 1, y)) // Months start at 0: January should be month 1
                 }
             }
 
