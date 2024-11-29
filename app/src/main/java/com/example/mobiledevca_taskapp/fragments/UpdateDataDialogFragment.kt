@@ -244,7 +244,7 @@ class UpdateDataDialogFragment : DialogFragment() {
                         when (dialogType) {
                             "4" -> {
                                 // Task Must Take The Edit Text Values To Save Changed
-                                task = Task(task.taskId, taskName.text.toString(), taskDescription.text.toString())
+                                task = Task(task.taskId, taskName.text.toString(), taskDescription.text.toString(), false, timeString, dateString)
                                 if (task != null) {
                                     updateTask(task)
                                 }
