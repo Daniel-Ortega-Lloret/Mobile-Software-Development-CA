@@ -1,5 +1,6 @@
 package com.example.mobiledevca_taskapp.taskDatabase.taskClasses
 
+import android.icu.util.Calendar
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -14,6 +15,11 @@ import com.example.mobiledevca_taskapp.fragments.UpdateDataDialogFragment
 import com.example.mobiledevca_taskapp.taskDatabase.TaskViewModel
 import com.example.mobiledevca_taskapp.taskDatabase.entities.Task
 import com.example.mobiledevca_taskapp.taskDatabase.taskClasses.TaskListAdapter.TaskViewHolder
+import java.text.SimpleDateFormat
+import java.time.Duration
+import java.time.Year
+import java.time.temporal.ChronoUnit
+
 
 class TaskListAdapter(fragmentManager: FragmentManager, taskAppViewModel: TaskViewModel): ListAdapter<Task, TaskViewHolder>(TASK_COMPARATOR) {
     private val fragmentManager = fragmentManager
@@ -36,6 +42,7 @@ class TaskListAdapter(fragmentManager: FragmentManager, taskAppViewModel: TaskVi
         private var taskId = 0
         private var taskTime = ""
         private var taskDate = ""
+        private var taskTimeView: TextView = itemView.findViewById(R.id.RecyclerItemTime)
         private val fragmentManager = fragmentManager
         private val taskAppViewModel = taskAppViewModel
 
@@ -54,16 +61,20 @@ class TaskListAdapter(fragmentManager: FragmentManager, taskAppViewModel: TaskVi
             taskNameView.contentDescription = "Task name: ${task.taskName}"
             //taskDescriptionView.contentDescription = "Task description: ${task.description ?: ""}"
 
-
+            // Checkbox Listener
             taskCheckView.isChecked = task.isChecked
-            // Checkbox listener
             taskCheckView.setOnClickListener {
                 ChangeCheckbox(task)
             }
 
+            // taskTime and taskDate is for passing to dialogs
             taskTime = task.time
             taskDate = task.date
+
+            // For Doing Calculations and displaying beside each recycler item
+            taskTimeView.setText(ShowTime(task))
         }
+
 
         companion object {
             fun create(parent: ViewGroup, fragmentManager: FragmentManager, taskAppViewModel: TaskViewModel): TaskViewHolder {
@@ -104,17 +115,129 @@ class TaskListAdapter(fragmentManager: FragmentManager, taskAppViewModel: TaskVi
             taskAppViewModel.ChangeCheckbox(task)
         }
 
+        // For calculating what to display for the time string in a recycler item
+        private fun ShowTime(task: Task): String
+        {
+            var min = 0
+            var hr = 0
+            var d = 0
+            var m = 0
+            var y = 0
+            var dateSplit: List<String>
+
+            // If Neither Time Or Date Was Selected: Display nothing
+            if ((task.time == "null:null") && (task.date == "null:null:null"))
+            {
+                return ""
+            }
+
+            if (task.time != "null:null")
+            {
+
+            }
+            // Get All Data Times Right Now For Calculations
+            val calendar = Calendar.getInstance()
+
+
+            // Get The Current Time into a calender format
+            val minute = calendar.get(Calendar.MINUTE)
+            val hour = calendar.get(Calendar.HOUR)
+            val date = calendar.get(Calendar.DATE)
+            val month = calendar.get(Calendar.MONTH)
+            val year = calendar.get(Calendar.YEAR)
+            val dateNow = Calendar.getInstance()
+            dateNow.set(Calendar.MINUTE, minute)
+            dateNow.set(Calendar.HOUR, hour)
+            dateNow.set(Calendar.DATE, date)
+            dateNow.set(Calendar.MONTH, month)
+            dateNow.set(Calendar.YEAR, year)
+
+            // Check if its null to stop crash
+            if (task.date != "null:null:null")
+            {
+                // Parsing the task date to do maths
+                dateSplit = task.date.split(":")
+                d = dateSplit[0].toInt()
+                m = dateSplit[1].toInt()
+                y = dateSplit[2].toInt()
+            }
+            // If We Dont Have A Date: Then It Becomes Todays Date
+            else
+            {
+                d = calendar.get(Calendar.DATE)
+                m = calendar.get(Calendar.MONTH)
+                y = calendar.get(Calendar.YEAR)
+            }
+
+            // If Time Isnt Null Then Use It
+            if (task.time != "null:null")
+            {
+                dateSplit = task.time.split(":")
+                hr = dateSplit[0].toInt()
+                min = dateSplit[1].toInt()
+            }
+
+            // Else Give 12am
+            else
+            {
+                min = 0
+                hr = 0
+            }
+
+
+
+            // Turn the task date into a calender
+            val formatTaskDate = Calendar.getInstance()
+            formatTaskDate.set(Calendar.MINUTE, min)
+            formatTaskDate.set(Calendar.HOUR, hr)
+            formatTaskDate.set(Calendar.DATE, d)
+            formatTaskDate.set(Calendar.MONTH, m)
+            formatTaskDate.set(Calendar.YEAR, y)
+
+
+            var Difference = formatTaskDate.timeInMillis - dateNow.timeInMillis
+            if (Difference < 0)
+            {
+                return "Time Over"
+            }
+
+            // If Its More Than A Day: Dislay in Days
+            else if ((Difference / 1000 / 60 / 60 / 24) >= 1)
+            {
+                Difference = Difference / 1000 / 60 / 60 / 24
+                return ("%d Days Left").format(Difference)
+            }
+
+            // If Its Less Than A Day, But More or Equal To 1hr: Display in hours
+            else if (((Difference / 1000/ 60 / 60 < 24) && (Difference / 1000 / 60 / 60 >= 1)))
+            {
+                Difference = Difference / 1000 / 60 / 60
+                return ("%d Hours Left").format(Difference)
+            }
+
+            else if ((Difference / 1000 / 60 < 60))
+            {
+                Difference = Difference / 1000 / 60
+                return ("%d Mins Left").format(Difference)
+            }
+
+            return ""
+        }
+
     }
 
     companion object {
         private val TASK_COMPARATOR = object : DiffUtil.ItemCallback<Task>() {
             override fun areItemsTheSame(oldItem: Task, newItem: Task): Boolean {
-                return oldItem === newItem
+                return oldItem.taskId == newItem.taskId
             }
 
             override fun areContentsTheSame(oldItem: Task, newItem: Task): Boolean {
-                return oldItem.taskId == newItem.taskId
+                return oldItem == newItem
             }
         }
     }
+
+
+
 }
