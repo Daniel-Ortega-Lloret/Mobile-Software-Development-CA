@@ -16,21 +16,27 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.asLiveData
 import androidx.lifecycle.viewModelScope
+import com.example.mobiledevca_taskapp.taskDatabase.entities.Day
 import com.example.mobiledevca_taskapp.taskDatabase.entities.Habit
 import com.example.mobiledevca_taskapp.taskDatabase.entities.Task
+import com.example.mobiledevca_taskapp.taskDatabase.entities.TimeSlot
 import com.example.mobiledevca_taskapp.taskDatabase.taskClasses.TaskRepository
 import com.example.mobiledevca_taskapp.taskDatabase.habitClasses.HabitRepository
 import com.example.mobiledevca_taskapp.taskDatabase.habitClasses.NotificationEvent
 import com.example.mobiledevca_taskapp.taskDatabase.habitClasses.StepNotificationMaker
+import com.example.mobiledevca_taskapp.taskDatabase.scheduleClasses.ScheduleRepository
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.launch
+import java.text.SimpleDateFormat
 import java.util.Calendar
+import java.util.Locale
 
 class TaskViewModel(application: Application, private val applicationScope: CoroutineScope) : AndroidViewModel(application) {
     private val database = TaskAppRoomDatabase.getDatabase(application, applicationScope)
 
     private val taskRepository = TaskRepository(database.taskDao())
+    private val scheduleRepository = ScheduleRepository(database.scheduleDao())
     private val habitRepository = HabitRepository(database.habitDao())
 
     private val _stepGoalReached = MutableLiveData<NotificationEvent<Int>>()
@@ -63,6 +69,63 @@ class TaskViewModel(application: Application, private val applicationScope: Coro
     fun ChangeCheckbox(task: Task) = viewModelScope.launch {
         taskRepository.ChangeCheckbox(task)
     }
+
+
+    private val _allDays = MutableLiveData<List<Day>>()
+    val allDays: LiveData<List<Day>> = _allDays
+
+    // Preload the tasks for the week
+    fun preLoadWeekTasks() {
+
+        val currentWeek = getCurrentWeek()
+
+        // Mock data to simulate week task loading
+        val tasks = listOf(
+            Task(0, "Meeting", "Team sync-up", false, "10:00", "02:11:2025"),
+            Task(0, "Gym", "Workout", false, "06:00", "09:08:2023")
+        )
+
+        val daysOfWeek = currentWeek.mapIndexed { index, dayString ->
+            val dayParts = dayString.split(", ")
+            val dayName = dayParts[0]
+            val dayNumber = dayParts[1].toInt()
+            Day(dayId = 0, dayName = dayName, dayNumber = dayNumber, timeSlots = listOf(
+                TimeSlot(timeSlotId = 0, time = "06:00", tasks = tasks),
+                TimeSlot(timeSlotId = 0, time = "10:00", tasks = tasks)
+            ))
+        }
+
+        _allDays.value = daysOfWeek
+    }
+
+    fun getAllDays() {
+        scheduleRepository.getAllDaysFromDatabase().observeForever { days ->
+            _allDays.value = days
+        }
+    }
+
+    fun getCurrentWeek(): List<String> {
+        val calendar = Calendar.getInstance()
+
+        // Get the current day of the week
+        val today = calendar.get(Calendar.DAY_OF_WEEK)
+
+        // Find the start of the week (Monday)
+        calendar.add(Calendar.DAY_OF_WEEK, -today + Calendar.MONDAY)
+
+        val weekDates = mutableListOf<String>()
+
+        // Generate 7 days starting from the current Monday
+        val sdf = SimpleDateFormat("EEE, dd", Locale.getDefault())
+
+        for (i in 0 until 7) {
+            weekDates.add(sdf.format(calendar.time))
+            calendar.add(Calendar.DAY_OF_YEAR, 1)
+        }
+
+        return weekDates
+    }
+
 
     val allHabits: LiveData<List<Habit>> = habitRepository.allItems.asLiveData()
 
@@ -143,8 +206,6 @@ class TaskViewModel(application: Application, private val applicationScope: Coro
             }
         }
     }
-
-
 }
 
 class TaskViewModelFactory(

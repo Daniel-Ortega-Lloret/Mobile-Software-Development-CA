@@ -10,7 +10,7 @@
     android:orientation="horizontal"
     tools:context=".TasksActivity">
 
-    <LinearLayout
+    <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="10dp"
@@ -24,29 +24,44 @@
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
             android:scaleX="2"
-            android:scaleY="2">
+            android:scaleY="2"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent">
 
         </CheckBox>
 
-        <TextView
-            android:id="@+id/Task_Name"
-            android:layout_marginLeft="2dp"
+        <LinearLayout
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_weight="2"
-            android:text="string"
-            android:textAlignment="viewStart"
-            android:textSize="@dimen/font_size" />
+            android:orientation="vertical"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toEndOf="@+id/Task_Checkbox"
+            app:layout_constraintTop_toTopOf="parent">
 
-        <TextView
-            android:id="@+id/RecyclerItemTime"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:textSize="@dimen/font_size"
-            android:text="Time">
+            <TextView
+                android:id="@+id/Task_Name"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="2"
+                android:text="string"
+                android:textAlignment="viewStart"
+                android:textSize="18sp"
+                android:ellipsize="end"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
 
-        </TextView>
+            <TextView
+                android:id="@+id/RecyclerItemTime"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Time"
+                android:textSize="15sp">
 
-    </LinearLayout>
+            </TextView>
+
+        </LinearLayout>
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
 </LinearLayout>

@@ -17,6 +17,7 @@ class TaskAppApplication: Application() {
     //by lazy makes it so that these are only made when they are needed, not as the activity starts
     val database by lazy { TaskAppRoomDatabase.getDatabase(this, applicationScope) }
     val taskRepository by lazy { TaskAppRepository(database.taskDao()) }
+    val scheduleRepository by lazy { TaskAppRepository(database.scheduleDao())}
     val habitRepository by lazy { TaskAppRepository(database.habitDao())}
 
     override fun onCreate() {

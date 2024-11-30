@@ -4,19 +4,26 @@ import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
 import android.content.Context
+import androidx.room.TypeConverters
 import androidx.sqlite.db.SupportSQLiteDatabase
 import com.example.mobiledevca_taskapp.taskDatabase.dao.HabitDAO
+import com.example.mobiledevca_taskapp.taskDatabase.dao.ScheduleDAO
 import com.example.mobiledevca_taskapp.taskDatabase.dao.TaskDAO
+import com.example.mobiledevca_taskapp.taskDatabase.entities.Day
 import com.example.mobiledevca_taskapp.taskDatabase.entities.Habit
 import com.example.mobiledevca_taskapp.taskDatabase.entities.Task
+import com.example.mobiledevca_taskapp.taskDatabase.scheduleClasses.TaskConverter
+import com.example.mobiledevca_taskapp.taskDatabase.scheduleClasses.TimeSlotListConverter
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
 //Everytime we change the schema (which we will) we update the version number
-@Database(entities = [Task::class, Habit::class], version = 17)
+@Database(entities = [Task::class, Day::class, Habit::class], version = 22)
+@TypeConverters(TaskConverter::class, TimeSlotListConverter::class)
 abstract class TaskAppRoomDatabase : RoomDatabase() {
     abstract fun taskDao() : TaskDAO
+    abstract fun scheduleDao() : ScheduleDAO
     abstract fun habitDao() : HabitDAO
 
     companion object {
@@ -49,9 +56,6 @@ abstract class TaskAppRoomDatabase : RoomDatabase() {
 
         suspend fun populateDatabase(taskDao: TaskDAO, habitDao: HabitDAO) {
             taskDao.deleteAll()
-
-            val task = Task(0, "Make Database", "For Tasks", true, "23:59:59", "01/01/2004")
-            taskDao.insert(task)
 
             habitDao.deleteAll()
         }
