@@ -2,7 +2,6 @@ package com.example.mobiledevca_taskapp.taskDatabase.scheduleClasses
 
 import android.content.Context
 import android.util.Log
-import android.view.Gravity
 import androidx.recyclerview.widget.RecyclerView
 import android.view.LayoutInflater
 import android.view.View
@@ -10,44 +9,52 @@ import android.view.ViewGroup
 import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.core.content.ContextCompat
-import androidx.core.view.marginTop
-import androidx.lifecycle.LifecycleOwner
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.ListAdapter
 import com.example.mobiledevca_taskapp.R
 import com.example.mobiledevca_taskapp.taskDatabase.TaskViewModel
 import com.example.mobiledevca_taskapp.taskDatabase.entities.Day
-import com.example.mobiledevca_taskapp.taskDatabase.entities.Task
-import com.example.mobiledevca_taskapp.taskDatabase.taskClasses.TaskListAdapter
+
 class ScheduleAdapter(
     private val viewModel: TaskViewModel,
-    private val context: Context
+    private val context: Context,
+    private val onDayClick: (Day) -> Unit
 ) : ListAdapter<Day, ScheduleAdapter.DayViewHolder>(DayDiffCallback()) {
 
-    class DayViewHolder(view: View) : RecyclerView.ViewHolder(view) {
-        val textViewDayDate: TextView = view.findViewById(R.id.textViewDayDate)
-        val textViewDayNumber : TextView = view.findViewById(R.id.textViewDayNumber)
-        val timeSlotRecyclerView: RecyclerView = view.findViewById(R.id.recyclerViewTimeSlots)
-    }
+    private var selectedDay: Day? = null
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): DayViewHolder {
         val view = LayoutInflater.from(parent.context)
             .inflate(R.layout.day_item, parent, false)
-        return DayViewHolder(view)
+        return DayViewHolder(view, this)
     }
 
     override fun onBindViewHolder(holder: DayViewHolder, position: Int) {
         val day = getItem(position)
+        holder.bind(day)
+    }
 
-        holder.textViewDayDate.text = day.dayName
-        holder.textViewDayNumber.text = "${day.dayNumber}"
+    class DayViewHolder(view: View, private val adapter: ScheduleAdapter) : RecyclerView.ViewHolder(view) {
+        private val textViewTimeLabel: LinearLayout = view.findViewById(R.id.textViewTimeLabel)
+        private val textViewDayDate: TextView = view.findViewById(R.id.textViewDayDate)
+        private val textViewDayNumber : TextView = view.findViewById(R.id.textViewDayNumber)
 
-        holder.timeSlotRecyclerView.layoutManager = LinearLayoutManager(holder.itemView.context)
+        fun bind(day: Day) {
+            textViewDayDate.text = day.dayName
+            textViewDayNumber.text = "${day.dayNumber}"
 
-        if (day.timeSlots.isNotEmpty()) {
-            val timeSlotAdapter = TimeSlotAdapter(day.timeSlots)
-            holder.timeSlotRecyclerView.adapter = timeSlotAdapter
+            val isSelected = day == adapter.selectedDay
+            textViewTimeLabel.background = ContextCompat.getDrawable(
+                adapter.context,
+                if (isSelected) R.drawable.selected_day_background else R.drawable.day_item_background
+            )
+
+            textViewTimeLabel.setOnClickListener {
+                Log.d("schedule", "just clicked $day")
+                adapter.selectedDay = day
+                adapter.onDayClick(day)
+            }
         }
     }
 

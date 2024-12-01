@@ -28,8 +28,11 @@ import com.example.mobiledevca_taskapp.taskDatabase.scheduleClasses.ScheduleRepo
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.launch
+import java.sql.Time
+import java.text.ParseException
 import java.text.SimpleDateFormat
 import java.util.Calendar
+import java.util.Date
 import java.util.Locale
 
 class TaskViewModel(application: Application, private val applicationScope: CoroutineScope) : AndroidViewModel(application) {
@@ -72,30 +75,75 @@ class TaskViewModel(application: Application, private val applicationScope: Coro
 
 
     private val _allDays = MutableLiveData<List<Day>>()
-    val allDays: LiveData<List<Day>> = _allDays
+    val allDays: LiveData<List<Day>> get() = _allDays
+
+    private val _selectedDayTasks = MutableLiveData<List<Task>>()
+    val selectedDayTasks: LiveData<List<Task>> = _selectedDayTasks
+
+    private var currentWeekStartDate: String = ""
+
+    fun updateTasksForSelectedDay(day: Day) {
+
+        val tasksForSelectedDay = day.timeSlots.flatMap { it.tasks }
+        _selectedDayTasks.value = tasksForSelectedDay
+    }
+
+    fun ensureStateConsistency() {
+        if (currentWeekStartDate.isEmpty()) {
+            Log.e("WeekNavigation", "Current week start date is uninitialized!")
+            preLoadWeekTasks()
+        }
+    }
 
     // Preload the tasks for the week
     fun preLoadWeekTasks() {
+        val calendar = Calendar.getInstance()
 
-        val currentWeek = getCurrentWeek()
+        val today = Date()
+        calendar.time = today
 
-        // Mock data to simulate week task loading
-        val tasks = listOf(
-            Task(0, "Meeting", "Team sync-up", false, "10:00", "02:11:2025"),
-            Task(0, "Gym", "Workout", false, "06:00", "09:08:2023")
-        )
+        calendar.set(Calendar.DAY_OF_WEEK, Calendar.MONDAY)
 
-        val daysOfWeek = currentWeek.mapIndexed { index, dayString ->
-            val dayParts = dayString.split(", ")
-            val dayName = dayParts[0]
-            val dayNumber = dayParts[1].toInt()
-            Day(dayId = 0, dayName = dayName, dayNumber = dayNumber, timeSlots = listOf(
-                TimeSlot(timeSlotId = 0, time = "06:00", tasks = tasks),
-                TimeSlot(timeSlotId = 0, time = "10:00", tasks = tasks)
-            ))
+        val startDate = calendar.time
+        currentWeekStartDate = SimpleDateFormat("dd:MM:yyyy", Locale.getDefault()).format(startDate)
+
+        val week = List(7) { index ->
+            val dayDate = calendar.time
+            val dayName = SimpleDateFormat("EEE", Locale.getDefault()).format(dayDate)
+            val dayNumber = calendar.get(Calendar.DAY_OF_MONTH)
+            calendar.add(Calendar.DAY_OF_YEAR, 1)
+
+            Day(
+                dayId = 0,
+                dayName = dayName,
+                dayNumber = dayNumber
+            )
         }
 
-        _allDays.value = daysOfWeek
+        _allDays.value = week
+    }
+
+
+    fun loadPreviousWeekTasks() {
+        ensureStateConsistency()
+        val previousWeekStartDate = getPreviousWeekDate(currentWeekStartDate)
+        val previousWeek = getWeekForDate(previousWeekStartDate)
+
+        if (previousWeek.isNotEmpty()) {
+            _allDays.value = previousWeek
+            currentWeekStartDate = previousWeekStartDate
+            Log.d("WeekNavigation", "Updated currentWeekStartDate to: $currentWeekStartDate")
+        } else {
+            Log.e("WeekNavigation", "Failed to load previous week.")
+        }
+    }
+
+    private fun isValidDate(date: String): Boolean {
+        return try {
+            SimpleDateFormat("dd:MM:yyyy", Locale.getDefault()).parse(date) != null
+        } catch (e: ParseException) {
+            false
+        }
     }
 
     fun getAllDays() {
@@ -104,26 +152,91 @@ class TaskViewModel(application: Application, private val applicationScope: Coro
         }
     }
 
-    fun getCurrentWeek(): List<String> {
+    fun loadNextWeekTasks() {
+        ensureStateConsistency()
+        val nextWeekStartDate = getNextWeekDate(currentWeekStartDate)
+        val nextWeek = getWeekForDate(nextWeekStartDate)
+
+        if (nextWeek.isNotEmpty()) {
+            _allDays.value = nextWeek
+            currentWeekStartDate = nextWeekStartDate
+            Log.d("WeekNavigation", "Updated currentWeekStartDate to: $currentWeekStartDate")
+        } else {
+            Log.e("WeekNavigation", "Failed to load next week.")
+        }
+    }
+
+    private fun getNextWeekDate(startDate: String): String {
+        if (!isValidDate(startDate)) {
+            return ""
+        }
+
+        val sdf = SimpleDateFormat("dd:MM:yyyy", Locale.getDefault())
+        val parsedDate = sdf.parse(startDate) ?: throw IllegalArgumentException("Invalid start date")
+
+        val calendar = Calendar.getInstance().apply {
+            time = parsedDate
+            add(Calendar.DAY_OF_YEAR, 7)
+        }
+        val monday = calculateMonday(calendar.time)
+        return sdf.format(monday)
+    }
+
+
+    private fun getPreviousWeekDate(startDate: String): String {
+        if (!isValidDate(startDate)) {
+            return ""
+        }
+        val sdf = SimpleDateFormat("dd:MM:yyyy", Locale.getDefault())
+        val parsedDate = sdf.parse(startDate) ?: throw IllegalArgumentException("Invalid start date")
+
+        val calendar = Calendar.getInstance().apply {
+            time = parsedDate
+            add(Calendar.DAY_OF_YEAR, -7)
+        }
+        val monday = calculateMonday(calendar.time)
+        return sdf.format(monday)
+    }
+
+    private fun getWeekForDate(startDate: String): List<Day> {
         val calendar = Calendar.getInstance()
+        val sdf = SimpleDateFormat("dd:MM:yyyy", Locale.getDefault())
 
-        // Get the current day of the week
-        val today = calendar.get(Calendar.DAY_OF_WEEK)
+        calendar.time = sdf.parse(startDate) ?: return emptyList()
 
-        // Find the start of the week (Monday)
-        calendar.add(Calendar.DAY_OF_WEEK, -today + Calendar.MONDAY)
+        val currentDayOfWeek = calendar.get(Calendar.DAY_OF_WEEK)
+        val diff = (currentDayOfWeek - Calendar.MONDAY + 7) % 7
+        calendar.add(Calendar.DAY_OF_YEAR, -diff)
 
-        val weekDates = mutableListOf<String>()
-
-        // Generate 7 days starting from the current Monday
-        val sdf = SimpleDateFormat("EEE, dd", Locale.getDefault())
-
+        val week = mutableListOf<Day>()
         for (i in 0 until 7) {
-            weekDates.add(sdf.format(calendar.time))
+            val date = calendar.time
+            val dayName = SimpleDateFormat("EEE", Locale.getDefault()).format(date)
+            val dayNumber = calendar.get(Calendar.DAY_OF_MONTH)
+            week.add(Day(
+                dayId = 0,
+                dayName = dayName,
+                dayNumber = dayNumber
+            ))
+
             calendar.add(Calendar.DAY_OF_YEAR, 1)
         }
 
-        return weekDates
+        return week
+    }
+
+    private fun calculateMonday(date: Date): Date {
+        val calendar = Calendar.getInstance().apply {
+            time = date
+            set(Calendar.HOUR_OF_DAY, 0)
+            set(Calendar.MINUTE, 0)
+            set(Calendar.SECOND, 0)
+            set(Calendar.MILLISECOND, 0)
+        }
+        val dayOfWeek = calendar.get(Calendar.DAY_OF_WEEK)
+        val daysToMonday = (dayOfWeek - Calendar.MONDAY + 7) % 7
+        calendar.add(Calendar.DAY_OF_YEAR, -daysToMonday)
+        return calendar.time
     }
 
 

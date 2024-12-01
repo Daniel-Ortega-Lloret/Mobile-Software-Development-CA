@@ -103,7 +103,7 @@ class UpdateDataDialogFragment : DialogFragment() {
         {
             taskTime.setText(task.time)
         }
-        if (CalenderNotNull(task.date))
+        if (CalenderNotNull(task.date) && dialogType == "4")
         {
             var dateSplit = task.date.split(":")
             var month = dateSplit[1].toInt()
