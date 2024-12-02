@@ -2,13 +2,17 @@ package com.example.mobiledevca_taskapp.taskDatabase.taskClasses
 
 import android.util.Log
 import android.icu.util.Calendar
+import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.CheckBox
 import android.widget.TextView
 import androidx.fragment.app.FragmentManager
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
 import androidx.recyclerview.widget.DiffUtil
+import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.example.mobiledevca_taskapp.R
@@ -34,6 +38,38 @@ class TaskListAdapter(fragmentManager: FragmentManager, taskAppViewModel: TaskVi
     override fun onBindViewHolder(holder: TaskViewHolder, position: Int) {
         val current = getItem(position)
         holder.bind(current)
+    }
+
+    // For Drag and Drop reorder
+    fun moveItem(from: Int, to: Int)
+    {
+        // Get the current list
+        val updateCurrentList = currentList.toMutableList()
+
+        val item = updateCurrentList[from]
+        updateCurrentList.removeAt(from)
+
+        if(to < from)
+        {
+            updateCurrentList.add(to + 1, item)
+        }
+        else
+        {
+            updateCurrentList.add(to -1, item)
+        }
+
+        // Set The Index To Match Where It Is Before View Model
+        updateCurrentList.forEachIndexed{index, task ->
+            task.position = index
+        }
+        // Update the list
+        submitList(updateCurrentList)
+        {
+            Log.d("TaskListAdapter", "Current list updated to: $currentList")
+        }
+
+        // Tell ViewModel to update the order
+        taskAppViewModel.updateOrder(updateCurrentList)
     }
 
     class TaskViewHolder(itemView: View, fragmentManager: FragmentManager, taskAppViewModel: TaskViewModel) : RecyclerView.ViewHolder(itemView), View.OnClickListener {
@@ -224,6 +260,7 @@ class TaskListAdapter(fragmentManager: FragmentManager, taskAppViewModel: TaskVi
 
     }
 
+
     companion object {
         private val TASK_COMPARATOR = object : DiffUtil.ItemCallback<Task>() {
             override fun areItemsTheSame(oldItem: Task, newItem: Task): Boolean {
@@ -231,7 +268,7 @@ class TaskListAdapter(fragmentManager: FragmentManager, taskAppViewModel: TaskVi
             }
 
             override fun areContentsTheSame(oldItem: Task, newItem: Task): Boolean {
-                return oldItem == newItem
+                return oldItem == newItem && oldItem.position == newItem.position
             }
         }
     }

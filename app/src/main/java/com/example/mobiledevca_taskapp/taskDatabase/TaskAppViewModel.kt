@@ -43,6 +43,9 @@ class TaskViewModel(application: Application, private val applicationScope: Coro
     //Observer for the tasks repository, only updates UI if data changes
     val allTasks: LiveData<List<Task>> = taskRepository.allItems.asLiveData()
 
+    fun updateOrder(newOrder: List<Task>) = viewModelScope.launch {
+        taskRepository.updateOrder(newOrder)
+    }
     fun insertTask(task: Task) = viewModelScope.launch {
         taskRepository.insert(task)
 

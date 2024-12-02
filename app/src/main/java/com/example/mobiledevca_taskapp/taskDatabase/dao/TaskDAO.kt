@@ -3,13 +3,17 @@ package com.example.mobiledevca_taskapp.taskDatabase.dao
 import androidx.lifecycle.LiveData
 import androidx.room.Dao
 import androidx.room.Query
+import androidx.room.Update
 import com.example.mobiledevca_taskapp.taskDatabase.entities.Task
 import kotlinx.coroutines.flow.Flow
 
 @Dao //Data Access Object pattern for accessing DB
 interface TaskDAO : BaseDAO<Task>{
-    @Query("SELECT * FROM Task")
+    @Query("SELECT * FROM Task ORDER BY position ASC")
     override fun getAll(): Flow<List<Task>>
+
+    @Query ("UPDATE Task SET position = :task_Position WHERE taskId = :task_Id")
+    suspend fun updateTaskPositionById(task_Id: Int, task_Position: Int)
 
     @Query("DELETE FROM Task")
     override suspend fun deleteAll()

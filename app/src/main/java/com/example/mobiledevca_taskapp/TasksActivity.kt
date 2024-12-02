@@ -10,6 +10,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.ViewModelProvider
+import androidx.recyclerview.widget.ItemTouchHelper
 import com.example.mobiledevca_taskapp.common.BaseActivity
 import com.example.mobiledevca_taskapp.fragments.AddDataDialogFragment
 import com.example.mobiledevca_taskapp.fragments.UpdateDataDialogFragment
@@ -52,6 +53,33 @@ class TasksActivity : BaseActivity() {
         // Set a linear layout manager on the recycler view then generate an adapter and attach it
         _recyclerview.layoutManager = LinearLayoutManager(this)
 
+        // For Moving The Items
+        val itemTouchHelper by lazy {
+            val simpleItemTouchCallback =
+                object : ItemTouchHelper.SimpleCallback(ItemTouchHelper.UP or ItemTouchHelper.DOWN or ItemTouchHelper.START or ItemTouchHelper.END, 0)
+                {
+                    override fun onMove(
+                        recyclerView: RecyclerView,
+                        viewHolder: RecyclerView.ViewHolder,
+                        target: RecyclerView.ViewHolder
+                    ): Boolean {
+                        val adapter = recyclerView.adapter as TaskListAdapter
+                        val from = viewHolder.adapterPosition
+                        val to = target.adapterPosition
+
+                        adapter.moveItem(from, to)
+                        // Tell adapter to render the update
+                        adapter.notifyItemMoved(from, to)
+                        return true
+                    }
+
+                    override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
+                        // If Swiped
+                    }
+                }
+            ItemTouchHelper(simpleItemTouchCallback)
+        }
+        itemTouchHelper.attachToRecyclerView(_recyclerview)
 
         taskViewModel.allTasks.observe(this as LifecycleOwner) {tasks ->
             tasks?.let { adapter.submitList(it) }

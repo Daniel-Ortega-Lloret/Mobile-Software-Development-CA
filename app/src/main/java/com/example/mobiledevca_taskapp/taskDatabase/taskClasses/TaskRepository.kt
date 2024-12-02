@@ -13,6 +13,15 @@ class TaskRepository (private val taskDAO: TaskDAO): TaskAppRepository<Task>(tas
     }
 
     @WorkerThread
+    suspend fun updateOrder(List: List<Task>)
+    {
+        // Set Each Individual Tasks Position Correctly
+        List.forEach { task: Task ->
+            taskDAO.updateTaskPositionById(task.taskId, task.position)
+        }
+    }
+
+    @WorkerThread
     suspend fun deleteTask(taskId: Int){
         taskDAO.deleteTaskById(taskId)
     }
