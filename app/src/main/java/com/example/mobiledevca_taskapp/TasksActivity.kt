@@ -56,7 +56,7 @@ class TasksActivity : BaseActivity() {
         // For Moving The Items
         val itemTouchHelper by lazy {
             val simpleItemTouchCallback =
-                object : ItemTouchHelper.SimpleCallback(ItemTouchHelper.UP or ItemTouchHelper.DOWN or ItemTouchHelper.START or ItemTouchHelper.END, 0)
+                object : ItemTouchHelper.SimpleCallback(ItemTouchHelper.UP or ItemTouchHelper.DOWN, 0)
                 {
                     override fun onMove(
                         recyclerView: RecyclerView,
@@ -69,7 +69,7 @@ class TasksActivity : BaseActivity() {
 
                         adapter.moveItem(from, to)
                         // Tell adapter to render the update
-                        adapter.notifyItemMoved(from, to)
+                        //adapter.notifyItemMoved(from, to)
                         return true
                     }
 

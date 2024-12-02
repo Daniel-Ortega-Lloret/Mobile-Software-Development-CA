@@ -51,25 +51,29 @@ class TaskListAdapter(fragmentManager: FragmentManager, taskAppViewModel: TaskVi
 
         if(to < from)
         {
-            updateCurrentList.add(to + 1, item)
+            updateCurrentList.add(to, item)
         }
         else
         {
-            updateCurrentList.add(to -1, item)
+            updateCurrentList.add(to, item)
         }
 
         // Set The Index To Match Where It Is Before View Model
         updateCurrentList.forEachIndexed{index, task ->
             task.position = index
         }
+
+        // Tell ViewModel to update the order
+        taskAppViewModel.updateOrder(updateCurrentList)
+
         // Update the list
         submitList(updateCurrentList)
         {
             Log.d("TaskListAdapter", "Current list updated to: $currentList")
         }
 
-        // Tell ViewModel to update the order
-        taskAppViewModel.updateOrder(updateCurrentList)
+
+
     }
 
     class TaskViewHolder(itemView: View, fragmentManager: FragmentManager, taskAppViewModel: TaskViewModel) : RecyclerView.ViewHolder(itemView), View.OnClickListener {
