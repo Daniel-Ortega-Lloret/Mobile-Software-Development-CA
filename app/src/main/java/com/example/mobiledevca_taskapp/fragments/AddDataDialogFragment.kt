@@ -119,7 +119,8 @@ class AddDataDialogFragment : DialogFragment(), AdapterView.OnItemSelectedListen
                     )
                     timePicker.show()
                 }
-                else {
+                else
+                {
                     val timePicker: TimePickerDialog = TimePickerDialog(
                         requireContext(), timePickerDialogListener, 12, 0, true)
                         timePicker.show()

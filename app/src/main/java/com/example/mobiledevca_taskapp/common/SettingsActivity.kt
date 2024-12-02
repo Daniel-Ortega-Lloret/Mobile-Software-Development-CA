@@ -31,7 +31,6 @@ class SettingsActivity : AppCompatActivity() {
             val SwichPreference = findPreference<SwitchPreferenceCompat?>("Dark_Mode_Switch")
 
             // Check If its on dark / light mode and changes the switch accordingly
-            val currentMode = AppCompatDelegate.getDefaultNightMode()
             val sharedPreferences = preferenceManager.sharedPreferences
             val CheckSwitch = sharedPreferences?.getBoolean("Dark_Mode_Switch", false)
 
@@ -59,15 +58,7 @@ class SettingsActivity : AppCompatActivity() {
                     true
                 }
             }
-            // We Change the theme based on this if statement
-                    // Probably wont need, if i can access root preferences from other files
-//
-//            val CheckSwitch = sharedPreferences?.getBoolean("Dark_Mode_Switch", false)
-//            if (CheckSwitch == true) {
-//                // If Switch is on
-//            } else {
-//
-//            }
+
 
         }
     }
