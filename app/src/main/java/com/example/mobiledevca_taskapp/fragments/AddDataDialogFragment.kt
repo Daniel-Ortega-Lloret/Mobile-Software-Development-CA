@@ -5,7 +5,6 @@ import android.app.DatePickerDialog
 import android.app.Dialog
 import android.app.TimePickerDialog
 import android.os.Bundle
-import android.util.Log
 import android.view.View
 import android.widget.AdapterView
 import android.widget.ArrayAdapter
@@ -13,11 +12,9 @@ import android.widget.CheckBox
 import android.widget.Button
 import android.widget.DatePicker
 import android.widget.EditText
-import android.widget.RadioButton
 import android.widget.RadioGroup
 import android.widget.Spinner
 import android.widget.Toast
-import android.widget.TextView
 import android.widget.TimePicker
 import androidx.fragment.app.DialogFragment
 import androidx.lifecycle.ViewModelProvider
@@ -28,7 +25,6 @@ import com.example.mobiledevca_taskapp.taskDatabase.TaskViewModelFactory
 import com.example.mobiledevca_taskapp.taskDatabase.entities.Habit
 import com.example.mobiledevca_taskapp.taskDatabase.entities.Task
 import java.util.Calendar
-import java.util.Locale
 import com.google.android.material.textfield.TextInputEditText
 
 // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
@@ -115,9 +111,20 @@ class AddDataDialogFragment : DialogFragment(), AdapterView.OnItemSelectedListen
             }
 
             taskTime.setOnClickListener{
-               val timePicker: TimePickerDialog = TimePickerDialog(
-                   requireContext(), timePickerDialogListener, 12, 0, true)
-               timePicker.show()
+                // If We Set A time And Then Want To Change it Again Before Saving, We Should Be Choosing From Where We Left Off
+                if (taskTime.text != "Set Time")
+                {
+                    val timePicker: TimePickerDialog = TimePickerDialog(    // Set Hours To Prev using / slicing of time string
+                        requireContext(), timePickerDialogListener, taskTime.text.substring(0,2).toInt(), taskTime.text.substring(3,5).toInt(), true
+                    )
+                    timePicker.show()
+                }
+                else {
+                    val timePicker: TimePickerDialog = TimePickerDialog(
+                        requireContext(), timePickerDialogListener, 12, 0, true)
+                        timePicker.show()
+                }
+
             }
             // End Of Time Dialog Logic
 
@@ -132,15 +139,27 @@ class AddDataDialogFragment : DialogFragment(), AdapterView.OnItemSelectedListen
             }
 
             taskDate.setOnClickListener{
-                // Used to open calendar on current month
-                val calendar = Calendar.getInstance()
-                val curYear = calendar.get(Calendar.YEAR)
-                val curMonth = calendar.get(Calendar.MONTH)
-                val curDate = calendar.get(Calendar.DATE)
+                // If We Were To Edit Our Date Before Saving We Want To Pick From Our Last Selected Value
+                if (taskDate.text != "Set Date")
+                {
+                    val datePicker: DatePickerDialog = DatePickerDialog(
+                        requireContext(), datePickerDialogListener, taskDate.text.substring(6, 10).toInt(), taskDate.text.substring(3,5).toInt() - 1, taskDate.text.substring(0,2).toInt())
+                    datePicker.show()
+                }
 
-                val datePicker: DatePickerDialog = DatePickerDialog(
-                    requireContext(), datePickerDialogListener, curYear, curMonth, curDate)
-                datePicker.show()
+                else
+                {
+                    // Used to open calendar on current month
+                    val calendar = Calendar.getInstance()
+                    val curYear = calendar.get(Calendar.YEAR)
+                    val curMonth = calendar.get(Calendar.MONTH)
+                    val curDate = calendar.get(Calendar.DATE)
+
+                    val datePicker: DatePickerDialog = DatePickerDialog(
+                        requireContext(), datePickerDialogListener, curYear, curMonth, curDate)
+                    datePicker.show()
+                }
+
             }
 
 

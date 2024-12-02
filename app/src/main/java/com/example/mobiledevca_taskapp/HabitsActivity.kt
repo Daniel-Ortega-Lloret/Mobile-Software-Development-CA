@@ -7,7 +7,6 @@ import android.content.Intent
 import android.content.pm.PackageManager
 import android.Manifest
 import android.annotation.SuppressLint
-import android.app.Service
 import android.content.ComponentName
 import android.content.ServiceConnection
 import android.os.Build
@@ -20,7 +19,6 @@ import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.FragmentManager
 import androidx.lifecycle.LifecycleOwner
-import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -28,13 +26,9 @@ import com.example.mobiledevca_taskapp.broadcast_receivers.HabitResetReceiver
 import com.example.mobiledevca_taskapp.common.BaseActivity
 import com.example.mobiledevca_taskapp.fragments.AddDataDialogFragment
 import com.example.mobiledevca_taskapp.services.StepCounterService
-import com.example.mobiledevca_taskapp.taskDatabase.TaskAppApplication
-import com.example.mobiledevca_taskapp.taskDatabase.TaskViewModel
-import com.example.mobiledevca_taskapp.taskDatabase.TaskViewModelFactory
 import com.example.mobiledevca_taskapp.taskDatabase.entities.Habit
 import com.example.mobiledevca_taskapp.taskDatabase.habitClasses.HabitListAdapter
 import com.example.mobiledevca_taskapp.taskDatabase.habitClasses.StepNotificationMaker
-import com.example.mobiledevca_taskapp.taskDatabase.taskClasses.TaskListAdapter
 
 class HabitsActivity : BaseActivity() {
     private lateinit var _recyclerview: RecyclerView
@@ -92,8 +86,6 @@ class HabitsActivity : BaseActivity() {
                         val to = target.adapterPosition
 
                         adapter.moveItem(from, to)
-                        // Tell adapter to render the update
-                        //adapter.notifyItemMoved(from, to)
                         return true
                     }
 

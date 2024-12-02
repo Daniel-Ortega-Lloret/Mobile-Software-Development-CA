@@ -13,23 +13,22 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.ItemTouchHelper
 import com.example.mobiledevca_taskapp.common.BaseActivity
 import com.example.mobiledevca_taskapp.fragments.AddDataDialogFragment
-import com.example.mobiledevca_taskapp.fragments.UpdateDataDialogFragment
 import com.example.mobiledevca_taskapp.taskDatabase.TaskAppApplication
 import com.example.mobiledevca_taskapp.taskDatabase.TaskViewModel
 import com.example.mobiledevca_taskapp.taskDatabase.TaskViewModelFactory
 
 import com.example.mobiledevca_taskapp.taskDatabase.taskClasses.TaskListAdapter
-import com.example.mobiledevca_taskapp.taskDatabase.entities.Task
-import java.util.Date
+
 
 class TasksActivity : BaseActivity() {
     private lateinit var _recyclerview: RecyclerView
     private lateinit var fragmentManager: FragmentManager
-    // For passing to recycler view
+    private lateinit var taskAppViewModel : TaskViewModel
 
+    // To Figure out what type was passed to dialog (habit / task)
     private lateinit var id : String
     private lateinit var name : String
-    private lateinit var taskAppViewModel : TaskViewModel
+
 
 
 
@@ -47,12 +46,13 @@ class TasksActivity : BaseActivity() {
         _recyclerview = findViewById(R.id.recyclerview)
         fragmentManager = supportFragmentManager
 
-        // Passing Update Dialog
+        // Passing fragment manager for dialogs, taskViewModel for dao changes
         val adapter = TaskListAdapter(supportFragmentManager, taskViewModel)
         _recyclerview.adapter = adapter
+
         // Set a linear layout manager on the recycler view then generate an adapter and attach it
         _recyclerview.layoutManager = LinearLayoutManager(this)
-        _recyclerview.itemAnimator = null // Idk what this line does but it stops it glitching and i cant tell a difference
+        _recyclerview.itemAnimator = null   // Stops Glitchy animations when moving tasks
 
         // For Moving The Items
         val itemTouchHelper by lazy {
@@ -68,14 +68,13 @@ class TasksActivity : BaseActivity() {
                         val from = viewHolder.adapterPosition
                         val to = target.adapterPosition
 
+                        // Updates Lists. Its In TaskAdapter
                         adapter.moveItem(from, to)
-                        // Tell adapter to render the update
-                        //adapter.notifyItemMoved(from, to)
                         return true
                     }
 
                     override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
-                        // If Swiped
+                        // For Swiping Functionality
                     }
                 }
             ItemTouchHelper(simpleItemTouchCallback)
@@ -85,8 +84,6 @@ class TasksActivity : BaseActivity() {
         taskViewModel.allTasks.observe(this as LifecycleOwner) {tasks ->
             tasks?.let { adapter.submitList(it) }
         }
-
-
 
         id = getString(R.string.tasks_id)
         name = getString(R.string.tasks_name)

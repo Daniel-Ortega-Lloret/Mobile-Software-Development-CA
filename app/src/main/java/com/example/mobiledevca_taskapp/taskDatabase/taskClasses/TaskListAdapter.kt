@@ -47,15 +47,15 @@ class TaskListAdapter(fragmentManager: FragmentManager, taskAppViewModel: TaskVi
         updateCurrentList.add(to, item)
 
 
-        // Set The Index To Match Where It Is Before View Model
+        // Set The Position To Match The Stored Value
         updateCurrentList.forEachIndexed{index, task ->
             task.position = index
         }
 
-        // Tell ViewModel to update the order
+        // Tell ViewModel to update the position in the database
         taskAppViewModel.updateOrder(updateCurrentList)
 
-        // Update the list
+        // Updates the list. Runs on a seperate thread, so wont be correct straight after
         submitList(updateCurrentList)
         {
             Log.d("TaskListAdapter", "Current list updated to: $currentList")
@@ -86,10 +86,12 @@ class TaskListAdapter(fragmentManager: FragmentManager, taskAppViewModel: TaskVi
             taskNameView.text = task.taskName
             taskDescriptionView = task.description
             taskId  = task.taskId
+            // taskTime and taskDate is for passing to dialogs
+            taskTime = task.time
+            taskDate = task.date
 
             // For Screen Readers
             taskNameView.contentDescription = "Task name: ${task.taskName}"
-            //taskDescriptionView.contentDescription = "Task description: ${task.description ?: ""}"
 
             // Checkbox Listener
             taskCheckView.isChecked = task.isChecked
@@ -97,9 +99,6 @@ class TaskListAdapter(fragmentManager: FragmentManager, taskAppViewModel: TaskVi
                 ChangeCheckbox(task)
             }
 
-            // taskTime and taskDate is for passing to dialogs
-            taskTime = task.time
-            taskDate = task.date
 
             // For Doing Calculations and displaying beside each recycler item
             taskTimeView.setText(ShowTime(task))
@@ -155,23 +154,22 @@ class TaskListAdapter(fragmentManager: FragmentManager, taskAppViewModel: TaskVi
             // If Neither Time Or Date Was Selected: Display nothing
             if ((task.time == "null:null") && (task.date == "null:null:null"))
             {
-                return ""
+                return ""   // Just Display Nothing
             }
 
-            if (task.time != "null:null")
-            {
 
-            }
-            // Get All Data Times Right Now For Calculations
+            // Next We Do The Calculations Based On Time vs Current Time
             val calendar = Calendar.getInstance()
 
 
-            // Get The Current Time into a calender format
+            // Get The Current Date + Time
             val minute = calendar.get(Calendar.MINUTE)
             val hour = calendar.get(Calendar.HOUR_OF_DAY) // Hr of day = 24hr   / Hour =  12
             val date = calendar.get(Calendar.DATE)
             val month = calendar.get(Calendar.MONTH)
             val year = calendar.get(Calendar.YEAR)
+
+            // Now Set A Calender to the Current Date + Time values
             val dateNow = Calendar.getInstance()
             dateNow.set(Calendar.MINUTE, minute)
             dateNow.set(Calendar.HOUR_OF_DAY, hour)
@@ -221,8 +219,10 @@ class TaskListAdapter(fragmentManager: FragmentManager, taskAppViewModel: TaskVi
             formatTaskDate.set(Calendar.MONTH, m)
             formatTaskDate.set(Calendar.YEAR, y)
 
-
+            // This Finds The Time Difference Between The Task Date/Time And The Current Date/Time
             var Difference = formatTaskDate.timeInMillis - dateNow.timeInMillis
+
+            // If The Task Date/Time is in the past
             if (Difference < 0)
             {
                 return "Time Over"
@@ -242,6 +242,7 @@ class TaskListAdapter(fragmentManager: FragmentManager, taskAppViewModel: TaskVi
                 return ("%d Hours Left").format(Difference)
             }
 
+            // Else Display in minutes
             else if ((Difference / 1000 / 60 < 60))
             {
                 Difference = Difference / 1000 / 60
@@ -261,7 +262,7 @@ class TaskListAdapter(fragmentManager: FragmentManager, taskAppViewModel: TaskVi
             }
 
             override fun areContentsTheSame(oldItem: Task, newItem: Task): Boolean {
-                return oldItem == newItem //&& oldItem.position == newItem.position
+                return oldItem == newItem && oldItem.position == newItem.position
             }
         }
     }

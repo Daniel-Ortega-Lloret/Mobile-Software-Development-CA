@@ -4,6 +4,7 @@ import android.app.AlertDialog
 import android.app.DatePickerDialog
 import android.app.Dialog
 import android.app.TimePickerDialog
+import android.content.DialogInterface
 import android.os.Bundle
 import android.util.Log
 import android.view.View
@@ -154,7 +155,7 @@ class UpdateDataDialogFragment : DialogFragment() {
         }
 
 
-        // Time Dialog Logic
+        // Selecting and saving the time to timeString
         val timePickerDialogListener: TimePickerDialog.OnTimeSetListener = object : TimePickerDialog.OnTimeSetListener {
             override fun onTimeSet(view: TimePicker?, hourOfDay: Int, minute: Int) {
                 hour = hourOfDay
@@ -164,17 +165,26 @@ class UpdateDataDialogFragment : DialogFragment() {
                 taskTime.setText(timeString)
             }
         }
-
+        // Setting up for above
         taskTime.setOnClickListener{
+            // If We Were To Edit Our Time Before Saving We Want To Pick From Our Last Selected Value
+            if (taskTime.text != "Set Time")
+            {
+                val timePicker: TimePickerDialog = TimePickerDialog(    // Set Hours To Prev using / slicing of time string
+                    requireContext(), timePickerDialogListener, taskTime.text.substring(0,2).toInt(), taskTime.text.substring(3,5).toInt(), true
+                )
+                timePicker.show()
+            }
             // We can pre set the time to the last one selected, only if it has been done before
-            if (TimeNotNull(task.time))
+            else if (TimeNotNull(task.time))
             {
                 val timePicker: TimePickerDialog = TimePickerDialog(    // Set Hours To Prev using / slicing of time string
                     requireContext(), timePickerDialogListener, task.time.substring(0,2).toInt(), task.time.substring(3,5).toInt(), true
                 )
                 timePicker.show()
+
             }
-            else
+            else    // Set time to 12 if it hasnt been chosen yet
             {
                 val timePicker: TimePickerDialog = TimePickerDialog(    // Set Time To A Default
                     requireContext(), timePickerDialogListener, 12, 0, true
@@ -185,7 +195,7 @@ class UpdateDataDialogFragment : DialogFragment() {
         }
         // End Of Time Dialog Logic
 
-        // Start of Date Dialog
+        // Selecting and saving the date to dateString
         val datePickerDialogListener: DatePickerDialog.OnDateSetListener = object : DatePickerDialog.OnDateSetListener {
             override fun onDateSet(view: DatePicker?, year: Int, month: Int, dayOfMonth: Int) {
                 d = dayOfMonth
@@ -198,9 +208,17 @@ class UpdateDataDialogFragment : DialogFragment() {
                 taskDate.setText(displayString)
             }
         }
-
+        // Set the datepicker for above
         taskDate.setOnClickListener{
-            if (CalenderNotNull(task.date)) // If Date Exists Already Then PreFill It
+            // If We Were To Edit Our Date Before Saving We Want To Pick From Our Last Selected Value
+            if (taskDate.text != "Set Date")
+            {
+                val datePicker: DatePickerDialog = DatePickerDialog(
+                    requireContext(), datePickerDialogListener, taskDate.text.substring(6, 10).toInt(), taskDate.text.substring(3,5).toInt() - 1, taskDate.text.substring(0,2).toInt())
+                datePicker.show()
+            }
+            // If We Are Editing A Date
+            else if (CalenderNotNull(task.date)) // If Date Exists Already Then PreFill It
             {
                 val datePicker: DatePickerDialog = DatePickerDialog(
                     requireContext(), datePickerDialogListener, task.date.substring(6, 10).toInt(), task.date.substring(3,5).toInt(), task.date.substring(0,2).toInt())
@@ -218,7 +236,7 @@ class UpdateDataDialogFragment : DialogFragment() {
                 datePicker.show()
             }
 
-        }
+        } // End of date dialog
 
 
         return AlertDialog.Builder(requireContext())
@@ -232,8 +250,6 @@ class UpdateDataDialogFragment : DialogFragment() {
                     // Confirm Button Pressed
                     val confirmBtn = dialog.getButton(AlertDialog.BUTTON_POSITIVE)
                     confirmBtn.setOnClickListener{
-                        //Task Validation goes here
-
 
                         //Habit Validation
                         val habitNameText = habitNameEditText.text.trim()
@@ -247,16 +263,18 @@ class UpdateDataDialogFragment : DialogFragment() {
                             else -> 0
                         }
 
+                        // If We Came From TaskActivity
                         when (dialogType) {
                             "4" -> {
                                 // Task Must Take The Edit Text Values To Save Changed
                                 task = Task(task.taskId, taskName.text.toString(), taskDescription.text.toString(), false, timeString, dateString)
-                                if (task != null) {
-                                    updateTask(task)
-                                }
+
+                                // Change values in database
+                                updateTask(task)
                                 dialog.dismiss()
                             }
 
+                            // If We Came From HabitActivity
                             "6" -> {
                                 if (habitNameText.isEmpty()) {
                                     Toast.makeText(requireContext(), "Please enter a habit name", Toast.LENGTH_SHORT).show()
@@ -289,14 +307,13 @@ class UpdateDataDialogFragment : DialogFragment() {
                         }
                     }
 
+                    // Habit and Task Delets are seperated by the dialogType
                     val deleteBtn = dialog.getButton((AlertDialog.BUTTON_NEUTRAL))
                     deleteBtn.setOnClickListener {
                         when (dialogType) {
                             "4" -> {
-                                // We just use the initialised task at the top of this class otherwise if we want to delete
-                                if (task != null) {
-                                    deleteTask(task)
-                                }
+                                // We use the initialised task at the top of the class
+                                deleteTask(task)
                                 dialog.dismiss()
                             }
 
@@ -307,17 +324,19 @@ class UpdateDataDialogFragment : DialogFragment() {
                             }
                         }
 
-                    }
-                }
-            }
-    }
+                    }//End Of deleteBtn
+                }//End Of dialogListener
+            }//End of .create
+    }//End Of onCreateDialog
 
+    // Checks if time wasnt set(null) or when inserting habits (time = Blank)
     private fun TimeNotNull(t: String): Boolean {
         if (t != "null:null" && t != "Blank")
             return true
         return false
     }
 
+    // Checks if date wasnt set(null) or when inserting habits (date = Blank)
     private fun CalenderNotNull(d: String): Boolean {
         if (d != "null:null:null" && d != "Blank")
             return true
