@@ -2,8 +2,13 @@ package com.example.mobiledevca_taskapp.taskDatabase.dao
 
 import androidx.lifecycle.LiveData
 import androidx.room.Dao
+import androidx.room.Insert
+import androidx.room.OnConflictStrategy
 import androidx.room.Query
+import androidx.room.Transaction
+import com.example.mobiledevca_taskapp.taskDatabase.entities.Day
 import com.example.mobiledevca_taskapp.taskDatabase.entities.Task
+import com.example.mobiledevca_taskapp.taskDatabase.entities.TimeSlot
 import kotlinx.coroutines.flow.Flow
 
 @Dao //Data Access Object pattern for accessing DB
@@ -23,4 +28,14 @@ interface TaskDAO : BaseDAO<Task>{
     // For Changing The Checkbox
     @Query("UPDATE Task Set isChecked = :is_Checked WHERE taskId = :task_Id")
     suspend fun changeTaskById(task_Id: Int, is_Checked: Boolean)
+
+    @Query("SELECT Task.* FROM Task INNER JOIN DayTask ON Task.taskId = DayTask.taskId WHERE DayTask.dayId = :dayId")
+    suspend fun getTasksForDay(dayId: Int): List<Task>
+
+    @Query(" SELECT * FROM Task WHERE taskId IN (:taskIds)")
+    fun getTasksByIds(taskIds: List<Int>): List<Task>
+
+    @Query("SELECT taskId FROM Task WHERE taskName = :taskName AND time = :time AND date = :date")
+    suspend fun getTaskId(taskName: String, time: String, date: String) : Int
+
 }

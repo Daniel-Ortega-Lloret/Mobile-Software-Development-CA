@@ -277,6 +277,7 @@ class AddDataDialogFragment : DialogFragment(), AdapterView.OnItemSelectedListen
 
     //Task database function
     fun addTask(task: Task) {
+        Log.d("schedule", "adding task")
         taskAppViewModel.insertTask(task)
     }
 

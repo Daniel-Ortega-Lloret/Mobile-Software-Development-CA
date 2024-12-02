@@ -1,6 +1,7 @@
 package com.example.mobiledevca_taskapp.taskDatabase.entities
 
 import androidx.room.Entity
+import androidx.room.ForeignKey
 import androidx.room.PrimaryKey
 import java.sql.Date
 import java.sql.Time
@@ -12,5 +13,6 @@ data class Task(
     val description: String,
     var isChecked: Boolean = false,
     var time: String,
-    var date: String
+    var date: String,
 )
+

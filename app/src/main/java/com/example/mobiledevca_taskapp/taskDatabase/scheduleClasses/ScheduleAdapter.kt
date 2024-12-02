@@ -32,7 +32,7 @@ class ScheduleAdapter(
 
     override fun onBindViewHolder(holder: DayViewHolder, position: Int) {
         val day = getItem(position)
-        holder.bind(day)
+        holder.bind(day, viewModel)
     }
 
     class DayViewHolder(view: View, private val adapter: ScheduleAdapter) : RecyclerView.ViewHolder(view) {
@@ -40,7 +40,7 @@ class ScheduleAdapter(
         private val textViewDayDate: TextView = view.findViewById(R.id.textViewDayDate)
         private val textViewDayNumber : TextView = view.findViewById(R.id.textViewDayNumber)
 
-        fun bind(day: Day) {
+        fun bind(day: Day, taskViewModel: TaskViewModel) {
             textViewDayDate.text = day.dayName
             textViewDayNumber.text = "${day.dayNumber}"
 
@@ -52,6 +52,7 @@ class ScheduleAdapter(
 
             textViewTimeLabel.setOnClickListener {
                 Log.d("schedule", "just clicked $day")
+                taskViewModel.updateTasksForSelectedDay(day)
                 adapter.selectedDay = day
                 adapter.onDayClick(day)
             }

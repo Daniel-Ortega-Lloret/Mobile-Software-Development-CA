@@ -18,12 +18,6 @@ import androidx.room.PrimaryKey
             parentColumns = ["habitId"],
             childColumns = ["habitId"],
             onDelete = ForeignKey.CASCADE
-        ),
-        ForeignKey(
-            entity = Tag::class,
-            parentColumns = ["tagId"],
-            childColumns = ["tagId"],
-            onDelete = ForeignKey.CASCADE
         )
     ]
 )
@@ -32,5 +26,4 @@ data class Profile(
     val profileName: String,
     val taskId: Int,
     val habitId: Int,
-    val tagId: Int
 )

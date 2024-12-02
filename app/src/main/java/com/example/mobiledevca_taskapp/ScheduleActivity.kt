@@ -59,10 +59,13 @@ class ScheduleActivity : BaseActivity() {
 
         taskViewModel.selectedDayTasks.observe(this as LifecycleOwner) { tasks ->
             val timeSlotsForThisDay = convertTasksToTimeSlots(tasks)
+
             timeSlotAdapter.submitList(timeSlotsForThisDay)
         }
 
-        taskViewModel.preLoadWeekTasks()
+        taskViewModel.selectedTimeSlots.observe(this as LifecycleOwner) { timeSlots ->
+            timeSlotAdapter.submitList(timeSlots)
+        }
 
         previousWeekBtn.setOnClickListener {
             Log.d("schedule", "clicked previous week")
@@ -73,6 +76,8 @@ class ScheduleActivity : BaseActivity() {
             Log.d("schedule", "clicked next week")
             taskViewModel.loadNextWeekTasks()
         }
+
+//        taskViewModel.populateTestData()
 
     }
 
@@ -100,6 +105,7 @@ class ScheduleActivity : BaseActivity() {
                 if (selectedDay != day) {
                     selectedDay = day
                     taskViewModel.updateTasksForSelectedDay(day)
+                    taskViewModel.updateTimeSlotsForSelectedDay(day)
                     updateDayBackgrounds(weekTasks)
                 }
             }
