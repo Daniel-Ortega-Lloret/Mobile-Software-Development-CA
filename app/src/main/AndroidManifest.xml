@@ -49,12 +49,15 @@
 
         <activity
             android:name=".HabitsActivity"
+            android:windowSoftInputMode="adjustPan"
             android:exported="false" />
         <activity
             android:name=".ScheduleActivity"
+            android:windowSoftInputMode="adjustPan"
             android:exported="false" />
         <activity
             android:name=".TasksActivity"
+            android:windowSoftInputMode="adjustPan"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -63,5 +66,7 @@
             </intent-filter>
         </activity>
     </application>
+
+
 
 </manifest>
