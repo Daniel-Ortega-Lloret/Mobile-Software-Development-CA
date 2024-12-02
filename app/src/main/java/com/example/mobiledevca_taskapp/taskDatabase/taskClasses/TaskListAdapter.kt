@@ -9,10 +9,7 @@ import android.view.ViewGroup
 import android.widget.CheckBox
 import android.widget.TextView
 import androidx.fragment.app.FragmentManager
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
 import androidx.recyclerview.widget.DiffUtil
-import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.example.mobiledevca_taskapp.R
@@ -20,10 +17,6 @@ import com.example.mobiledevca_taskapp.fragments.UpdateDataDialogFragment
 import com.example.mobiledevca_taskapp.taskDatabase.TaskViewModel
 import com.example.mobiledevca_taskapp.taskDatabase.entities.Task
 import com.example.mobiledevca_taskapp.taskDatabase.taskClasses.TaskListAdapter.TaskViewHolder
-import java.text.SimpleDateFormat
-import java.time.Duration
-import java.time.Year
-import java.time.temporal.ChronoUnit
 
 
 class TaskListAdapter(fragmentManager: FragmentManager, taskAppViewModel: TaskViewModel): ListAdapter<Task, TaskViewHolder>(TASK_COMPARATOR) {
@@ -46,17 +39,13 @@ class TaskListAdapter(fragmentManager: FragmentManager, taskAppViewModel: TaskVi
         // Get the current list
         val updateCurrentList = currentList.toMutableList()
 
+        // Take the item you are moving and Remove it from List
         val item = updateCurrentList[from]
         updateCurrentList.removeAt(from)
 
-        if(to < from)
-        {
-            updateCurrentList.add(to, item)
-        }
-        else
-        {
-            updateCurrentList.add(to, item)
-        }
+        // Move it Back at The Right Index. List will automatically shift
+        updateCurrentList.add(to, item)
+
 
         // Set The Index To Match Where It Is Before View Model
         updateCurrentList.forEachIndexed{index, task ->
