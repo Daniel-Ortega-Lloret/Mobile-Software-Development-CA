@@ -8,8 +8,11 @@ import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface HabitDAO : BaseDAO<Habit>{
-    @Query("SELECT * FROM Habit")
+    @Query("SELECT * FROM Habit ORDER BY position ASC, habitId DESC")
     override fun getAll(): Flow<List<Habit>>
+
+    @Query ("UPDATE Habit SET position = :habit_Position WHERE habitId = :habit_Id")
+    suspend fun updateHabitPositionById(habit_Id: Int, habit_Position: Int)
 
     @Query("DELETE FROM Habit")
     override suspend fun deleteAll()

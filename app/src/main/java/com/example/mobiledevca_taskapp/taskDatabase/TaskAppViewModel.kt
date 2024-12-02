@@ -26,6 +26,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.launch
 import java.util.Calendar
+import javax.microedition.khronos.opengles.GL10
 
 class TaskViewModel(application: Application, private val applicationScope: CoroutineScope) : AndroidViewModel(application) {
     private val database = TaskAppRoomDatabase.getDatabase(application, applicationScope)
@@ -46,6 +47,8 @@ class TaskViewModel(application: Application, private val applicationScope: Coro
     fun updateOrder(newOrder: List<Task>) = viewModelScope.launch {
         taskRepository.updateOrder(newOrder)
     }
+
+
     fun insertTask(task: Task) = viewModelScope.launch {
         taskRepository.insert(task)
 
@@ -68,6 +71,10 @@ class TaskViewModel(application: Application, private val applicationScope: Coro
     }
 
     val allHabits: LiveData<List<Habit>> = habitRepository.allItems.asLiveData()
+
+    fun updateHabitOrder(newOrder: List<Habit>) = viewModelScope.launch {
+        habitRepository.updateHabitOrder(newOrder)
+    }
 
     fun insertHabit(habit: Habit) = viewModelScope.launch {
         habitRepository.insert(habit)

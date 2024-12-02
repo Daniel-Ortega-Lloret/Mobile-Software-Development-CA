@@ -47,6 +47,34 @@ class HabitListAdapter(private val fragmentManager: FragmentManager, private val
 
     }
 
+    fun moveItem(from: Int, to: Int) {
+        // Get the current list
+        val updateCurrentList = currentList.toMutableList()
+
+        val item = updateCurrentList[from]
+        updateCurrentList.removeAt(from)
+
+        if (to < from) {
+            updateCurrentList.add(to, item)
+        } else {
+            updateCurrentList.add(to, item)
+        }
+
+        // Set The Index To Match Where It Is Before View Model
+        updateCurrentList.forEachIndexed { index, habit ->
+           habit.position  = index
+        }
+
+        // Tell ViewModel to update the order
+        taskViewModel.updateHabitOrder(updateCurrentList)
+
+        // Update the list
+        submitList(updateCurrentList)
+        {
+            Log.d("TaskListAdapter", "Current list updated to: $currentList")
+        }
+    }
+
     override fun getItemViewType(position: Int): Int {
         if (getItem(position).habitSwitch == 1){
             return 1

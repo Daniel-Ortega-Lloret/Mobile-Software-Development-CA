@@ -21,6 +21,7 @@ import androidx.core.content.ContextCompat
 import androidx.fragment.app.FragmentManager
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.ViewModelProvider
+import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.mobiledevca_taskapp.broadcast_receivers.HabitResetReceiver
@@ -33,6 +34,7 @@ import com.example.mobiledevca_taskapp.taskDatabase.TaskViewModelFactory
 import com.example.mobiledevca_taskapp.taskDatabase.entities.Habit
 import com.example.mobiledevca_taskapp.taskDatabase.habitClasses.HabitListAdapter
 import com.example.mobiledevca_taskapp.taskDatabase.habitClasses.StepNotificationMaker
+import com.example.mobiledevca_taskapp.taskDatabase.taskClasses.TaskListAdapter
 
 class HabitsActivity : BaseActivity() {
     private lateinit var _recyclerview: RecyclerView
@@ -74,6 +76,34 @@ class HabitsActivity : BaseActivity() {
         adapter = HabitListAdapter(fragmentManager, taskViewModel)
         _recyclerview.adapter = adapter
         _recyclerview.layoutManager = LinearLayoutManager(this)
+        _recyclerview.itemAnimator = null
+
+        val itemTouchHelper by lazy {
+            val simpleItemTouchCallback =
+                object : ItemTouchHelper.SimpleCallback(ItemTouchHelper.UP or ItemTouchHelper.DOWN, 0)
+                {
+                    override fun onMove(
+                        recyclerView: RecyclerView,
+                        viewHolder: RecyclerView.ViewHolder,
+                        target: RecyclerView.ViewHolder
+                    ): Boolean {
+                        val adapter = recyclerView.adapter as HabitListAdapter
+                        val from = viewHolder.adapterPosition
+                        val to = target.adapterPosition
+
+                        adapter.moveItem(from, to)
+                        // Tell adapter to render the update
+                        //adapter.notifyItemMoved(from, to)
+                        return true
+                    }
+
+                    override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
+                        // If Swiped
+                    }
+                }
+            ItemTouchHelper(simpleItemTouchCallback)
+        }
+        itemTouchHelper.attachToRecyclerView(_recyclerview)
 
         taskViewModel.allHabits.observe(this as LifecycleOwner) { habits ->
             habits?.let{ adapter.submitList(it)}}

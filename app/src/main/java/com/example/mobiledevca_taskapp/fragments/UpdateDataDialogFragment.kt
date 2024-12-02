@@ -313,13 +313,13 @@ class UpdateDataDialogFragment : DialogFragment() {
     }
 
     private fun TimeNotNull(t: String): Boolean {
-        if (t != "null:null")
+        if (t != "null:null" && t != "Blank")
             return true
         return false
     }
 
     private fun CalenderNotNull(d: String): Boolean {
-        if (d != "null:null:null")
+        if (d != "null:null:null" && d != "Blank")
             return true
         return false
     }
