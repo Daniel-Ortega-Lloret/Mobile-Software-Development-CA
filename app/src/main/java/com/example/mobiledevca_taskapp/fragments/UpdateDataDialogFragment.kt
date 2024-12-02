@@ -27,6 +27,7 @@ import com.example.mobiledevca_taskapp.taskDatabase.TaskViewModelFactory
 import com.example.mobiledevca_taskapp.taskDatabase.entities.Habit
 import com.example.mobiledevca_taskapp.taskDatabase.entities.Task
 import com.google.android.material.textfield.TextInputEditText
+import java.util.Calendar
 
 class UpdateDataDialogFragment : DialogFragment() {
     //Generic variables
@@ -199,16 +200,21 @@ class UpdateDataDialogFragment : DialogFragment() {
         }
 
         taskDate.setOnClickListener{
-            if (CalenderNotNull(task.date))
+            if (CalenderNotNull(task.date)) // If Date Exists Already Then PreFill It
             {
                 val datePicker: DatePickerDialog = DatePickerDialog(
                     requireContext(), datePickerDialogListener, task.date.substring(6, 10).toInt(), task.date.substring(3,5).toInt(), task.date.substring(0,2).toInt())
                 datePicker.show()
             }
-            else
+            else    // Else Have Todays Day Selected
             {
+                val calendar = Calendar.getInstance()
+                val curYear = calendar.get(Calendar.YEAR)
+                val curMonth = calendar.get(Calendar.MONTH)
+                val curDate = calendar.get(Calendar.DATE)
+
                 val datePicker: DatePickerDialog = DatePickerDialog(
-                    requireContext(), datePickerDialogListener, 2024, 0, 1)
+                    requireContext(), datePickerDialogListener, curYear, curMonth, curDate)
                 datePicker.show()
             }
 

@@ -9,7 +9,7 @@ import kotlinx.coroutines.flow.Flow
 
 @Dao //Data Access Object pattern for accessing DB
 interface TaskDAO : BaseDAO<Task>{
-    @Query("SELECT * FROM Task ORDER BY position ASC")
+    @Query("SELECT * FROM Task ORDER BY position ASC, taskId DESC")
     override fun getAll(): Flow<List<Task>>
 
     @Query ("UPDATE Task SET position = :task_Position WHERE taskId = :task_Id")

@@ -272,7 +272,7 @@ class TaskListAdapter(fragmentManager: FragmentManager, taskAppViewModel: TaskVi
             }
 
             override fun areContentsTheSame(oldItem: Task, newItem: Task): Boolean {
-                return oldItem == newItem && oldItem.position == newItem.position
+                return oldItem == newItem //&& oldItem.position == newItem.position
             }
         }
     }
