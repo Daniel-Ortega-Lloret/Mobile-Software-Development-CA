@@ -52,6 +52,7 @@ class TasksActivity : BaseActivity() {
         _recyclerview.adapter = adapter
         // Set a linear layout manager on the recycler view then generate an adapter and attach it
         _recyclerview.layoutManager = LinearLayoutManager(this)
+        _recyclerview.itemAnimator = null // Idk what this line does but it stops it glitching and i cant tell a difference
 
         // For Moving The Items
         val itemTouchHelper by lazy {
