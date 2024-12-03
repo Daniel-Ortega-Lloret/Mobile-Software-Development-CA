@@ -80,8 +80,6 @@ class TaskViewModel(application: Application, private val applicationScope: Coro
         {
             taskRepository.insert(task)
         }
-
-
     }
 
     fun deleteAllTasks() = viewModelScope.launch {
@@ -409,9 +407,6 @@ class TaskViewModel(application: Application, private val applicationScope: Coro
 
                     val newTimeSlot = createTimeSlot(task)
                     val newDay = createDay(dayNumber, month, year, newTimeSlot)
-                    scheduleRepository.insertDay(newDay).also {
-                        Log.d("schedule", "day getting inserted is: $newDay")
-                    }
 
                     newDay
                 }
