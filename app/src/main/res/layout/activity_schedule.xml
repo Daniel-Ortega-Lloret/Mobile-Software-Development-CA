@@ -1,10 +1,42 @@
 <?xml version="1.0" encoding="utf-8"?>
-<CalendarView
+<LinearLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@+id/calendarView"
-    android:layout_width="wrap_content"
-    android:layout_height="375dp"
-    android:maxDate="12152024"
-    android:minDate="09012024"
-/>
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <LinearLayout
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/previousWeekBtn"
+            android:text="&#x3C;"/>
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/nextWeekBtn"
+            android:text="&#x3E;"/>
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/dayLayout"
+        android:orientation="horizontal"
+        android:weightSum="7"/>
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/recyclerViewTimeSlots"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical" />
+
+</LinearLayout>
+
+
+
 

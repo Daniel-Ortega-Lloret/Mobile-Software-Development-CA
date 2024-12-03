@@ -105,7 +105,7 @@ class UpdateDataDialogFragment : DialogFragment() {
         {
             taskTime.setText(task.time)
         }
-        if (CalenderNotNull(task.date))
+        if (CalenderNotNull(task.date) && dialogType == "4")
         {
             var dateSplit = task.date.split(":")
             var month = dateSplit[1].toInt()
@@ -114,7 +114,6 @@ class UpdateDataDialogFragment : DialogFragment() {
             var String = "%02d:%02d:%02d".format(dateSplit[0].toInt(), month, dateSplit[2].toInt())
             taskDate.setText(String)
         }
-
 
         // For Storing Time And Date
         var hour: Int? = null

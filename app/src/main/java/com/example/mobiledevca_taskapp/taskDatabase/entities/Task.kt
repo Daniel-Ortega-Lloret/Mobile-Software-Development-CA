@@ -2,8 +2,6 @@ package com.example.mobiledevca_taskapp.taskDatabase.entities
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey
-import java.sql.Date
-import java.sql.Time
 
 @Entity
 data class Task(
@@ -15,3 +13,4 @@ data class Task(
     var date: String,
     var position: Int = 0
 )
+

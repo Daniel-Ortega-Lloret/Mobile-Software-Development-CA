@@ -31,4 +31,24 @@ class TaskRepository (private val taskDAO: TaskDAO): TaskAppRepository<Task>(tas
     {
         taskDAO.changeTaskById(task.taskId, task.isChecked)
     }
+
+    @WorkerThread
+    suspend fun getTasksForDay(taskId: Int) : List<Task>{
+        return taskDAO.getTasksForDay(taskId)
+    }
+
+    @WorkerThread
+    suspend fun getTasksByIds(taskIds: List<Int>): List<Task> {
+        return taskDAO.getTasksByIds(taskIds)
+    }
+
+    @WorkerThread
+    suspend fun getTaskId(taskName: String, time: String, date: String): Int{
+        return taskDAO.getTaskId(taskName,time,date)
+    }
+
+    @WorkerThread
+    suspend fun getTaskById(taskId: Int) : Task?{
+        return taskDAO.getTaskById(taskId)
+    }
 }

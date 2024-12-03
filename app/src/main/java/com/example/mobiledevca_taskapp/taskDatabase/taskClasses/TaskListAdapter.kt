@@ -97,6 +97,7 @@ class TaskListAdapter(fragmentManager: FragmentManager, taskAppViewModel: TaskVi
             taskCheckView.isChecked = task.isChecked
             taskCheckView.setOnClickListener {
                 ChangeCheckbox(task)
+
             }
 
 
