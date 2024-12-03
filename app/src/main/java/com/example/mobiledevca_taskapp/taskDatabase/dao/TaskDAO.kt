@@ -33,9 +33,11 @@ interface TaskDAO : BaseDAO<Task>{
     suspend fun getTasksForDay(dayId: Int): List<Task>
 
     @Query(" SELECT * FROM Task WHERE taskId IN (:taskIds)")
-    fun getTasksByIds(taskIds: List<Int>): List<Task>
+    suspend fun getTasksByIds(taskIds: List<Int>): List<Task>
 
     @Query("SELECT taskId FROM Task WHERE taskName = :taskName AND time = :time AND date = :date")
     suspend fun getTaskId(taskName: String, time: String, date: String) : Int
 
+    @Query("SELECT * FROM Task WHERE taskId = :taskId")
+    suspend fun getTaskById(taskId: Int) : Task?
 }

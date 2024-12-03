@@ -64,6 +64,7 @@ class ScheduleActivity : BaseActivity() {
         }
 
         taskViewModel.selectedTimeSlots.observe(this as LifecycleOwner) { timeSlots ->
+            Log.d("schedule", "timeslots for selected day are: $timeSlots")
             timeSlotAdapter.submitList(timeSlots)
         }
 
@@ -76,8 +77,6 @@ class ScheduleActivity : BaseActivity() {
             Log.d("schedule", "clicked next week")
             taskViewModel.loadNextWeekTasks()
         }
-
-//        taskViewModel.populateTestData()
 
     }
 

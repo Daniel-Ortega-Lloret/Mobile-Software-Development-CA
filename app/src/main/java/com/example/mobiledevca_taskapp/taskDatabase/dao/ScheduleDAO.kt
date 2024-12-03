@@ -14,6 +14,7 @@ import com.example.mobiledevca_taskapp.taskDatabase.entities.DayTask
 import com.example.mobiledevca_taskapp.taskDatabase.entities.Task
 import com.example.mobiledevca_taskapp.taskDatabase.entities.TimeSlot
 import kotlinx.coroutines.flow.Flow
+import java.sql.Time
 
 @Dao
 interface ScheduleDAO: BaseDAO<Day> {
@@ -53,8 +54,11 @@ interface ScheduleDAO: BaseDAO<Day> {
         return day?.timeSlots ?: emptyList()
     }
 
+    @Query("SELECT * FROM TimeSlot WHERE timeSlotId = :timeSlotId")
+    suspend fun getTimeSlotById(timeSlotId:Int): TimeSlot?
+
     @Query("SELECT taskId FROM DayTask WHERE dayId = :dayId")
-    fun getTaskIdsForDay(dayId: Int): List<Int>
+    suspend fun getTaskIdsForDay(dayId: Int): List<Int>
 
     @Update
     suspend fun updateTimeSlot(timeSlot: TimeSlot)
@@ -83,4 +87,15 @@ interface ScheduleDAO: BaseDAO<Day> {
     @Insert(onConflict = OnConflictStrategy.IGNORE)
     suspend fun insertDayTask(dayTask: DayTask)
 
+    @Query("SELECT * FROM Day WHERE dayNumber IN (:days) AND month IN (:months) AND year IN (:years)")
+    suspend fun getDaysByDates(days: List<Int>, months: List<Int>, years: List<Int>): List<Day>
+
+    @Delete
+    suspend fun deleteTimeSlot(timeSlot: TimeSlot)
+
+    @Query("SELECT dayId FROM DayTask WHERE taskId = :taskId")
+    suspend fun getDaysForTask(taskId: Int): List<Int>
+
+    @Delete
+    suspend fun deleteDay(day: Day)
 }

@@ -7,7 +7,6 @@ import com.example.mobiledevca_taskapp.taskDatabase.TaskAppRepository
 import com.example.mobiledevca_taskapp.taskDatabase.dao.ScheduleDAO
 import com.example.mobiledevca_taskapp.taskDatabase.entities.Day
 import com.example.mobiledevca_taskapp.taskDatabase.entities.DayTask
-import com.example.mobiledevca_taskapp.taskDatabase.entities.Task
 import com.example.mobiledevca_taskapp.taskDatabase.entities.TimeSlot
 
 class ScheduleRepository(private val scheduleDao: ScheduleDAO) : TaskAppRepository<Day>(scheduleDao) {
@@ -25,7 +24,7 @@ class ScheduleRepository(private val scheduleDao: ScheduleDAO) : TaskAppReposito
     }
 
     @WorkerThread
-    fun getTaskIdsForDay(dayId: Int): List<Int> {
+    suspend fun getTaskIdsForDay(dayId: Int): List<Int> {
         return scheduleDao.getTaskIdsForDay(dayId)
     }
 
@@ -36,20 +35,16 @@ class ScheduleRepository(private val scheduleDao: ScheduleDAO) : TaskAppReposito
 
     @WorkerThread
     suspend fun insertTimeSlot(timeSlot: TimeSlot) {
-        // Check if the TimeSlot with the given time already exists
         val existingSlot = scheduleDao.getTimeSlotByTime(timeSlot.time)
 
         if (existingSlot == null) {
             Log.d("schedule", "timeslot doesnt exist")
-            // If the TimeSlot doesn't exist, insert it
             scheduleDao.insertTimeSlot(timeSlot)
         } else {
             Log.d("schedule", "timeslot exists")
-            // If the TimeSlot exists, update it by adding tasks to the existing list
             val updatedTasks = existingSlot.tasks + timeSlot.tasks
             val updatedTimeSlot = existingSlot.copy(tasks = updatedTasks)
 
-            // Update the existing TimeSlot in the database
             scheduleDao.updateTimeSlot(updatedTimeSlot)
         }
     }
@@ -76,17 +71,6 @@ class ScheduleRepository(private val scheduleDao: ScheduleDAO) : TaskAppReposito
     }
 
     @WorkerThread
-    suspend fun getTimeSlotForDayAndTime(dayId: Int, time: String): TimeSlot? {
-        val day = scheduleDao.getDayById(dayId)
-        return day?.timeSlots?.find { it.time == time }
-    }
-
-    @WorkerThread
-    suspend fun insertDayWithTimeSlot(day: Day, timeSlot: TimeSlot){
-        scheduleDao.insertDayWithTimeSlot(day, timeSlot)
-    }
-
-    @WorkerThread
     suspend fun updateTimeSlot(timeSlot: TimeSlot) {
         scheduleDao.updateTimeSlot(timeSlot)
     }
@@ -104,5 +88,28 @@ class ScheduleRepository(private val scheduleDao: ScheduleDAO) : TaskAppReposito
     @WorkerThread
     suspend fun updateDay(day: Day) {
         scheduleDao.updateDay(day)
+    }
+
+    @WorkerThread
+    suspend fun getDaysByDates(dates: List<Triple<Int, Int, Int>>): List<Day> {
+        val days = dates.map { it.first }
+        val months = dates.map { it.second }
+        val years = dates.map { it.third }
+        return scheduleDao.getDaysByDates(days, months, years)
+    }
+
+    @WorkerThread
+    suspend fun getDaysForTask(taskId: Int): List<Int> {
+        return scheduleDao.getDaysForTask(taskId)
+    }
+
+    @WorkerThread
+    suspend fun deleteTimeSlot(timeSlot: TimeSlot) {
+        scheduleDao.deleteTimeSlot(timeSlot)
+    }
+
+    @WorkerThread
+    suspend fun deleteDay(day: Day) {
+        scheduleDao.deleteDay(day)
     }
 }

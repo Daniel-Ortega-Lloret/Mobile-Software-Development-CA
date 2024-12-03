@@ -113,7 +113,6 @@ class UpdateDataDialogFragment : DialogFragment() {
             taskDate.setText(String)
         }
 
-
         // For Storing Time And Date
         var hour: Int? = null
         var min: Int? = null
