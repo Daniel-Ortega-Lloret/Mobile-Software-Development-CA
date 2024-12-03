@@ -299,6 +299,16 @@ class AddDataDialogFragment : DialogFragment(), AdapterView.OnItemSelectedListen
     //Task database function
     fun addTask(task: Task) {
         Log.d("schedule", "adding task")
+        if (task.date == "null:null:null")
+        {
+            var calendar = Calendar.getInstance()
+            task.date = "%02d:%02d:%04d".format(calendar.get(Calendar.DATE), calendar.get(Calendar.MONTH), calendar.get(Calendar.YEAR))
+        }
+        if (task.time == "null:null")
+        {
+            var calendar = Calendar.getInstance()
+            task.time = "%02d:00".format(calendar.get(Calendar.HOUR_OF_DAY))
+        }
         taskAppViewModel.insertTask(task)
     }
 
