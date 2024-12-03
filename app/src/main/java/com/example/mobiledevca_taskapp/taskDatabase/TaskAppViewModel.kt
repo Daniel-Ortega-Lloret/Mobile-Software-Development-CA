@@ -68,12 +68,20 @@ class TaskViewModel(application: Application, private val applicationScope: Coro
 
     fun insertTask(task: Task) = dbScope.launch {
         Log.d("schedule", "inserting task")
+        if (task.date != "null:null:null" && task.time != "null:null")
+        {
+            taskRepository.insert(task)
 
-        taskRepository.insert(task)
+            val newTaskId = taskRepository.getTaskId(task.taskName, task.time, task.date)
+            val newTask = task.copy(taskId = newTaskId)
+            ensureDayExistsAndInsertTask(task.date, newTask)
+        }
+        else
+        {
+            taskRepository.insert(task)
+        }
 
-        val newTaskId = taskRepository.getTaskId(task.taskName, task.time, task.date)
-        val newTask = task.copy(taskId = newTaskId)
-        ensureDayExistsAndInsertTask(task.date, newTask)
+
     }
 
     fun deleteAllTasks() = viewModelScope.launch {
@@ -82,45 +90,90 @@ class TaskViewModel(application: Application, private val applicationScope: Coro
 
     fun updateTask(task: Task) = viewModelScope.launch(Dispatchers.IO) {
         runBlocking {
-            var currentTask = taskRepository.getTaskById(task.taskId)
-            Log.d("schedule", "old task data is $currentTask")
+            if (task.date != "null:null:null" && task.time != "null:null")
+            {
+                var currentTask = taskRepository.getTaskById(task.taskId)
+                Log.d("schedule", "old task data is $currentTask")
 
-            if (currentTask?.time != task.time) {
-                val oldTimeSlot = currentTask?.let { scheduleRepository.getTimeSlotForTime(it.time) }
-                if (oldTimeSlot != null) {
-                    val updatedTasksInOldTimeSlot = oldTimeSlot.tasks.filter { it.taskId != task.taskId }
-                    if (updatedTasksInOldTimeSlot.isEmpty()) {
-                        scheduleRepository.deleteTimeSlot(oldTimeSlot)
-                    } else {
-                        scheduleRepository.updateTimeSlot(oldTimeSlot.copy(tasks = updatedTasksInOldTimeSlot))
-                    }
-                }
-
-                val newTimeSlot = updateCreateTimeSlot(task)
-
-                val (newDayNumber, newMonth, newYear) = parseDate(task.date)
-                val correctedMonth = newMonth + 1
-                Log.d("schedule", "new date is ${task.date}")
-                if (currentTask != null) {
-                    if (currentTask.date == task.date) {
-
-                        Log.d("schedule", "date not changed")
-                        val existingDay = scheduleRepository.getDayByDate(newDayNumber, correctedMonth, newYear)
-
-                        if (existingDay != null) {
-                            val updatedTimeSlots = existingDay.timeSlots.filter { it.time != currentTask.time }
-                            scheduleRepository.updateDay(existingDay.copy(timeSlots = updatedTimeSlots + newTimeSlot))
+                if (currentTask?.time != task.time) {
+                    val oldTimeSlot = currentTask?.let { scheduleRepository.getTimeSlotForTime(it.time) }
+                    if (oldTimeSlot != null) {
+                        val updatedTasksInOldTimeSlot = oldTimeSlot.tasks.filter { it.taskId != task.taskId }
+                        if (updatedTasksInOldTimeSlot.isEmpty()) {
+                            scheduleRepository.deleteTimeSlot(oldTimeSlot)
                         } else {
-                            val newDay = Day(dayName = getDayName(newDayNumber, correctedMonth, newYear), dayNumber = newDayNumber, month = correctedMonth, year = newYear, timeSlots = listOf(newTimeSlot))
-                            scheduleRepository.insertDay(newDay)
+                            scheduleRepository.updateTimeSlot(oldTimeSlot.copy(tasks = updatedTasksInOldTimeSlot))
                         }
-                    } else {
+                    }
+
+                    val newTimeSlot = updateCreateTimeSlot(task)
+
+                    val (newDayNumber, newMonth, newYear) = parseDate(task.date)
+                    val correctedMonth = newMonth + 1
+                    Log.d("schedule", "new date is ${task.date}")
+                    if (currentTask != null) {
+                        if (currentTask.date == task.date) {
+
+                            Log.d("schedule", "date not changed")
+                            val existingDay = scheduleRepository.getDayByDate(newDayNumber, correctedMonth, newYear)
+
+                            if (existingDay != null) {
+                                val updatedTimeSlots = existingDay.timeSlots.filter { it.time != currentTask.time }
+                                scheduleRepository.updateDay(existingDay.copy(timeSlots = updatedTimeSlots + newTimeSlot))
+                            } else {
+                                val newDay = Day(dayName = getDayName(newDayNumber, correctedMonth, newYear), dayNumber = newDayNumber, month = correctedMonth, year = newYear, timeSlots = listOf(newTimeSlot))
+                                scheduleRepository.insertDay(newDay)
+                            }
+                        } else {
+                            Log.d("schedule", "date changed")
+
+                            val (oldDayNumber, oldMonth, oldYear) = parseDate(currentTask.date)
+                            val oldCorrectedMonth = oldMonth + 1
+                            val oldDay = scheduleRepository.getDayByDate(oldDayNumber, oldCorrectedMonth, oldYear)
+                            Log.d("schedule", "old day is $oldDay")
+                            if (oldDay != null) {
+                                val updatedTimeSlots = oldDay.timeSlots.filter { it.time != currentTask.time }
+                                if (updatedTimeSlots.isEmpty()) {
+                                    scheduleRepository.deleteDay(oldDay)
+                                } else {
+                                    scheduleRepository.updateDay(oldDay.copy(timeSlots = updatedTimeSlots))
+                                }
+                            }
+
+                            val newDay = Day(dayName = getDayName(newDayNumber, correctedMonth, newYear), dayNumber = newDayNumber, month = correctedMonth, year = newYear)
+
+                            val updatedTimeSlot = if (scheduleRepository.getTimeSlotForTime(task.time) != null) {
+                                val existingTimeSlot = scheduleRepository.getTimeSlotForTime(task.time)!!
+                                existingTimeSlot.copy(tasks = existingTimeSlot.tasks + task)
+                            } else {
+                                TimeSlot(time = task.time, tasks = listOf(task))
+                            }
+
+                            scheduleRepository.insertDay(newDay.copy(timeSlots = listOf(updatedTimeSlot)))
+                        }
+                    }
+
+                    taskRepository.updateTask(task.copy(time = newTimeSlot.time))
+
+                    val createdDayId = scheduleRepository.getDayId(newDayNumber, correctedMonth, newYear)
+                    val createdDay = scheduleRepository.getDayById(createdDayId)
+                    if (createdDay != null){
+                        val resultDay = createdDay.copy(dayId = createdDayId)
+                        insertDayTask(resultDay, task)
+                    }
+
+                } else {
+                    Log.d("schedule", "time did not change")
+
+                    val (newDayNumber, newMonth, newYear) = parseDate(task.date)
+                    val correctedMonth = newMonth + 1
+
+                    if (currentTask.date != task.date) {
                         Log.d("schedule", "date changed")
 
                         val (oldDayNumber, oldMonth, oldYear) = parseDate(currentTask.date)
                         val oldCorrectedMonth = oldMonth + 1
                         val oldDay = scheduleRepository.getDayByDate(oldDayNumber, oldCorrectedMonth, oldYear)
-                        Log.d("schedule", "old day is $oldDay")
                         if (oldDay != null) {
                             val updatedTimeSlots = oldDay.timeSlots.filter { it.time != currentTask.time }
                             if (updatedTimeSlots.isEmpty()) {
@@ -130,85 +183,48 @@ class TaskViewModel(application: Application, private val applicationScope: Coro
                             }
                         }
 
-                        val newDay = Day(dayName = getDayName(newDayNumber, correctedMonth, newYear), dayNumber = newDayNumber, month = correctedMonth, year = newYear)
-
-                        val updatedTimeSlot = if (scheduleRepository.getTimeSlotForTime(task.time) != null) {
-                            val existingTimeSlot = scheduleRepository.getTimeSlotForTime(task.time)!!
-                            existingTimeSlot.copy(tasks = existingTimeSlot.tasks + task)
+                        val newDay = scheduleRepository.getDayByDate(newDayNumber, correctedMonth, newYear)
+                        if (newDay != null) {
+                            val existingTimeSlot = scheduleRepository.getTimeSlotForTime(task.time)
+                            val updatedTimeSlot = existingTimeSlot?.copy(tasks = existingTimeSlot.tasks + task)
+                                ?: TimeSlot(time = task.time, tasks = listOf(task))
+                            scheduleRepository.updateDay(newDay.copy(timeSlots = newDay.timeSlots + updatedTimeSlot))
                         } else {
-                            TimeSlot(time = task.time, tasks = listOf(task))
-                        }
-
-                        scheduleRepository.insertDay(newDay.copy(timeSlots = listOf(updatedTimeSlot)))
-                    }
-                }
-
-                taskRepository.updateTask(task.copy(time = newTimeSlot.time))
-
-                val createdDayId = scheduleRepository.getDayId(newDayNumber, correctedMonth, newYear)
-                val createdDay = scheduleRepository.getDayById(createdDayId)
-                if (createdDay != null){
-                    val resultDay = createdDay.copy(dayId = createdDayId)
-                    insertDayTask(resultDay, task)
-                }
-
-            } else {
-                Log.d("schedule", "time did not change")
-
-                val (newDayNumber, newMonth, newYear) = parseDate(task.date)
-                val correctedMonth = newMonth + 1
-
-                if (currentTask.date != task.date) {
-                    Log.d("schedule", "date changed")
-
-                    val (oldDayNumber, oldMonth, oldYear) = parseDate(currentTask.date)
-                    val oldCorrectedMonth = oldMonth + 1
-                    val oldDay = scheduleRepository.getDayByDate(oldDayNumber, oldCorrectedMonth, oldYear)
-                    if (oldDay != null) {
-                        val updatedTimeSlots = oldDay.timeSlots.filter { it.time != currentTask.time }
-                        if (updatedTimeSlots.isEmpty()) {
-                            scheduleRepository.deleteDay(oldDay)
-                        } else {
-                            scheduleRepository.updateDay(oldDay.copy(timeSlots = updatedTimeSlots))
+                            val newTimeSlot = TimeSlot(time = task.time, tasks = listOf(task))
+                            val createdDay = Day(
+                                dayName = getDayName(newDayNumber, correctedMonth, newYear),
+                                dayNumber = newDayNumber,
+                                month = correctedMonth,
+                                year = newYear,
+                                timeSlots = listOf(newTimeSlot)
+                            )
+                            scheduleRepository.insertDay(createdDay)
                         }
                     }
 
-                    val newDay = scheduleRepository.getDayByDate(newDayNumber, correctedMonth, newYear)
-                    if (newDay != null) {
-                        val existingTimeSlot = scheduleRepository.getTimeSlotForTime(task.time)
-                        val updatedTimeSlot = existingTimeSlot?.copy(tasks = existingTimeSlot.tasks + task)
-                            ?: TimeSlot(time = task.time, tasks = listOf(task))
-                        scheduleRepository.updateDay(newDay.copy(timeSlots = newDay.timeSlots + updatedTimeSlot))
-                    } else {
-                        val newTimeSlot = TimeSlot(time = task.time, tasks = listOf(task))
-                        val createdDay = Day(
-                            dayName = getDayName(newDayNumber, correctedMonth, newYear),
-                            dayNumber = newDayNumber,
-                            month = correctedMonth,
-                            year = newYear,
-                            timeSlots = listOf(newTimeSlot)
-                        )
-                        scheduleRepository.insertDay(createdDay)
+                    val currentTimeSlot = scheduleRepository.getTimeSlotForTime(currentTask.time)
+                    if (currentTimeSlot != null) {
+                        val updatedTasksInCurrentTimeSlot = currentTimeSlot.tasks.map {
+                            if (it.taskId == task.taskId) task else it
+                        }
+                        scheduleRepository.updateTimeSlot(currentTimeSlot.copy(tasks = updatedTasksInCurrentTimeSlot))
                     }
-                }
 
-                val currentTimeSlot = scheduleRepository.getTimeSlotForTime(currentTask.time)
-                if (currentTimeSlot != null) {
-                    val updatedTasksInCurrentTimeSlot = currentTimeSlot.tasks.map {
-                        if (it.taskId == task.taskId) task else it
+                    taskRepository.updateTask(task)
+
+                    val createdDayId = scheduleRepository.getDayId(newDayNumber, correctedMonth, newYear)
+                    val createdDay = scheduleRepository.getDayById(createdDayId)
+                    if (createdDay != null){
+                        val resultDay = createdDay.copy(dayId = createdDayId)
+                        insertDayTask(resultDay, task)
                     }
-                    scheduleRepository.updateTimeSlot(currentTimeSlot.copy(tasks = updatedTasksInCurrentTimeSlot))
-                }
-
-                taskRepository.updateTask(task)
-
-                val createdDayId = scheduleRepository.getDayId(newDayNumber, correctedMonth, newYear)
-                val createdDay = scheduleRepository.getDayById(createdDayId)
-                if (createdDay != null){
-                    val resultDay = createdDay.copy(dayId = createdDayId)
-                    insertDayTask(resultDay, task)
                 }
             }
+            else
+            {
+                taskRepository.updateTask(task)
+            }
+
         }
     }
 
@@ -238,67 +254,96 @@ class TaskViewModel(application: Application, private val applicationScope: Coro
     }
 
     fun parseDate(date: String): Triple<Int, Int, Int> {
-        val dateParts = date.split(":")
-        val day = dateParts[0].toInt()
-        val month = dateParts[1].toInt()
-        val year = dateParts[2].toInt()
-        return Triple(day, month, year)
+        Log.d("insert","Date String is, $date" )
+        if (date != "null:null:null")
+        {
+            val dateParts = date.split(":")
+            val day = dateParts[0].toInt()
+            val month = dateParts[1].toInt()
+            val year = dateParts[2].toInt()
+            return Triple(day, month, year)
+        }
+        return Triple(0, 0, 0)
+
     }
 
     fun deleteTask(taskId: Int) = viewModelScope.launch(Dispatchers.IO) {
         withContext(Dispatchers.IO) {
-            runBlocking {
-                val affectedDayIds = scheduleRepository.getDaysForTask(taskId)
-                Log.d("schedule", "updated with new day, lists look like this ${allDays.value}\n${selectedTimeSlots.value}\n${selectedDayTasks.value}")
+            var task = taskRepository.getTaskById(taskId)
+            if (task != null) {
 
-                for (dayId in affectedDayIds) {
-                    val day = scheduleRepository.getDayById(dayId)
-                    if (day != null) {
-                        val updatedTimeSlots = mutableListOf<TimeSlot>()
+                runBlocking {
+                    if (task.date != "null:null:null" && task.time != "null:null") {
+                        val affectedDayIds = scheduleRepository.getDaysForTask(taskId)
+                        Log.d(
+                            "schedule",
+                            "updated with new day, lists look like this ${allDays.value}\n${selectedTimeSlots.value}\n${selectedDayTasks.value}"
+                        )
 
-                        for (timeSlot in day.timeSlots) {
-                            val remainingTasks = timeSlot.tasks.filter { it.taskId != taskId }
+                        for (dayId in affectedDayIds) {
+                            val day = scheduleRepository.getDayById(dayId)
+                            if (day != null) {
+                                val updatedTimeSlots = mutableListOf<TimeSlot>()
 
-                            if (remainingTasks.isEmpty()) {
-                                // Delete empty TimeSlot
-                                Log.d("schedule", "timeslot $remainingTasks is empty")
+                                for (timeSlot in day.timeSlots) {
+                                    val remainingTasks =
+                                        timeSlot.tasks.filter { it.taskId != taskId }
 
-                                scheduleRepository.deleteTimeSlot(timeSlot)
-                            } else {
-                                // Update TimeSlot with remaining tasks
-                                Log.d("schedule", "timeslot is not empty, $timeSlot")
-                                val updatedTimeSlot = timeSlot.copy(tasks = remainingTasks)
-                                scheduleRepository.updateTimeSlot(updatedTimeSlot)
-                                updatedTimeSlots.add(updatedTimeSlot)
+                                    if (remainingTasks.isEmpty()) {
+                                        // Delete empty TimeSlot
+                                        Log.d("schedule", "timeslot $remainingTasks is empty")
+
+                                        scheduleRepository.deleteTimeSlot(timeSlot)
+                                    } else {
+                                        // Update TimeSlot with remaining tasks
+                                        Log.d("schedule", "timeslot is not empty, $timeSlot")
+                                        val updatedTimeSlot = timeSlot.copy(tasks = remainingTasks)
+                                        scheduleRepository.updateTimeSlot(updatedTimeSlot)
+                                        updatedTimeSlots.add(updatedTimeSlot)
+                                    }
+                                }
+
+                                val updatedDay = day.copy(timeSlots = updatedTimeSlots)
+
+                                if (updatedTimeSlots.isEmpty()) {
+                                    Log.d(
+                                        "schedule",
+                                        "updating empty day with timeslots of $updatedDay"
+                                    )
+                                    scheduleRepository.deleteDay(updatedDay)
+
+                                    // Post the new list of days after deletion
+                                    val allDays = scheduleRepository.getAllDays()
+                                    _allDays.postValue(allDays)
+                                } else {
+                                    Log.d("schedule", "udpating day with timeslots of$updatedDay")
+                                    scheduleRepository.updateDay(updatedDay)
+                                    updateTimeSlotsForDay(updatedDay)
+                                    updateTasksForSelectedDay(updatedDay)
+                                    updateTimeSlotsForSelectedDay(updatedDay)
+
+                                    // Post the new list of days after update
+                                    val allDays = scheduleRepository.getAllDays()
+                                    _allDays.postValue(allDays)
+                                }
                             }
                         }
-
-                        val updatedDay = day.copy(timeSlots = updatedTimeSlots)
-
-                        if (updatedTimeSlots.isEmpty()) {
-                            Log.d("schedule", "updating empty day with timeslots of $updatedDay")
-                            scheduleRepository.deleteDay(updatedDay)
-
-                            // Post the new list of days after deletion
-                            val allDays = scheduleRepository.getAllDays()
-                            _allDays.postValue(allDays)
-                        } else {
-                            Log.d("schedule", "udpating day with timeslots of$updatedDay")
-                            scheduleRepository.updateDay(updatedDay)
-                            updateTimeSlotsForDay(updatedDay)
-                            updateTasksForSelectedDay(updatedDay)
-                            updateTimeSlotsForSelectedDay(updatedDay)
-
-                            // Post the new list of days after update
-                            val allDays = scheduleRepository.getAllDays()
-                            _allDays.postValue(allDays)
-                        }
+                        taskRepository.deleteTask(taskId)
                     }
+                    else
+                    {
+                        taskRepository.deleteTask(taskId)
+                    }
+                    Log.d(
+                        "schedule",
+                        "updated with new day, lists look like this ${allDays.value}\n${selectedTimeSlots.value}\n${selectedDayTasks.value}"
+                    )
+
+
+
                 }
             }
-            Log.d("schedule", "updated with new day, lists look like this ${allDays.value}\n${selectedTimeSlots.value}\n${selectedDayTasks.value}")
 
-            taskRepository.deleteTask(taskId)
         }
     }
 
@@ -320,24 +365,27 @@ class TaskViewModel(application: Application, private val applicationScope: Coro
     private fun ensureDayExistsAndInsertTask(date: String, task: Task) {
         Log.d("schedule", "starting to add a day and timeslot")
         viewModelScope.launch(Dispatchers.IO) {
-            // Parse the date
-            val sdf = SimpleDateFormat("dd:MM:yyyy", Locale.getDefault())
-            val calendar = Calendar.getInstance()
-            calendar.time = sdf.parse(date) ?: throw IllegalArgumentException("Invalid date format")
+            if (date != "null:null:null" && date != "Blank")
+            {
+                // Parse the date
+                val sdf = SimpleDateFormat("dd:MM:yyyy", Locale.getDefault())
+                val calendar = Calendar.getInstance()
+                calendar.time = sdf.parse(date) ?: throw IllegalArgumentException("Invalid date format")
 
-            val dayNumber = calendar.get(Calendar.DAY_OF_MONTH)
-            val month = calendar.get(Calendar.MONTH) + 2
-            val year = calendar.get(Calendar.YEAR)
-            Log.d("schedule", "parsed data is number: $dayNumber\nmonth:$month\nyear:$year\n")
+                val dayNumber = calendar.get(Calendar.DAY_OF_MONTH)
+                val month = calendar.get(Calendar.MONTH) + 2
+                val year = calendar.get(Calendar.YEAR)
+                Log.d("schedule", "parsed data is number: $dayNumber\nmonth:$month\nyear:$year\n")
 
-            runBlocking {
-                val day = getOrCreateDay(dayNumber, month, year, task)
+                runBlocking {
+                    val day = getOrCreateDay(dayNumber, month, year, task)
 
-                insertDayTask(day, task)
+                    insertDayTask(day, task)
 
-                updateTimeSlotsForDay(day)
+                    updateTimeSlotsForDay(day)
 
-                Log.d("schedule", "updated with new day, lists look like this ${allDays.value}\n${selectedTimeSlots.value}\n${selectedDayTasks.value}")
+                    Log.d("schedule", "updated with new day, lists look like this ${allDays.value}\n${selectedTimeSlots.value}\n${selectedDayTasks.value}")
+                }
             }
 
         }

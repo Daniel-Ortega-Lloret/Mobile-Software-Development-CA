@@ -249,6 +249,14 @@ class UpdateDataDialogFragment : DialogFragment() {
                     // Confirm Button Pressed
                     val confirmBtn = dialog.getButton(AlertDialog.BUTTON_POSITIVE)
                     confirmBtn.setOnClickListener{
+                        // Task Validation
+                        // If Only a time is provided change the date to today
+                        if (timeString != "null:null" && dateString == "null:null:null")
+                        {
+                            val calendar = Calendar.getInstance()
+                            dateString = "%02d:%02d:%04d".format(calendar.get(Calendar.DATE), calendar.get(Calendar.MONTH), calendar.get(Calendar.YEAR))
+
+                        }
 
                         //Habit Validation
                         val habitNameText = habitNameEditText.text.trim()
