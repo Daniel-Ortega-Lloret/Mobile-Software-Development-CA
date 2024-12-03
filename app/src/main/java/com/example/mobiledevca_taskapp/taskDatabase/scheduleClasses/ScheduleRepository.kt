@@ -112,4 +112,9 @@ class ScheduleRepository(private val scheduleDao: ScheduleDAO) : TaskAppReposito
     suspend fun deleteDay(day: Day) {
         scheduleDao.deleteDay(day)
     }
+
+    @WorkerThread
+    suspend fun getAllDays():List<Day> {
+        return scheduleDao.getAllStaticDays()
+    }
 }

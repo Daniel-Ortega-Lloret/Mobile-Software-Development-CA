@@ -21,7 +21,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
 //Everytime we change the schema (which we will) we update the version number
-@Database(entities = [Task::class, Day::class, Habit::class, DayTask::class, TimeSlot::class], version = 112)
+@Database(entities = [Task::class, Day::class, Habit::class, DayTask::class, TimeSlot::class], version = 134)
 @TypeConverters(TaskConverter::class, TimeSlotListConverter::class)
 abstract class TaskAppRoomDatabase : RoomDatabase() {
     abstract fun taskDao() : TaskDAO

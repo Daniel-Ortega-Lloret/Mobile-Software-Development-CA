@@ -2,31 +2,25 @@
 
 package com.example.mobiledevca_taskapp
 
-import android.content.res.Resources
 import android.os.Bundle
 import android.util.Log
-import android.view.Gravity
-import android.view.LayoutInflater
 import android.widget.Button
-import android.widget.GridLayout
 import android.widget.LinearLayout
 import android.widget.TextView
-import android.widget.Toast
 import androidx.lifecycle.LifecycleOwner
-import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.mobiledevca_taskapp.common.BaseActivity
 import com.example.mobiledevca_taskapp.taskDatabase.entities.Day
 import com.example.mobiledevca_taskapp.taskDatabase.entities.Task
 import com.example.mobiledevca_taskapp.taskDatabase.entities.TimeSlot
-import com.example.mobiledevca_taskapp.taskDatabase.scheduleClasses.ScheduleAdapter
 import com.example.mobiledevca_taskapp.taskDatabase.scheduleClasses.TimeSlotAdapter
 
 class ScheduleActivity : BaseActivity() {
     private lateinit var nextWeekBtn: Button
     private lateinit var previousWeekBtn: Button
     private var selectedDay: Day? = null
+    private lateinit var timeSlotAdapter: TimeSlotAdapter
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -38,30 +32,8 @@ class ScheduleActivity : BaseActivity() {
 
         val recyclerViewTimeSlots = findViewById<RecyclerView>(R.id.recyclerViewTimeSlots)
         recyclerViewTimeSlots.layoutManager = LinearLayoutManager(this)
-        val timeSlotAdapter = TimeSlotAdapter(emptyList())
+        timeSlotAdapter = TimeSlotAdapter(emptyList())
         recyclerViewTimeSlots.adapter = timeSlotAdapter
-
-        taskViewModel.allDays.observe(this as LifecycleOwner) { weekTasks ->
-            addDaysToLinearLayout(weekTasks)
-
-            if (weekTasks.isNotEmpty()) {
-                val monday = weekTasks.firstOrNull { it.dayName == "Mon" } ?: weekTasks[0]
-                selectedDay = monday
-                taskViewModel.updateTasksForSelectedDay(monday)
-                updateDayBackgrounds(weekTasks)
-            }
-
-            updateDaysTextForWeek(weekTasks)
-            updateDayBackgrounds(weekTasks)
-        }
-
-        taskViewModel.preLoadWeekTasks()
-
-        taskViewModel.selectedDayTasks.observe(this as LifecycleOwner) { tasks ->
-            val timeSlotsForThisDay = convertTasksToTimeSlots(tasks)
-
-            timeSlotAdapter.submitList(timeSlotsForThisDay)
-        }
 
         taskViewModel.selectedTimeSlots.observe(this as LifecycleOwner) { timeSlots ->
             Log.d("schedule", "timeslots for selected day are: $timeSlots")
@@ -154,5 +126,35 @@ class ScheduleActivity : BaseActivity() {
             )
         }
         return allTimeSlots
+    }
+
+    override fun onResume() {
+        super.onResume()
+        Log.d("schedule", "schedule resumed")
+        taskViewModel.allDays.observe(this as LifecycleOwner) { weekTasks ->
+            addDaysToLinearLayout(weekTasks)
+
+            if (weekTasks.isNotEmpty()) {
+                val monday = weekTasks.firstOrNull { it.dayName == "Mon" } ?: weekTasks[0]
+                selectedDay = monday
+                taskViewModel.updateTasksForSelectedDay(monday)
+                updateDayBackgrounds(weekTasks)
+            }
+
+            updateDaysTextForWeek(weekTasks)
+            updateDayBackgrounds(weekTasks)
+
+            Log.d("schedule", "received updated days $weekTasks")
+        }
+
+        taskViewModel.preLoadWeekTasks()
+
+        taskViewModel.selectedDayTasks.observe(this as LifecycleOwner) { tasks ->
+            val timeSlotsForThisDay = convertTasksToTimeSlots(tasks)
+
+            timeSlotAdapter.submitList(timeSlotsForThisDay)
+
+            Log.d("schedule", "received selected day tasks: $tasks")
+        }
     }
 }

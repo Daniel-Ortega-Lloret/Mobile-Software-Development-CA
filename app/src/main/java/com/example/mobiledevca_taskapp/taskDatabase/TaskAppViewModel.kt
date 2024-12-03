@@ -246,6 +246,7 @@ class TaskViewModel(application: Application, private val applicationScope: Coro
         withContext(Dispatchers.IO) {
             runBlocking {
                 val affectedDayIds = scheduleRepository.getDaysForTask(taskId)
+                Log.d("schedule", "updated with new day, lists look like this ${allDays.value}\n${selectedTimeSlots.value}\n${selectedDayTasks.value}")
 
                 for (dayId in affectedDayIds) {
                     val day = scheduleRepository.getDayById(dayId)
@@ -257,63 +258,46 @@ class TaskViewModel(application: Application, private val applicationScope: Coro
 
                             if (remainingTasks.isEmpty()) {
                                 // Delete empty TimeSlot
+                                Log.d("schedule", "timeslot $remainingTasks is empty")
+
                                 scheduleRepository.deleteTimeSlot(timeSlot)
                             } else {
                                 // Update TimeSlot with remaining tasks
+                                Log.d("schedule", "timeslot is not empty, $timeSlot")
                                 val updatedTimeSlot = timeSlot.copy(tasks = remainingTasks)
                                 scheduleRepository.updateTimeSlot(updatedTimeSlot)
                                 updatedTimeSlots.add(updatedTimeSlot)
                             }
                         }
 
+                        val updatedDay = day.copy(timeSlots = updatedTimeSlots)
+
                         if (updatedTimeSlots.isEmpty()) {
-                            scheduleRepository.deleteDay(day)
+                            Log.d("schedule", "updating empty day with timeslots of $updatedDay")
+                            scheduleRepository.deleteDay(updatedDay)
+
+                            // Post the new list of days after deletion
+                            val allDays = scheduleRepository.getAllDays()
+                            _allDays.postValue(allDays)
                         } else {
-                            scheduleRepository.updateDay(day.copy(timeSlots = updatedTimeSlots))
+                            Log.d("schedule", "udpating day with timeslots of$updatedDay")
+                            scheduleRepository.updateDay(updatedDay)
+                            updateTimeSlotsForDay(updatedDay)
+                            updateTasksForSelectedDay(updatedDay)
+                            updateTimeSlotsForSelectedDay(updatedDay)
+
+                            // Post the new list of days after update
+                            val allDays = scheduleRepository.getAllDays()
+                            _allDays.postValue(allDays)
                         }
                     }
                 }
             }
+            Log.d("schedule", "updated with new day, lists look like this ${allDays.value}\n${selectedTimeSlots.value}\n${selectedDayTasks.value}")
 
             taskRepository.deleteTask(taskId)
-
-            withContext(Dispatchers.Main) {
-                initializeSelectedDayToMonday()
-                val sdf = SimpleDateFormat("dd:MM:yyyy", Locale.getDefault())
-                val parsedDate = sdf.parse(selectedDay)
-                val calendar = Calendar.getInstance()
-                calendar.time = parsedDate ?: throw IllegalArgumentException("Invalid date format")
-
-                val dayNumber = calendar.get(Calendar.DAY_OF_MONTH)
-                val month = calendar.get(Calendar.MONTH) + 1
-                val year = calendar.get(Calendar.YEAR)
-                val currentDay = scheduleRepository.getDayByDate(dayNumber, month, year)
-
-                if (currentDay != null) {
-                    Log.d("schedule", "updating the UI")
-                    updateTasksForSelectedDay(currentDay)
-                    updateTimeSlotsForSelectedDay(currentDay)
-                }
-
-                val validDate = if (currentWeekStartDate.isNotBlank()) currentWeekStartDate else sdf.format(Date())
-                val updatedWeek = getWeekForDate(validDate)
-                _allDays.postValue(updatedWeek)
-            }
         }
     }
-
-    fun initializeSelectedDayToMonday() {
-        val calendar = Calendar.getInstance()
-
-        calendar.time = Date()
-
-        calendar.set(Calendar.DAY_OF_WEEK, Calendar.MONDAY)
-
-        val sdf = SimpleDateFormat("dd:MM:yyyy", Locale.getDefault())
-        selectedDay = sdf.format(calendar.time)
-    }
-
-
 
     fun ChangeCheckbox(task: Task) = viewModelScope.launch {
         taskRepository.ChangeCheckbox(task)
@@ -349,6 +333,8 @@ class TaskViewModel(application: Application, private val applicationScope: Coro
                 insertDayTask(day, task)
 
                 updateTimeSlotsForDay(day)
+
+                Log.d("schedule", "updated with new day, lists look like this ${allDays.value}\n${selectedTimeSlots.value}\n${selectedDayTasks.value}")
             }
 
         }

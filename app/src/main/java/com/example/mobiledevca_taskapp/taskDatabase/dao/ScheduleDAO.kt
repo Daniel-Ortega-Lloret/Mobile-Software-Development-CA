@@ -98,4 +98,7 @@ interface ScheduleDAO: BaseDAO<Day> {
 
     @Delete
     suspend fun deleteDay(day: Day)
+
+    @Query ("SELECT * FROM Day")
+    suspend fun getAllStaticDays() : List<Day>
 }
