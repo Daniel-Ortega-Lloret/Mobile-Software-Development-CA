@@ -34,14 +34,14 @@
             android:layout_gravity="start"
             android:fitsSystemWindows="false"
             app:menu="@menu/activity_app_drawer_drawer"
-            app:headerLayout="@layout/nav_bar_header"
+
 
             app:itemIconTint="@color/menu_item_text_color"
             app:itemTextColor="@color/menu_item_text_color"
             app:itemBackground="@drawable/nav_bar_buttons"
             app:itemRippleColor="@color/gray"
 
-            android:background="@drawable/nav_drawer_background"
+            android:background="@drawable/side_nav_bar_background"
         />
 
     </androidx.drawerlayout.widget.DrawerLayout>

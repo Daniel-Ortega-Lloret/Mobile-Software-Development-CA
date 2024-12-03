@@ -20,10 +20,6 @@
     <item android:title="Extras">
         <menu>
             <item
-                android:id="@+id/nav_help"
-                android:title="Help"
-            />
-            <item
                 android:id="@+id/nav_settings"
                 android:title="Settings"
             />
