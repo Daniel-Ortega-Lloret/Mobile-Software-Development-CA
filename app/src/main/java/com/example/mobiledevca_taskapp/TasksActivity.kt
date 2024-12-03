@@ -95,12 +95,5 @@ class TasksActivity : BaseActivity() {
                 fragmentManager, AddDataDialogFragment.TAG
             )
         }
-
-        val resetButton: Button = findViewById(R.id.Delete_Card)
-        resetButton.setOnClickListener{
-            taskViewModel.deleteAllTasks()
-            Toast.makeText(this, "All tasks deleted", Toast.LENGTH_SHORT).show()
-        }
-
     }
 }

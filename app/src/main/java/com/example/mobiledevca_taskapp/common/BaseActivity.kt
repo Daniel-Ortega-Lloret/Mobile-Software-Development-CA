@@ -187,11 +187,6 @@ abstract class BaseActivity : AppCompatActivity() {
         }
     }
 
-    //Handles the 3 dots icon menu
-    override fun onCreateOptionsMenu(menu: Menu): Boolean {
-        menuInflater.inflate(R.menu.app_drawer, menu)
-        return true
-    }
 
     //Updates highlighted menu item
     override fun onResume() {

@@ -53,9 +53,19 @@ class HabitsActivity : BaseActivity() {
             Manifest.permission.HIGH_SAMPLING_RATE_SENSORS
         )
         // Check and request permission
-        if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACTIVITY_RECOGNITION) == PackageManager.PERMISSION_GRANTED
-            && ContextCompat.checkSelfPermission(this, Manifest.permission.BODY_SENSORS) == PackageManager.PERMISSION_GRANTED
-            && ContextCompat.checkSelfPermission(this, Manifest.permission.HIGH_SAMPLING_RATE_SENSORS) == PackageManager.PERMISSION_GRANTED) {
+        if (ContextCompat.checkSelfPermission(
+                this,
+                Manifest.permission.ACTIVITY_RECOGNITION
+            ) == PackageManager.PERMISSION_GRANTED
+            && ContextCompat.checkSelfPermission(
+                this,
+                Manifest.permission.BODY_SENSORS
+            ) == PackageManager.PERMISSION_GRANTED
+            && ContextCompat.checkSelfPermission(
+                this,
+                Manifest.permission.HIGH_SAMPLING_RATE_SENSORS
+            ) == PackageManager.PERMISSION_GRANTED
+        ) {
 
             // All permissions are granted, bind to the service
             bindServiceWithPermission()
@@ -74,8 +84,8 @@ class HabitsActivity : BaseActivity() {
 
         val itemTouchHelper by lazy {
             val simpleItemTouchCallback =
-                object : ItemTouchHelper.SimpleCallback(ItemTouchHelper.UP or ItemTouchHelper.DOWN, 0)
-                {
+                object :
+                    ItemTouchHelper.SimpleCallback(ItemTouchHelper.UP or ItemTouchHelper.DOWN, 0) {
                     override fun onMove(
                         recyclerView: RecyclerView,
                         viewHolder: RecyclerView.ViewHolder,
@@ -98,7 +108,8 @@ class HabitsActivity : BaseActivity() {
         itemTouchHelper.attachToRecyclerView(_recyclerview)
 
         taskViewModel.allHabits.observe(this as LifecycleOwner) { habits ->
-            habits?.let{ adapter.submitList(it)}}
+            habits?.let { adapter.submitList(it) }
+        }
 
         checkExistingItems()
 
@@ -108,29 +119,14 @@ class HabitsActivity : BaseActivity() {
         name = getString(R.string.habits_name)
 
         val addHabitBtn: Button = findViewById(R.id.addHabitBtn)
-        addHabitBtn.setOnClickListener{
+        addHabitBtn.setOnClickListener {
             val addDataDialog = AddDataDialogFragment.newInstance(id, name)
             addDataDialog.show(
                 fragmentManager, AddDataDialogFragment.TAG
             )
         }
-
-        val resetHabitCountBtn: Button = findViewById(R.id.resetDailyBtn)
-        resetHabitCountBtn.setOnClickListener{
-            Log.d("debug", "Tried to reset")
-            val intent = Intent(this, HabitResetReceiver::class.java)
-            intent.putExtra("RESET_TYPE", 1)
-            this.sendBroadcast(intent)
-        }
-
-        val deleteHabitsBtn: Button = findViewById(R.id.deleteHabitBtn)
-        deleteHabitsBtn.setOnClickListener{
-            taskViewModel.deleteAllHabits()
-            stepCounterService?.cancelNotification()
-            taskViewModel.setStepItemAdded(false)
-            Toast.makeText(this, "All habits deleted", Toast.LENGTH_SHORT).show()
-        }
     }
+
 
     private fun bindServiceWithPermission() {
         if (checkPermission()) {
