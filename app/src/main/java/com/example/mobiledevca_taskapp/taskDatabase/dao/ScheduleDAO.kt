@@ -1,6 +1,5 @@
 package com.example.mobiledevca_taskapp.taskDatabase.dao
 
-import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.room.Dao
 import androidx.room.Delete
@@ -14,7 +13,6 @@ import com.example.mobiledevca_taskapp.taskDatabase.entities.DayTask
 import com.example.mobiledevca_taskapp.taskDatabase.entities.Task
 import com.example.mobiledevca_taskapp.taskDatabase.entities.TimeSlot
 import kotlinx.coroutines.flow.Flow
-import java.sql.Time
 
 @Dao
 interface ScheduleDAO: BaseDAO<Day> {

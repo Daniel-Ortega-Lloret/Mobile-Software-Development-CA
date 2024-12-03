@@ -2,7 +2,6 @@ package com.example.mobiledevca_taskapp.taskDatabase.taskClasses
 
 import android.util.Log
 import android.icu.util.Calendar
-import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup

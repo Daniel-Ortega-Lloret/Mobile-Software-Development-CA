@@ -1,6 +1,5 @@
 package com.example.mobiledevca_taskapp.taskDatabase.habitClasses
 
-import android.content.Intent
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
@@ -10,13 +9,10 @@ import androidx.fragment.app.FragmentManager
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
-import androidx.recyclerview.widget.RecyclerView.ViewHolder
 import com.example.mobiledevca_taskapp.R
 import com.example.mobiledevca_taskapp.fragments.UpdateDataDialogFragment
-import com.example.mobiledevca_taskapp.services.StepCounterService
 import com.example.mobiledevca_taskapp.taskDatabase.TaskViewModel
 import com.example.mobiledevca_taskapp.taskDatabase.entities.Habit
-import com.example.mobiledevca_taskapp.taskDatabase.habitClasses.HabitListAdapter.HabitCountViewHolder
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 
 class HabitListAdapter(private val fragmentManager: FragmentManager, private val taskViewModel: TaskViewModel) : ListAdapter<Habit, RecyclerView.ViewHolder>(HABIT_COMPARATOR) {

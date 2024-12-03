@@ -27,7 +27,6 @@ import kotlinx.coroutines.withContext
 import java.text.ParseException
 import java.text.SimpleDateFormat
 import java.util.Calendar
-import javax.microedition.khronos.opengles.GL10
 import java.util.Date
 import java.util.Locale
 import java.util.concurrent.Executors

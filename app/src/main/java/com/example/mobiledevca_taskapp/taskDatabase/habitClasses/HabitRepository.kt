@@ -4,8 +4,6 @@ import androidx.annotation.WorkerThread
 import com.example.mobiledevca_taskapp.taskDatabase.TaskAppRepository
 import com.example.mobiledevca_taskapp.taskDatabase.dao.HabitDAO
 import com.example.mobiledevca_taskapp.taskDatabase.entities.Habit
-import com.example.mobiledevca_taskapp.taskDatabase.entities.Task
-import kotlinx.coroutines.flow.forEach
 
 class HabitRepository(private val habitDao: HabitDAO) : TaskAppRepository<Habit>(habitDao){
     @WorkerThread

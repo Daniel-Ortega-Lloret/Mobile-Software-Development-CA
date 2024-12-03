@@ -3,7 +3,6 @@ package com.example.mobiledevca_taskapp.broadcast_receivers
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
-import android.os.Build
 import com.example.mobiledevca_taskapp.services.StepCounterService
 
 //Re-starts the step counter after a device reboot

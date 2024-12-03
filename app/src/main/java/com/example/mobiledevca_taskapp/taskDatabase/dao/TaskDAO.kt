@@ -1,15 +1,8 @@
 package com.example.mobiledevca_taskapp.taskDatabase.dao
 
-import androidx.lifecycle.LiveData
 import androidx.room.Dao
-import androidx.room.Insert
-import androidx.room.OnConflictStrategy
 import androidx.room.Query
-import androidx.room.Update
-import androidx.room.Transaction
-import com.example.mobiledevca_taskapp.taskDatabase.entities.Day
 import com.example.mobiledevca_taskapp.taskDatabase.entities.Task
-import com.example.mobiledevca_taskapp.taskDatabase.entities.TimeSlot
 import kotlinx.coroutines.flow.Flow
 
 @Dao //Data Access Object pattern for accessing DB

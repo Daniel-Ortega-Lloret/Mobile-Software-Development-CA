@@ -24,7 +24,6 @@ import androidx.lifecycle.LifecycleOwner
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.example.mobiledevca_taskapp.broadcast_receivers.HabitResetReceiver
 import com.example.mobiledevca_taskapp.common.BaseActivity
 import com.example.mobiledevca_taskapp.fragments.AddDataDialogFragment
 import com.example.mobiledevca_taskapp.services.StepCounterService
@@ -213,7 +212,6 @@ class HabitsActivity : BaseActivity() {
     }
 
     private fun retrievePendingSteps(habits: List<Habit>) {
-//        Log.d("debug", "Processing pending steps for habits: $habits")
         if (habits.isNotEmpty()) {
             stepCounterService?.pushPendingSteps() // Process steps
         }
@@ -231,10 +229,8 @@ class HabitsActivity : BaseActivity() {
                 stopStepCounterService()
             }
         }
-//        startStepCounterService()
         taskViewModel.allHabits.observe(this as LifecycleOwner) { habits ->
             habits?.let{ adapter.submitList(it)}
-//            Log.d("debug", "Habits observed: $habits")
             if (habits != null && habits.isNotEmpty()) {
                 if (!pendingStepsProcessed) {
                     retrievePendingSteps(habits)

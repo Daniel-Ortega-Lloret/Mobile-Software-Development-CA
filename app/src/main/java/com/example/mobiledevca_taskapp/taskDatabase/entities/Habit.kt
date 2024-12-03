@@ -1,7 +1,6 @@
 package com.example.mobiledevca_taskapp.taskDatabase.entities
 
 import androidx.room.Entity
-import androidx.room.Ignore
 import androidx.room.PrimaryKey
 
 @Entity
