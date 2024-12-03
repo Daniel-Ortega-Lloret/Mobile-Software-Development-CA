@@ -13,7 +13,9 @@ import android.os.Build
 import android.os.Bundle
 import android.os.IBinder
 import android.util.Log
+import android.view.View
 import android.widget.Button
+import android.widget.TextView
 import android.widget.Toast
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
@@ -219,6 +221,9 @@ class HabitsActivity : BaseActivity() {
 
     override fun onStart() {
         super.onStart()
+
+        val habitActivityLabel = findViewById<TextView>(R.id.habitActivityLabel)
+
         taskViewModel.isStepItemAdded.observe(this) { isAdded ->
             if (isAdded) {
                 startStepCounterService()
@@ -235,8 +240,10 @@ class HabitsActivity : BaseActivity() {
                     retrievePendingSteps(habits)
                     pendingStepsProcessed = true
                 }
+                habitActivityLabel.visibility = View.GONE
             } else {
                 Log.d("debug", "Habits not yet loaded")
+                habitActivityLabel.visibility = View.VISIBLE
             }
         }
 

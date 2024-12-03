@@ -3,7 +3,9 @@
 package com.example.mobiledevca_taskapp
 
 import android.os.Bundle
+import android.view.View
 import android.widget.Button
+import android.widget.TextView
 import android.widget.Toast
 import androidx.fragment.app.FragmentManager
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -30,6 +32,8 @@ class TasksActivity : BaseActivity() {
     private lateinit var name : String
 
 
+    private lateinit var adapter : TaskListAdapter
+
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -47,7 +51,7 @@ class TasksActivity : BaseActivity() {
         fragmentManager = supportFragmentManager
 
         // Passing fragment manager for dialogs, taskViewModel for dao changes
-        val adapter = TaskListAdapter(supportFragmentManager, taskViewModel)
+        adapter = TaskListAdapter(supportFragmentManager, taskViewModel)
         _recyclerview.adapter = adapter
 
         // Set a linear layout manager on the recycler view then generate an adapter and attach it
@@ -81,9 +85,7 @@ class TasksActivity : BaseActivity() {
         }
         itemTouchHelper.attachToRecyclerView(_recyclerview)
 
-        taskViewModel.allTasks.observe(this as LifecycleOwner) {tasks ->
-            tasks?.let { adapter.submitList(it) }
-        }
+
 
         id = getString(R.string.tasks_id)
         name = getString(R.string.tasks_name)
@@ -94,6 +96,22 @@ class TasksActivity : BaseActivity() {
             addDataDialog.show(
                 fragmentManager, AddDataDialogFragment.TAG
             )
+        }
+    }
+
+    override fun onResume() {
+        super.onResume()
+
+        val taskActivityLabel = findViewById<TextView>(R.id.taskActivityLabel)
+
+        taskViewModel.allTasks.observe(this as LifecycleOwner) {tasks ->
+            if (tasks.isNullOrEmpty()){
+                taskActivityLabel.visibility = View.VISIBLE
+            }
+            else{
+                taskActivityLabel.visibility = View.GONE
+            }
+            tasks.let { adapter.submitList(it) }
         }
     }
 }
